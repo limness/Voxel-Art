@@ -9,7 +9,7 @@
 AVoxelLandscape::AVoxelLandscape()
 {
 	PrimaryActorTick.bCanEverTick = true; 
-	PrimaryActorTick.bHighPriority = true;
+//	PrimaryActorTick.bHighPriority = true;
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RootComponent = SceneComponent;
@@ -17,13 +17,6 @@ AVoxelLandscape::AVoxelLandscape()
 	/* Object pooler component */
 	PoolChunks = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("PoolChunks"));
 }
-
-#if WITH_EDITOR
-bool AVoxelLandscape::ShouldTickIfViewportsOnly() const
-{
-	return true;
-}
-#endif
 
 void AVoxelLandscape::BeginPlay()
 {
@@ -38,20 +31,18 @@ void AVoxelLandscape::PostLoad()
 {
 	Super::PostLoad();
 }
-#include "EditorViewportClient.h"
 
 void AVoxelLandscape::CreateVoxelWorld()
 {
 	if (generatorLandscape)
 	{
-		///89
 		if (minimumLOD < 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Minimum LOD can't be under zero!"));
+			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be under zero!"));
 		}
 		else if (minimumLOD > maximumLOD)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Minimum LOD can't be upper Maximum LOD!"));
+			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be upper Maximum LOD!"));
 		}
 		else
 		{
@@ -72,13 +63,13 @@ void AVoxelLandscape::CreateVoxelWorld()
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Log: Voxel World has already been created!"));
+				UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Log: Voxel World has already been created!"));
 			}
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Generator of lansdcape is not exist!"));
+		UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Generator of lansdcape is not exist!"));
 	}
 }
 
@@ -217,20 +208,20 @@ void AVoxelLandscape::UpdateOctree()
 			{
 				if (!chunk->CurrentOctree.Pin()->HasChildren())
 				{
-				//	if (IsValid(chunk->CurrentOctree.Pin()->chunk))
+					if (IsValid(chunk->CurrentOctree.Pin()->chunk))
 					{
-				//		if (chunk->CurrentOctree.Pin()->chunk->Active == true)
+						if (chunk->CurrentOctree.Pin()->chunk->Active == true)
 						{
 							ChunksRemoving.Add(chunk->CurrentOctree.Pin()->chunk);
 						}
 					}
-				//	SpawnChunk(chunk->CurrentOctree.Pin());
+					SpawnChunk(chunk->CurrentOctree.Pin());
 					Index++;
 				}
 			}
 		}
 	}
-	/*{
+	{
 		FScopeLock Lock(&GlobalMutex);
 
 		while (ChunksGeneration.Num() > 0)
@@ -243,7 +234,7 @@ void AVoxelLandscape::UpdateOctree()
 				}
 			}
 		}
-	}*/
+	}
 	{
 		FScopeLock Lock(&GlobalMutex);
 
@@ -273,8 +264,6 @@ void AVoxelLandscape::UpdateOctree()
 					{
 						if (chunk->Active == true)
 						{
-							//	FScopeLock Lock(&GlobalMutex);
-								//chunk->Destroy();
 							chunk->SetActive(false);
 						}
 					}
@@ -313,7 +302,7 @@ void AVoxelLandscape::GenerateLandscape()
 
 	GenerateOctree(chunksBuffer, 0);
 
-	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Landscape was generated"));
+	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Landscape was generated"));
 }
 
 void AVoxelLandscape::CreateTextureDensityMap()
@@ -333,7 +322,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
+					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
 					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
@@ -342,7 +331,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 					if (PixelColorWB == 191)
 					{
-						//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] It's 121"));
+						//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's 121"));
 
 						FColor PixelColorRGB = GeneratorDensity->GetColorMap(FVector(
 							static_cast<float>((x - width * 0.5f) * StepTexture),
@@ -357,7 +346,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 					}
 					else
 					{
-						//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] It's not 121 but it's %d"), PixelColorWB);
+						//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's not 121 but it's %d"), PixelColorWB);
 
 						pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
 						pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
@@ -373,14 +362,14 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
+					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
 					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
 						0)
 					), -1.f, 1.0f) * 63.f + 128);
 
-					//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] It's not 121 but it's %d"), PixelColorWB);
+					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's not 121 but it's %d"), PixelColorWB);
 
 					pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
 					pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
@@ -422,8 +411,8 @@ void AVoxelLandscape::CreateTextureDensityMap()
 		Texture->UpdateResource();
 		Package->MarkPackageDirty();
 
-		UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Density Map Texture was created!"));
-		UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Check your directory to find it"));
+		UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Density Map Texture was created!"));
+		UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Check your directory to find it"));
 
 		free(pixels);
 		pixels = NULL;
@@ -431,91 +420,9 @@ void AVoxelLandscape::CreateTextureDensityMap()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: You should choose generator of the density!"));
+		UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: You should choose generator of the density!"));
 	}
 }
-
-//void AVoxelLandscape::ImportTextureToDensity()
-//{
-
-/*	FTexture2DMipMap* MyMipMap = &MyTexture->PlatformData->Mips[0];
-//	FByteBulkData* RawImageData = &MyMipMap->BulkData;
-
-	// Texture Information
-	FString FileName = FString("MyTexture");
-	int width = (int)MyMipMap->SizeX;
-	int height = (int)MyMipMap->SizeY;
-	uint8* pixels = (uint8*)malloc(width * height * 4);
-/*
-	MyTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
-	MyTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
-	MyTexture->SRGB = false;
-	MyTexture->UpdateResource();
-
-	TextureCompressionSettings OldCompressionSettings = MyTexture->CompressionSettings; TextureMipGenSettings OldMipGenSettings = MyTexture->MipGenSettings; bool OldSRGB = MyTexture->SRGB;
-
-	const FColor* FormatedImageData = static_cast<const FColor*>(MyTexture->PlatformData->Mips[0].BulkData.LockReadOnly());*/
-	
-	// filling the pixels with dummy data (4 boxes: red, green, blue and white)
-	/*for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Landscape was generated %f and smoothed %f"), GetValueNoise(FVector(static_cast<float>((x - width / 2) * StepTexture), static_cast<float>((y - height / 2) * StepTexture), 0)), FMath::Clamp((GetValueNoise(FVector(static_cast<float>((x - width / 2.f) * StepTexture), static_cast<float>((y - height / 2.f) * StepTexture), 0)) / (131000.f)), -1.f, 1.0f));
-
-			pixels[y * 4 * width + x * 4 + 0] = (uint8)(FMath::Clamp((GetValueNoise(FVector(static_cast<float>((x - width / 2.f) * StepTexture), static_cast<float>((y - height / 2.f) * StepTexture), 0)) / (height * StepTexture)), -1.f, 1.0f) * 63.f + 128);//(FormatedImageData[y * width + x].R + FormatedImageData[y * width + x].G + FormatedImageData[y * width + x].G) / 3;   // R
-			pixels[y * 4 * width + x * 4 + 1] = (uint8)(FMath::Clamp((GetValueNoise(FVector(static_cast<float>((x - width / 2.f) * StepTexture), static_cast<float>((y - height / 2.f) * StepTexture), 0)) / (height * StepTexture)), -1.f, 1.0f) * 63.f + 128);//(FormatedImageData[y * width + x].R + FormatedImageData[y * width + x].G + FormatedImageData[y * width + x].G) / 3;   // G
-			pixels[y * 4 * width + x * 4 + 2] = (uint8)(FMath::Clamp((GetValueNoise(FVector(static_cast<float>((x - width / 2.f) * StepTexture), static_cast<float>((y - height / 2.f) * StepTexture), 0)) / (height * StepTexture)), -1.f, 1.0f) * 63.f + 128);//(FormatedImageData[y * width + x].R + FormatedImageData[y * width + x].G + FormatedImageData[y * width + x].G) / 3;   // B
-			pixels[y * 4 * width + x * 4 + 3] = 255;
-		}
-	}*/
-
-	/*MyTexture->PlatformData->Mips[0].BulkData.Unlock();
-
-	MyTexture->CompressionSettings = OldCompressionSettings;
-	MyTexture->MipGenSettings = OldMipGenSettings;
-	MyTexture->SRGB = OldSRGB;
-	MyTexture->UpdateResource();*/
-
-	
-	// Create Package
-	/*FString pathPackage = FString("/Game/MyTextures/");
-	FString absolutePathPackage = FPaths::GameContentDir() + "/MyTextures/";
-
-	FPackageName::RegisterMountPoint(*pathPackage, *absolutePathPackage);
-
-	UPackage* Package = CreatePackage(nullptr, *pathPackage);
-	FName TextureName = MakeUniqueObjectName(Package, UTexture2D::StaticClass(), FName(*FileName));
-
-	
-	UTexture2D* Texture = NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone);
-
-	// Texture Settings
-	Texture->PlatformData = new FTexturePlatformData();
-	Texture->PlatformData->SizeX = width;
-	Texture->PlatformData->SizeY = height;
-	Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
-
-	// Passing the pixels information to the texture
-	FTexture2DMipMap* Mip = new(Texture->PlatformData->Mips) FTexture2DMipMap();
-	Mip->SizeX = width;
-	Mip->SizeY = height;
-
-	Mip->BulkData.Lock(LOCK_READ_WRITE);
-	uint8* TextureData = (uint8*)Mip->BulkData.Realloc(height * width * sizeof(uint8) * 4);
-	FMemory::Memcpy(TextureData, pixels, sizeof(uint8) * height * width * 4);
-	Mip->BulkData.Unlock();
-
-	// Updating Texture & mark it as unsaved
-	Texture->AddToRoot();
-	Texture->UpdateResource();
-	Package->MarkPackageDirty();
-
-	UE_LOG(LogTemp, Log, TEXT("Texture created: %s"), &FileName);
-
-	free(pixels);
-	pixels = NULL;*/
-//}
 
 void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 level)
 {
@@ -645,3 +552,10 @@ void AVoxelLandscape::ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData>
 		chunkData->chunk = chunk;
 	}
 }
+
+#if WITH_EDITOR
+bool AVoxelLandscape::ShouldTickIfViewportsOnly() const
+{
+	return true;
+}
+#endif
