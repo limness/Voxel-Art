@@ -44,6 +44,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 {
 	if (generatorLandscape)
 	{
+		///
 		if (minimumLOD < 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Minimum LOD can't be under zero!"));
