@@ -54,23 +54,6 @@ void AVoxelLandscape::CreateVoxelWorld()
 		}
 		else
 		{
-
-#if WITH_EDITOR
-			if (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview)
-			{
-				APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-				if ((CameraManager))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Generate Voxel World from Editor %s"), *(CameraManager->GetCameraLocation() - GetActorLocation()).ToString());
-				}
-				FViewport* activeViewport = GEditor->GetActiveViewport();
-				FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
-				if (activeViewport)
-				{
-					UE_LOG(LogTemp, Display, TEXT("Camera Location: %s"), *editorViewClient->GetViewLocation().ToString());
-				}
-			}
-#endif
 			if (!TerrainCreated)
 			{
 				GenerateLandscape();
@@ -108,12 +91,6 @@ void AVoxelLandscape::DestroyVoxelWorld()
 			delete ManagerCheckPositionThreadHandle;
 			ManagerCheckPositionThreadHandle = nullptr;
 		}
-		/*if (RendererCheckPositionThreadHandle)
-		{
-			RendererCheckPositionThreadHandle->EnsureCompletion();
-			delete RendererCheckPositionThreadHandle;
-			RendererCheckPositionThreadHandle = nullptr;
-		}*/
 		if (OctreeNeighborsChecker)
 		{
 			OctreeNeighborsChecker->EnsureCompletion();
@@ -161,12 +138,6 @@ void AVoxelLandscape::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		delete ManagerCheckPositionThreadHandle;
 		ManagerCheckPositionThreadHandle = nullptr;
 	}
-	/*if (RendererCheckPositionThreadHandle)
-	{
-		RendererCheckPositionThreadHandle->EnsureCompletion();
-		delete RendererCheckPositionThreadHandle;
-		RendererCheckPositionThreadHandle = nullptr;
-	}*/
 	if (OctreeNeighborsChecker)
 	{
 		OctreeNeighborsChecker->EnsureCompletion();
@@ -187,7 +158,6 @@ void AVoxelLandscape::Tick(float DeltaTime)
 #if WITH_EDITOR
 		if (TerrainCreated)
 		{
-			//UE_LOG(LogTemp, Display, TEXT("Entered from editor yees"));
 			UpdateOctree();
 		}
 #endif
