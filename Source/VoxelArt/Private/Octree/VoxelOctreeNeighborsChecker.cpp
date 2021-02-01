@@ -34,12 +34,8 @@ namespace DirectionOctree
 }
 
 VoxelOctreeNeighborsChecker::VoxelOctreeNeighborsChecker(AVoxelLandscape* _World)
+	: World(_World)
 {
-	World = _World;
-
-	m_Kill = false;
-	m_Pause = false;
-
 	m_semaphore = FGenericPlatformProcess::GetSynchEventFromPool(false);
 
 	Thread = FRunnableThread::Create(this, TEXT("CheckOctreeNeighbors"), 0, TPri_BelowNormal);
@@ -87,25 +83,13 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 				FScopeLock Lock(&World->GlobalMutex);
 				CheckOctree((World->chunksBuffer), 0);
 
-				for(auto& it : ChunksGeneration)
+				for (auto& it : ChunksGeneration)
 				{
 					World->ChunksGeneration.Add(it);
 				}
-			/*	for (auto& chunk : World->ChunksCreation)
-				{
-					float distancePlayer = sqrt(
-						pow(LocalPlayerPosition.X - chunk->position.X, 2) +
-						pow(LocalPlayerPosition.Y - chunk->position.Y, 2) +
-						pow(LocalPlayerPosition.Z - chunk->position.Z, 2)
-					);
-					chunk->priority = distancePlayer;
-				}
-				World->ChunksGeneration.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
-					{
-						return A->priority > B->priority;
-					});*/
-				ChunksGeneration.Empty();
 			}
+			ChunksGeneration.Empty();
+
 			FPlatformProcess::Sleep(0.11);
 		}
 	}
@@ -333,18 +317,6 @@ TArray<TWeakPtr<FVoxelOctreeData>> VoxelOctreeNeighborsChecker::GetNodeNeighbors
 		if (!biggerNeighbor.Pin()->cUpdating)
 		{
 			smallerNeighbors = GetSmallerNeighbors<Direction>(biggerNeighbor.Pin()->level, level, nodeID, biggerNeighbor);
-
-			/*	for (auto it : smallerNeighbors)
-				{
-					AsyncTask(ENamedThreads::GameThread, [=]()
-						{
-							for (auto it : smallerNeighbors)
-							{
-								World->SpawnBoxTest(it->position, it->radius / 2.f, 25.f, FColor::Red);
-							}
-						});
-				}
-			*/
 		}
 	}
 	return smallerNeighbors;
@@ -391,11 +363,6 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk
 							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }
 
 							ChunksGeneration.Add(chunk->chunk);
-						}
-						else
-						{
-
-							//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] no Called %d"), chunk->transvoxelDirection);
 						}
 					}
 				}

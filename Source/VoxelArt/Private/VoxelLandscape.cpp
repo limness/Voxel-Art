@@ -117,8 +117,6 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 void AVoxelLandscape::SpawnBoxTest(FVector location, float radius, float width, FColor color)
 {
-//	DrawDebugSphere(GetWorld(), location, radius, 26, FColor(181, 0, 0), false, 13.f, 13.f, width);
-
 	DrawDebugBox(GetWorld(), location, FVector(radius, radius, radius), color, false, 13.f, 5, width);
 }
 

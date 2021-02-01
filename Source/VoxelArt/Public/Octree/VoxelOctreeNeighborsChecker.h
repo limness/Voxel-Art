@@ -9,9 +9,6 @@
 
 class AVoxelLandscape;
 
-/**
- *
- */
 class VOXELART_API VoxelOctreeNeighborsChecker : public FRunnable
 {
 
@@ -29,6 +26,26 @@ public:
 	virtual void Stop();
 
 	bool IsThreadPaused();
+
+private:
+
+	TArray<AVoxelChunk*> ChunksGeneration;
+
+private:
+
+	AVoxelLandscape* World;
+
+private:
+
+	FRunnableThread* Thread;
+
+	FCriticalSection m_mutex;
+	FEvent* m_semaphore;
+
+	FThreadSafeBool m_Kill;
+	FThreadSafeBool m_Pause;
+
+private:
 
 	template<uint8 Direction>
 	TArray<TWeakPtr<FVoxelOctreeData>> GetNodeNeighbors(int level, uint64 nodeID);
@@ -53,20 +70,4 @@ public:
 	TWeakPtr<FVoxelOctreeData> FindNodeByID(TWeakPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level);
-
-	TArray<AVoxelChunk*> ChunksGeneration;
-
-private:
-
-	AVoxelLandscape* World;
-
-private:
-
-	FRunnableThread* Thread;
-
-	FCriticalSection m_mutex;
-	FEvent* m_semaphore;
-
-	FThreadSafeBool m_Kill;
-	FThreadSafeBool m_Pause;
 };

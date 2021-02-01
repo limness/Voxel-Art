@@ -1,35 +1,21 @@
 ﻿
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "VoxelLandscape.h"
 #include "Octree/VoxelManager.h"
 
 #include "Editor.h"
 #include "EditorViewportClient.h"
 
-#include "VoxelLandscape.h"
-//#include "VOXELENGINE421.h"
-
 #define NORMALS_SKIRT 2
 #define NORMALS_SKIRT_HALF 1
 
-VoxelManager::VoxelManager(
-	AVoxelLandscape* _World,
-	APlayerController* _PlayerController, 
-	float _UpdatingOctreeRadius,
-	int _MaximumLOD)
+VoxelManager::VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, float _UpdatingOctreeRadius, int _MaximumLOD) 
+	: World(_World)
+	, PlayerController(_PlayerController)
+	, UpdatingOctreeRadius(_UpdatingOctreeRadius)
+	, MaximumLOD(_MaximumLOD)
 {
-	World = _World;
-	PlayerController = _PlayerController;
-	UpdatingOctreeRadius = _UpdatingOctreeRadius;
-	MaximumLOD = _MaximumLOD;
-
-	if (OctreeCopy == nullptr)
-	{
-
-	}
-	m_Kill = false;
-	m_Pause = false;
-
 	m_semaphore = FGenericPlatformProcess::GetSynchEventFromPool(false);
 
 	Thread = FRunnableThread::Create(this, TEXT("CheckPosition"), 0, TPri_BelowNormal);
@@ -52,7 +38,7 @@ VoxelManager::~VoxelManager()
 
 bool VoxelManager::Init()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : Octree Manager init ]"));
+	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : Octree Manager init ]"));
 	return true;
 }
 
@@ -85,13 +71,10 @@ uint32 VoxelManager::Run()
 					{
 						PlayerPositionToWorld = editorViewClient->GetViewLocation() - World->GetActorLocation();
 					}
-					//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Log: Generate Voxel World from Editor inside Voxel Manager %s"), *PlayerPositionToWorld.ToString());
 				}
 			}
 			else
 			{
-			//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Error: Generate Voxel World from game inside Voxel Manager"));
-
 				if (PlayerController->GetPawn() != nullptr)
 				{
 					if (PlayerPositionToWorld != PlayerController->GetPawn()->GetActorLocation() - World->GetActorLocation())
@@ -139,8 +122,6 @@ uint32 VoxelManager::Run()
 						renderInfo->ChunksCreation.Empty();
 						renderInfo->ChunksRemoving.Empty();
 					}
-				//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : LODManager ] Send data"));
-
 					chunksToChange->ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
 						{
 							return A->priority > B->priority;
@@ -204,8 +185,6 @@ bool VoxelManager::IsThreadPaused()
 	return (bool)m_Pause;
 }
 
-#include "DrawDebugHelpers.h"
-
 int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 {
 	float distanceLODs = UpdatingOctreeRadius;
@@ -227,8 +206,6 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 
 			if (distancePlayer <= distanceLODs / 2.f)
 			{
-				//Set the status "Updating" 
-				//So our chunk doesn't get disturbed
 				chunk->cUpdating = true;
 
 				for (int i = 0; i < 8; i++)
@@ -243,9 +220,6 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						Y * radiusChild + chunk->position.Y - radiusChild / 2.f,
 						Z * radiusChild + chunk->position.Z - radiusChild / 2.f
 					);
-
-					//FVoxelOctreeData* chunkLittle(new FVoxelOctreeData());
-					//FVoxelOctreeData* chunkLittle = land->SavedChunks.FindAndRemoveChecked((chunk->nodeID << 3) | i);//(new FVoxelOctreeData());
 
 					TSharedPtr<FVoxelOctreeData> chunkLittle(new FVoxelOctreeData());//(new FVoxelOctreeData());
 					bool GettingHash = World->SavedChunks.RemoveAndCopyValue((chunk->nodeID << 3) | i, chunkLittle);
@@ -286,15 +260,7 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						ChunkCreation->radius = it->radius;
 						ChunkCreation->transvoxelDirection = it->transvoxelDirection;
 
-						//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] creating node %d removing %p chunk from node %d"), it->nodeID, chunk->chunk, chunk->nodeID);
-
-					//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : LODManager ] hasn't children chunk creation leaf %p %d"), it.Get(), it->nodeID);
-
-					//	chunk->ChunksShouldBeRemovedCounter += 1;
-					//	ChunkCreation->ChunksShouldBeRemoved.Add(chunk->chunk);
-
 						chunksToChange->ChunksCreation.Add(ChunkCreation);
-						//chunksToChange->ChunksGeneration.Add(it);
 					}
 					chunksToChange->LeavesCreation.Add(chunkLittle);
 				}
@@ -307,8 +273,6 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						chunk->chunk = nullptr;
 					}
 				}
-
-			//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : LODManager ] hasn't removing %p %d"), chunk->chunk, chunk->nodeID);
 			}
 		}
 		else if (chunk->HasChildren())
@@ -323,8 +287,6 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 					{
 						if (chunk->ChildrenChunks[i]->cUpdating == false)
 						{
-							//FVector positionChunk = chunk->ChildrenChunks[i]->position;
-
 							float distancePlayer = sqrt(
 								pow(PlayerPositionToWorld.X - chunk->ChildrenChunks[i]->position.X, 2) +
 								pow(PlayerPositionToWorld.Y - chunk->ChildrenChunks[i]->position.Y, 2) +
@@ -342,44 +304,6 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 				if (farFromPlayer == 8)
 				{
 					chunk->cUpdating = true;
-					//chunk->kostyl = true;
-
-					TArray<TSharedPtr<FVoxelOctreeData>> ChunksToGeneration = GetLeavesChunk(chunk);
-						
-					/*bool GridIsExist = false;
-
-						
-					if(GridIsExist)
-					{
-						int voxels = land->voxelsOneChunk;
-
-						chunk->Grid.Init(-1.0, (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT));
-
-						uint32 Index = 0;
-
-						for (auto it : ChunksToGeneration)
-						{
-							int X = Index % 2;
-							int Y = Index % 4 / 2;
-							int Z = Index / 4;
-
-							if (it->chunk != nullptr)
-							{
-								for (int ZChildren = NORMALS_SKIRT_HALF, ZParent = NORMALS_SKIRT_HALF + Z * voxels / 2; ZChildren < voxels + 1 + NORMALS_SKIRT_HALF; ZChildren += 2, ZParent++)
-								{
-									for (int YChildren = NORMALS_SKIRT_HALF, YParent = NORMALS_SKIRT_HALF + Y * voxels / 2; YChildren < voxels + 1 + NORMALS_SKIRT_HALF; YChildren += 2, YParent++)
-									{
-										for (int XChildren = NORMALS_SKIRT_HALF, XParent = NORMALS_SKIRT_HALF + X * voxels / 2; XChildren < voxels + 1 + NORMALS_SKIRT_HALF; XChildren += 2, XParent++)
-										{
-											chunk->Grid[XParent + YParent * (voxels + 1 + NORMALS_SKIRT) + ZParent * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] =
-												it->chunk->Grid[XChildren + YChildren * (voxels + 1 + NORMALS_SKIRT) + ZChildren * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
-										}
-									}
-								}
-							}
-							Index++;
-						}
-					}*/
 
 					TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
 					ChunkCreation->CurrentOctree = chunk;
@@ -390,15 +314,8 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 					ChunkCreation->radius = chunk->radius;
 					ChunkCreation->transvoxelDirection = chunk->transvoxelDirection;
 
-					for (auto it : ChunksToGeneration)
+					for (auto it : GetLeavesChunk(chunk))
 					{
-					/*	if (it->chunk != nullptr)
-						{
-							if (it->chunk->hasOwnGrid)
-							{
-								GridIsExist = true;
-							}
-						}*/
 						if (IsValid(it->chunk))
 						{
 							if (it->chunk->Active == true)
@@ -426,10 +343,9 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 			{
 				if (World->maximumLOD > level + 1)
 				{
-					for (int i = 0; i < 8; i++)
-						//for (auto child : chunk->GetChildren())
+					for (auto child : chunk->GetChildren())
 					{
-						CheckOctree(chunk->ChildrenChunks[i], level + 1);
+						CheckOctree(child, level + 1);
 					}
 				}
 			}
@@ -450,7 +366,6 @@ TArray<TSharedPtr<FVoxelOctreeData>> VoxelManager::GetLeavesChunk(TSharedPtr<FVo
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				//if(chunk->ChildrenChunks[i])
 				TArray <TSharedPtr<FVoxelOctreeData>> candidatesSmaller = GetLeavesChunk(chunk->ChildrenChunks[i]);
 
 				for (auto it : candidatesSmaller)
