@@ -9,7 +9,7 @@
 AVoxelChunk::AVoxelChunk()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	RootComponent = mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RootComponent"));
 
 	mesh->bCastShadowAsTwoSided = true;

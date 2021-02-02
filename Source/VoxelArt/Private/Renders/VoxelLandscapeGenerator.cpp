@@ -6,7 +6,48 @@
 
 UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitializer& objectInitializer) : Super(objectInitializer)
 {
+	if (HeightmapTexture && World)
+	{
+		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
 
+		WidthTexture = (int)MyMipMap->SizeX;
+		HeightTexture = (int)MyMipMap->SizeY;
+
+		HeightmapTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+		HeightmapTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+		HeightmapTexture->SRGB = false;
+		HeightmapTexture->UpdateResource();
+
+		TextureCompressionSettings OldCompressionSettings = HeightmapTexture->CompressionSettings; 
+		TextureMipGenSettings OldMipGenSettings = HeightmapTexture->MipGenSettings; 
+		bool OldSRGB = HeightmapTexture->SRGB;
+
+		const FColor* FormatedImageData = static_cast<const FColor*>(HeightmapTexture->PlatformData->Mips[0].BulkData.LockReadOnly());
+
+		TextureMap.Init(FColor(0, 0, 0), WidthTexture * HeightTexture);
+
+		for (int y = 0; y < HeightTexture; y++)
+		{
+			for (int x = 0; x < WidthTexture; x++)
+			{
+				TextureMap[y * WidthTexture + x] = FormatedImageData[y * WidthTexture + x];
+			}
+		}
+
+		HeightmapTexture->PlatformData->Mips[0].BulkData.Unlock();
+
+		HeightmapTexture->CompressionSettings = OldCompressionSettings;
+		HeightmapTexture->MipGenSettings = OldMipGenSettings;
+		HeightmapTexture->SRGB = OldSRGB;
+		HeightmapTexture->UpdateResource();
+
+		RadiusHeighestVoxel = World->radiusOfChunk / (float)World->voxelsOneChunk;
+
+		for (int i = 0; i < World->maximumLOD; i++)
+		{
+ 			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
+		}
+	}
 }
 
 /*void UVoxelLandscapeGenerator::GetNoiseData(const float& X, const float& Y, const float& Z, float& noise)
@@ -57,9 +98,9 @@ void UVoxelLandscapeGenerator::SetDensityMap_Implementation(const float& X, cons
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
-	float noise = 0.f;
+	float noise = -(CellPosition.Z + 5000.f);
 	//SetDensityMap_Implementation(CellPosition.X, CellPosition.Y, CellPosition.Z, noise);
-	return -(CellPosition.Z + 5000.f);
+	return noise;
 }
 
 FColor UVoxelLandscapeGenerator::GetColorMap(const FVector& CellPosition)
@@ -113,13 +154,7 @@ float UVoxelLandscapeGenerator::TorusLandscape(float X, float Y, float Z, float 
 
 float UVoxelLandscapeGenerator::VectorDistanceAB(FVector A, FVector B)
 {
-	float distance = sqrt(
-		pow(A.X - B.X, 2) +
-		pow(A.Y - B.Y, 2) +
-		pow(A.Z - B.Z, 2)
-	);
-
-	return distance;
+	return sqrt(pow(A.X - B.X, 2) + pow(A.Y - B.Y, 2) + pow(A.Z - B.Z, 2));
 }
 
 float UVoxelLandscapeGenerator::FractalNoise(float X, float Y, float Z, int seed, int octaves, float amplitude, float frequency)

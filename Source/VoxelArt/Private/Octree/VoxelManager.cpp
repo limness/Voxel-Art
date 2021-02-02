@@ -1,8 +1,8 @@
 ﻿
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "VoxelLandscape.h"
 #include "Octree/VoxelManager.h"
+#include "VoxelLandscape.h"
 
 #include "Editor.h"
 #include "EditorViewportClient.h"

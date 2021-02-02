@@ -195,7 +195,7 @@ void AVoxelLandscape::UpdateOctree()
 			renderInfo->ChunksCreation.Empty();
 			renderInfo->ChunksRemoving.Empty();
 		}
-
+	//	int timeBefore = FDateTime::Now().GetTicks();
 		int32 Index = 0;
 		while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
 		{
@@ -213,13 +213,18 @@ void AVoxelLandscape::UpdateOctree()
 							ChunksRemoving.Add(chunk->CurrentOctree.Pin()->chunk);
 						}
 					}
+				//	int timeBefore = FDateTime::Now().GetTicks();
 					SpawnChunk(chunk->CurrentOctree.Pin());
+				//	int timeNow = FDateTime::Now().GetTicks();
+				//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] time to element: %d ms"), timeNow - timeBefore);
 					Index++;
 				}
 			}
 		}
+		//int timeNow = FDateTime::Now().GetTicks();
+		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] Total time to gen %d element: %d ms"), Index, timeNow - timeBefore);
 	}
-	{
+	/*{
 		FScopeLock Lock(&GlobalMutex);
 
 		while (ChunksGeneration.Num() > 0)
@@ -232,7 +237,7 @@ void AVoxelLandscape::UpdateOctree()
 				}
 			}
 		}
-	}
+	}*/
 	{
 		FScopeLock Lock(&GlobalMutex);
 
@@ -472,6 +477,8 @@ void AVoxelLandscape::SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData)
 
 	if (IsValid(chunkPool))
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] From pool"));
+
 		ChunkInit(chunkPool, chunkData);
 		chunkPool->SetActorLocation(chunkData->position);
 		chunkPool->SetActive(true);
@@ -528,6 +535,7 @@ void AVoxelLandscape::ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData>
 
 	if (chunk)
 	{
+		chunk->CurrentOctree = chunkData;
 		chunk->nodeID = chunkData->nodeID;
 		chunk->transvoxelDirection = chunkData->transvoxelDirection;
 		chunk->level = chunkData->level;
@@ -538,16 +546,17 @@ void AVoxelLandscape::ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData>
 		chunk->Grid = chunkData->Grid;
 		chunk->meshTree = meshTree;
 		chunk->generatorLandscape = generatorLandscape;
+		chunkData->chunk = chunk;
 
-		chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
+
+	//	int timeBefore = FDateTime::Now().GetTicks();
+
+	//	chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 		//chunk->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		//chunk->SetActorLabel(FString::Printf(TEXT("%d, (%d, %d, %d)"), (int)chunkData->nodeID, chunkData->x, chunkData->y, chunkData->z));
-		chunk->SetActorLabel(FString::Printf(TEXT("%d, (%p)"), (int)chunkData->nodeID, chunk));
-		chunk->SetActorLocation(location);
+	//	chunk->SetActorLabel(FString::Printf(TEXT("%d, (%p)"), (int)chunkData->nodeID, chunk));
+		//chunk->SetActorLocation(location);
 
-		//chunk->isPool = false;
-		chunk->CurrentOctree = chunkData;
-		chunkData->chunk = chunk;
 	}
 }
 

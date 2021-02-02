@@ -38,8 +38,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Modification(AVoxelLandscape* terrain,
+	void Modification(
+		AVoxelLandscape* terrain,
 		AVoxelChunk* chunkCenter,
 		FVector position,
-		float range);
+		float range
+	);
 };

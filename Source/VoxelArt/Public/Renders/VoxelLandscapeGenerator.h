@@ -5,18 +5,34 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Math/Vector2D.h"
+#include "Engine/Texture2D.h"
 #include "VoxelLandscapeGenerator.generated.h"
 
-/**
- * 
- */
-//UCLASS(Blueprintable, BlueprintType, EditInlineNew)
+class AVoxelLandscape;
 
 UCLASS(Blueprintable, BlueprintType, EditInlineNew)
 class VOXELART_API UVoxelLandscapeGenerator : public UObject
 {
 	GENERATED_UCLASS_BODY()
-	
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
+	AVoxelLandscape* World;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
+	UTexture2D* HeightmapTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
+	int MapSize = 1024;
+
+	float RadiusHeighestVoxel = 0.f;
+
+	int WidthTexture;
+	int HeightTexture;
+
+	TArray<FColor> TextureMap;
+
 public:
 
 	UFUNCTION(BlueprintNativeEvent, meta = (DisplayName = "Density Map"))

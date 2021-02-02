@@ -160,9 +160,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
 	UStaticMesh* meshTree;
 
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Importer")
-//	int StepTexture;
-	
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
 	UVoxelLandscapeGenerator *GeneratorDensity;
 
@@ -180,9 +177,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Export Preview Heightmap")
 	void CreateTextureDensityMap();
-
-	//UFUNCTION(BlueprintCallable, CallInEditor)
-	//void ImportTextureToDensity();
 
 public:
 
