@@ -50,6 +50,15 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 	}
 }
 
+FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, float Z) const
+{
+	if (TextureMap.Num() < 1) return 0.f;
+	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return 0.f;
+	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return 0.f;
+
+	return (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * 100.f;
+}
+
 /*void UVoxelLandscapeGenerator::GetNoiseData(const float& X, const float& Y, const float& Z, float& noise)
 {
 	noise = 0.f;
@@ -98,7 +107,7 @@ void UVoxelLandscapeGenerator::SetDensityMap_Implementation(const float& X, cons
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
-	float noise = -(CellPosition.Z + 5000.f);
+	float noise = -(CellPosition.Z - GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
 	//SetDensityMap_Implementation(CellPosition.X, CellPosition.Y, CellPosition.Z, noise);
 	return noise;
 }

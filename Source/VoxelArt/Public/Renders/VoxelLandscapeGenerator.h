@@ -26,12 +26,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	int MapSize = 1024;
 
+private:
+
 	float RadiusHeighestVoxel = 0.f;
 
 	int WidthTexture;
 	int HeightTexture;
 
 	TArray<FColor> TextureMap;
+
+	FORCEINLINE float GetHeightmapData(float X, float Y, float Z) const;
 
 public:
 
