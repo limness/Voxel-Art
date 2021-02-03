@@ -6,6 +6,12 @@
 
 UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitializer& objectInitializer) : Super(objectInitializer)
 {
+}
+
+void UVoxelLandscapeGenerator::PostLoad()
+{
+	Super::PostLoad();
+
 	if (HeightmapTexture && World)
 	{
 		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
@@ -18,8 +24,8 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 		HeightmapTexture->SRGB = false;
 		HeightmapTexture->UpdateResource();
 
-		TextureCompressionSettings OldCompressionSettings = HeightmapTexture->CompressionSettings; 
-		TextureMipGenSettings OldMipGenSettings = HeightmapTexture->MipGenSettings; 
+		TextureCompressionSettings OldCompressionSettings = HeightmapTexture->CompressionSettings;
+		TextureMipGenSettings OldMipGenSettings = HeightmapTexture->MipGenSettings;
 		bool OldSRGB = HeightmapTexture->SRGB;
 
 		const FColor* FormatedImageData = static_cast<const FColor*>(HeightmapTexture->PlatformData->Mips[0].BulkData.LockReadOnly());
@@ -45,18 +51,23 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 
 		for (int i = 0; i < World->maximumLOD; i++)
 		{
- 			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
+			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : GetheightmapData ] From here RadiusHeighestVoxel %f"), RadiusHeighestVoxel);
 }
+
 
 FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, float Z) const
 {
-	if (TextureMap.Num() < 1) return 0.f;
-	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return 0.f;
-	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return 0.f;
+	X += WidthTexture / 2.f * RadiusHeighestVoxel;
+	Y += HeightTexture / 2.f * RadiusHeighestVoxel;
 
-	return (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * 100.f;
+	if (TextureMap.Num() < 1) return -1.f;
+	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return -1.f;
+	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return -1.f;
+	
+	return -(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
 }
 
 /*void UVoxelLandscapeGenerator::GetNoiseData(const float& X, const float& Y, const float& Z, float& noise)
@@ -107,7 +118,7 @@ void UVoxelLandscapeGenerator::SetDensityMap_Implementation(const float& X, cons
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
-	float noise = -(CellPosition.Z - GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
+	float noise = (GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
 	//SetDensityMap_Implementation(CellPosition.X, CellPosition.Y, CellPosition.Z, noise);
 	return noise;
 }

@@ -224,7 +224,7 @@ void AVoxelLandscape::UpdateOctree()
 		//int timeNow = FDateTime::Now().GetTicks();
 		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] Total time to gen %d element: %d ms"), Index, timeNow - timeBefore);
 	}
-	/*{
+	{
 		FScopeLock Lock(&GlobalMutex);
 
 		while (ChunksGeneration.Num() > 0)
@@ -237,7 +237,7 @@ void AVoxelLandscape::UpdateOctree()
 				}
 			}
 		}
-	}*/
+	}
 	{
 		FScopeLock Lock(&GlobalMutex);
 

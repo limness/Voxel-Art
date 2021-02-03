@@ -313,6 +313,8 @@ public:
 
 					float radiusVoxel = Radius / (float)Voxels;
 
+					//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : Voxel Async Generator ] radiusVoxel %f"), radiusVoxel);
+
 					for (int z = 0; z < Voxels + 1 + NORMALS_SKIRT; z++)
 					{
 						for (int y = 0; y < Voxels + 1 + NORMALS_SKIRT; y++)
@@ -321,9 +323,9 @@ public:
 							{
 								FVector positionNoise;
 
-								positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-								positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-								positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
+								positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel;
+								positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel;
+								positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
 								positionNoise = positionNoise - (float)(Radius / 2.f);
 
 								DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)] = World->generatorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + WorldLocation);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
@@ -331,14 +333,6 @@ public:
 						}
 					}
 				}
-/*
-				TArray<FVector> Vertices;
-				TArray<int32> Triangles;
-				TArray<FVector> Normals;
-				TArray<FLinearColor> VertexColors;
-				TArray<FProcMeshTangent> Tangents;
-				TArray<FVector2D> TextureCoordinates;*/
-
 				VoxelMarchingCubesMesher* mesher = new VoxelMarchingCubesMesher(
 					Voxels,
 					LevelOctree,
@@ -364,17 +358,7 @@ public:
 
 				delete mesher;
 				mesher = nullptr;
-				//}
-				//else
-				//{
-				//	VoxelTerrainActor->Grid = Grid;
-				//}
-				//int timeBefore = FDateTime::Now().GetTicks();
-				//VoxelTerrainActor->GenerateVertexCube(false);
-				//int timeAfter = FDateTime::Now().GetTicks();
 			}
-
-			//VoxelTerrainActor->IsUpdating = false;
 			isActive = false;
 		}
 

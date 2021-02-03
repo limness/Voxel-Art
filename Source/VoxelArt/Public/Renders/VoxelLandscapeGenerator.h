@@ -17,6 +17,10 @@ class VOXELART_API UVoxelLandscapeGenerator : public UObject
 
 public:
 
+	virtual void PostLoad() override;
+
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	AVoxelLandscape* World;
 
@@ -24,7 +28,7 @@ public:
 	UTexture2D* HeightmapTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
-	int MapSize = 1024;
+	float Multiply = 100.f;
 
 private:
 

@@ -907,8 +907,8 @@ void AVoxelChunk::UpdateMesh(TArray<FVector> Vert, TArray<int32> Tri, TArray<FVe
 		{
 		//	Tri.Add(TrianglesTransition[b]);
 		}
-		//Norm
-		mesh->CreateMeshSection_LinearColor(0, Vert, Tri, TArray<FVector>(), TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), true);
+		//TArray<FVector>()
+		mesh->CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), true);
 		mesh->SetMaterial(0, material);
 	}
 	if (VerticesTransition.Num() > 0)
