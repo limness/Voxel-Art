@@ -22,24 +22,27 @@ void UVoxelPoolComponent::BeginPlay()
 	// ...
 	
 }
-AVoxelChunk* UVoxelPoolComponent::AddChunkToPool()
+UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 {
 	UWorld* const World = GetWorld();
 
 	if (World) 
 	{
-		AVoxelChunk* PoolableActor = World->SpawnActor<AVoxelChunk>(AVoxelChunk::StaticClass(), FVector().ZeroVector, FRotator().ZeroRotator);
+		FString name = FString::Printf(TEXT("%d"), PoolChunks.Num());
+		UVoxelChunkComponent* PoolableChunk = NewObject<UVoxelChunkComponent>(this, *name);
+		PoolableChunk->OnComponentCreated();
+		PoolableChunk->RegisterComponent();
+		if (PoolableChunk->bWantsInitializeComponent) PoolableChunk->InitializeComponent();
+		PoolableChunk->SetActive(false);
 
-		PoolableActor->SetActive(false);
-
-		PoolChunks.Add(PoolableActor);
+		PoolChunks.Add(PoolableChunk);
 
 		return PoolChunks[PoolChunks.Num() - 1];
 	}
 	return nullptr;
 }
 
-AVoxelChunk* UVoxelPoolComponent::GetChunkFromPool()
+UVoxelChunkComponent* UVoxelPoolComponent::GetChunkFromPool()
 {
 	for(int i = 0; i < PoolChunks.Num(); i++)
 	{
@@ -48,10 +51,5 @@ AVoxelChunk* UVoxelPoolComponent::GetChunkFromPool()
 			return PoolChunks[i];
 		}
 	}
-	/*if (PoolChunks.Num() > 0)
-	{
-		return PoolChunks.Pop();
-	}*/
-	/* pool is drained, no inactive objects found */
 	return nullptr;
 }

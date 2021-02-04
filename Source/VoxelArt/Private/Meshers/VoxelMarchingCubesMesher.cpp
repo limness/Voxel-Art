@@ -509,7 +509,7 @@ float VoxelMarchingCubesMesher::GetValue(float X, float Y, float size, int LOD)
 		}
 		if (chunkNeihbor.IsValid())
 		{
-			if (chunkNeihbor.Pin()->chunk->Grid.Num() > 0)
+			if (chunkNeihbor.Pin()->chunk->DensityMap.Num() > 0)
 			{
 				FScopeTryLock ScopeTryLock(&chunkNeihbor.Pin()->chunk->ChunkMutex);
 				if (ScopeTryLock.IsLocked())

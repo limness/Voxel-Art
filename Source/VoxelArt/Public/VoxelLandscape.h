@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "VoxelChunk.h"
+#include "VoxelChunkComponent.h"
 #include "Renders/VoxelRender.h"
 #include "Renders/VoxelLandscapeGenerator.h"
 #include "Octree/VoxelManager.h"
@@ -54,6 +55,10 @@ protected:
 
 	virtual void PostLoad() override;
 
+	virtual void Destroyed() override;
+
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 public:
 
 	virtual void Tick(float DeltaTime) override;
@@ -79,6 +84,8 @@ public:
 private:
 
 	UVoxelPoolComponent* PoolChunks;
+
+	TArray<UVoxelChunkComponent*> ChunkComponents;
 
 public:
 
@@ -188,9 +195,6 @@ public:
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<AVoxelChunk*> chungz;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Noise")
 	bool kost = false;
 
@@ -203,14 +207,14 @@ private:
 
 	void SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData);
 
-	void ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
+	void ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
 	
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
 
-	void PutChunkOnGeneration(AVoxelChunk* Chunk);
+	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
 
 	UFUNCTION()
 	void UpdateOctree();
@@ -219,23 +223,29 @@ public:
 
 	TArray <FChunksRenderInfo*> ChunksToRecomputeOctree;
 
+	TQueue<TSharedPtr<FVoxelChunkRenderData>> ChunksCreationGroup;
+
 	//Chunks which has to be created
 	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
 
 	//Chunks which has to be created
-	TArray<AVoxelChunk*> ChunksGeneration;
+	TArray<UVoxelChunkComponent*> ChunksGeneration;
 	//Chunks which has to be generated
 	//TArray<TSharedPtr<FVoxelOctreeData>> ChunksGeneration;
 
+	//TArray<TSharedPtr<FVoxelOctreeData>> ChunksGeneration;
+
+	TQueue<UVoxelChunkComponent*> ChunksRemovingGroup;
+
 	//Chunks which has to be removed
-	TArray<AVoxelChunk*> ChunksRemoving;
+	TArray<UVoxelChunkComponent*> ChunksRemoving;
 
 	int TotalTasksCounter = 0;
 
 	friend class TerrainGenerationAsyncTask;
 	class TerrainGenerationAsyncTask : public FNonAbandonableTask
 	{
-		AVoxelChunk* VoxelTerrainActor;
+		UVoxelChunkComponent* VoxelChunkComponent;
 		FThreadSafeBool isActive;
 		AVoxelLandscape* World;
 
@@ -251,7 +261,7 @@ public:
 
 		TerrainGenerationAsyncTask(
 			AVoxelLandscape* World,
-			AVoxelChunk* InActor, 
+			UVoxelChunkComponent* InComponent,
 			bool isActive, 
 			int Voxels,
 			int LevelOctree,
@@ -259,7 +269,7 @@ public:
 			FVector WorldLocation,
 			uint8 TransvoxelDirection)
 		{
-			this->VoxelTerrainActor = InActor; 
+			this->VoxelChunkComponent = InComponent;
 			this->isActive = isActive;
 			this->World = World;
 
@@ -275,9 +285,9 @@ public:
 			RETURN_QUICK_DECLARE_CYCLE_STAT(TerrainGenerationAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
 		}
 
-		void SetActor(AVoxelChunk* InActor)
+		void SetActor(UVoxelChunkComponent* InActor)
 		{
-			VoxelTerrainActor = InActor;
+			VoxelChunkComponent = InActor;
 		}
 
 		void SetActive(bool Active)
@@ -352,7 +362,7 @@ public:
 				
 				AsyncTask(ENamedThreads::GameThread, [=]()
 					{
-						VoxelTerrainActor->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
+						VoxelChunkComponent->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
 					});
 
 
@@ -369,5 +379,6 @@ public:
 	TArray<FAsyncTask<TerrainGenerationAsyncTask>*> PoolThreads;
 	FThreadSafeCounter TaskWorkGlobalCounter;
 
-	FCriticalSection GlobalMutex;
+	FCriticalSection OctreeMutex;
+	FCriticalSection ChunksToCreationMutex;
 };

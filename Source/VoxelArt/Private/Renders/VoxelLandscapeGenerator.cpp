@@ -118,7 +118,7 @@ void UVoxelLandscapeGenerator::SetDensityMap_Implementation(const float& X, cons
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
-	float noise = (GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
+	float noise = -(CellPosition.Z + 5000.f);//(GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
 	//SetDensityMap_Implementation(CellPosition.X, CellPosition.Y, CellPosition.Z, noise);
 	return noise;
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelChunk.h"
+#include "VoxelChunkComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ActorComponent.h"
 #include "VoxelPoolComponent.generated.h"
@@ -29,14 +29,14 @@ public:
 public:
 
 //	UPROPERTY(Transient)
-	TArray<AVoxelChunk*> PoolChunks;
+	TArray<UVoxelChunkComponent*> PoolChunks;
 
 public:
 
 	//Has our pool free actors or not
-	AVoxelChunk* AddChunkToPool();
+	UVoxelChunkComponent* AddChunkToPool();
 
 	//Get our chunk from the pool
 	//If chunks are exist in queue we get it
-	AVoxelChunk* GetChunkFromPool();
+	UVoxelChunkComponent* GetChunkFromPool();
 };

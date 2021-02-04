@@ -65,7 +65,7 @@ public:
 
 public:
 	//Actor of chunk
-	AVoxelChunk* chunk = nullptr;
+	UVoxelChunkComponent* chunk = nullptr;
 
 public:
 	//Vertices mesh
@@ -132,7 +132,7 @@ public:
 
 	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren()
 	{
-		check(HasChildren());
+	//	check(HasChildren());
 
 		return ChildrenChunks;
 	}
@@ -216,5 +216,5 @@ struct FChunksRenderInfo
 	TArray<TWeakPtr<FVoxelOctreeData>> ChunksGeneration;
 
 	//Chunks which has to be removed
-	TArray<AVoxelChunk*> ChunksRemoving;
+	TArray<UVoxelChunkComponent*> ChunksRemoving;
 };

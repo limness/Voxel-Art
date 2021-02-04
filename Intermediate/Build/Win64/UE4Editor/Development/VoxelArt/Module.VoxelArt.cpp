@@ -12,6 +12,7 @@
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\Renders\WorldInit.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelArt.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelChunk.cpp"
+#include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelChunkComponent.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelChunkTransvoxels.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelLandscape.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private\VoxelPlayerController.cpp"

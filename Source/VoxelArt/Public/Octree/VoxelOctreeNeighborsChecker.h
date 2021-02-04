@@ -35,6 +35,8 @@ private:
 
 	AVoxelLandscape* World;
 
+	FVector PlayerPositionToWorld;
+
 private:
 
 	FRunnableThread* Thread;

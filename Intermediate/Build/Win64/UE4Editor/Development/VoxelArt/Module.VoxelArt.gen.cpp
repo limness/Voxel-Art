@@ -2,6 +2,7 @@
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\SimplexNoiseBPLibrary.gen.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelArt.init.gen.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelChunk.gen.cpp"
+#include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelChunkComponent.gen.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelChunkTransvoxels.gen.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelHeightmapImport.gen.cpp"
 #include "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt\VoxelLandscape.gen.cpp"

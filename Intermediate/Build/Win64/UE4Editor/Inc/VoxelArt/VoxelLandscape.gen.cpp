@@ -26,7 +26,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FColor();
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_UpdateOctree();
-	VOXELART_API UClass* Z_Construct_UClass_AVoxelChunk_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_UMaterialInterface_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_USceneComponent_NoRegister();
 	VOXELART_API UClass* Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister();
@@ -271,11 +270,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		static void NewProp_kost_SetBit(void* Obj);
 		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_kost;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_chungz_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FArrayPropertyParams NewProp_chungz;
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_chungz_Inner;
-#if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_material_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_material;
@@ -435,14 +429,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		((AVoxelLandscape*)Obj)->kost = 1;
 	}
 	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_kost = { UE4CodeGen_Private::EPropertyClass::Bool, "kost", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_kost_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_kost_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_kost_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz_MetaData[] = {
-		{ "Category", "VoxelLandscape" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FArrayPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz = { UE4CodeGen_Private::EPropertyClass::Array, "chungz", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000010015, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, chungz), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz_MetaData)) };
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz_Inner = { UE4CodeGen_Private::EPropertyClass::Object, "chungz", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0000000000000000, 1, nullptr, 0, Z_Construct_UClass_AVoxelChunk_NoRegister, METADATA_PARAMS(nullptr, 0) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData[] = {
 		{ "Category", "VoxelLandscape" },
@@ -686,8 +672,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering = { UE4CodeGen_Private::EPropertyClass::Bool, "TerrainRendering", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AVoxelLandscape_Statics::PropPointers[] = {
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_kost,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_chungz_Inner,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_SceneComponent,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_RenderType,
@@ -742,7 +726,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 887286070);
+	IMPLEMENT_CLASS(AVoxelLandscape, 2164894837);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

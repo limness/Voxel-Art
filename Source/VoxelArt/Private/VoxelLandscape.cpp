@@ -18,6 +18,26 @@ AVoxelLandscape::AVoxelLandscape()
 	PoolChunks = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("PoolChunks"));
 }
 
+void AVoxelLandscape::OnConstruction(const FTransform& Transform)
+{
+/*	TSubclassOf<UVoxelPoolComponent> TMyObj1;
+	FString name = "PoolableChunk";
+	UVoxelPoolComponent* PoolableChunk = NewObject<UVoxelPoolComponent>(this, *name, RF_Transient, TMyObj1.GetDefaultObject());
+	PoolableChunk->RegisterComponent();
+	//PoolableChunk->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] UVoxelPoolComponent Updated %p mesh s"), PoolableChunk);
+
+
+	TSubclassOf<UVoxelPoolComponent> TMyObj2;
+	FString name2 = "PoolableChunk";
+	UVoxelPoolComponent* PoolableChunk2 = NewObject<UVoxelPoolComponent>(this, *name2, RF_Transient, TMyObj2.GetDefaultObject());
+	PoolableChunk2->RegisterComponent();*/
+//	PoolableChunk2->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] UVoxelPoolComponent Updated %p mesh s"), PoolableChunk2);
+}
+
 void AVoxelLandscape::BeginPlay()
 {
 	Super::BeginPlay();
@@ -30,6 +50,14 @@ void AVoxelLandscape::BeginPlay()
 void AVoxelLandscape::PostLoad()
 {
 	Super::PostLoad();
+}
+
+void AVoxelLandscape::Destroyed()
+{
+	for (auto& Chunk : ChunkComponents)
+	{
+		Chunk->DestroyComponent();
+	}
 }
 
 void AVoxelLandscape::CreateVoxelWorld()
@@ -102,14 +130,14 @@ void AVoxelLandscape::DestroyVoxelWorld()
 			it->Cancel();
 		}
 
-		TSubclassOf<AVoxelChunk> ChunkClass = AVoxelChunk::StaticClass();
+		/*TSubclassOf<AVoxelChunk> ChunkClass = AVoxelChunk::StaticClass();
 		TArray<AActor*> ChunksOctreeToRemove;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ChunkClass, ChunksOctreeToRemove);
 
 		for (auto& Chunk : ChunksOctreeToRemove)
 		{
 			Chunk->Destroy();
-		}
+		}*/
 		GEngine->ForceGarbageCollection(true);
 		TerrainCreated = false;
 	}
@@ -163,9 +191,7 @@ void AVoxelLandscape::Tick(float DeltaTime)
 void AVoxelLandscape::UpdateOctree()
 {
 	{
-		FScopeLock Lock(&GlobalMutex);
-
-		while (ChunksToRecomputeOctree.Num() > 0)
+		/*while (ChunksToRecomputeOctree.Num() > 0)
 		{
 			FChunksRenderInfo* renderInfo = ChunksToRecomputeOctree.Pop();
 
@@ -194,54 +220,126 @@ void AVoxelLandscape::UpdateOctree()
 			renderInfo->LeavesDestroying.Empty();
 			renderInfo->ChunksCreation.Empty();
 			renderInfo->ChunksRemoving.Empty();
+		}*/
+
+		TSharedPtr<FVoxelChunkRenderData> ChunksCreationNewGroup;
+
+		while (ChunksCreationGroup.Peek(ChunksCreationNewGroup))
+		{
+			ChunksCreationGroup.Dequeue(ChunksCreationNewGroup);
+
+			ChunksCreation.Add(ChunksCreationNewGroup);
 		}
-	//	int timeBefore = FDateTime::Now().GetTicks();
+
+		UVoxelChunkComponent* ChunksRemovingNewGroup;
+
+		while (ChunksRemovingGroup.Peek(ChunksRemovingNewGroup))
+		{
+			ChunksRemovingGroup.Dequeue(ChunksRemovingNewGroup);
+
+			ChunksRemoving.Add(ChunksRemovingNewGroup);
+		}
+		
+		{
+		//	int timeBefore = FDateTime::Now().GetTicks();
+
+			FVector PlayerPositionToWorld = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation() - GetActorLocation();
+
+			for (auto& chunk : ChunksCreation)
+			{
+				float distancePlayer = sqrt(
+					pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
+					pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
+					pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
+				);
+				chunk->priority = distancePlayer;
+			}
+			ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
+				{
+					return A->priority > B->priority;
+				});
+
+		//	int timeAfter = FDateTime::Now().GetTicks();
+		//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Time to sort: %d"), timeAfter - timeBefore);
+
+		}
+		//FScopeLock Lock(&OctreeMutex);
+
 		int32 Index = 0;
 		while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
 		{
-			TSharedPtr<FVoxelChunkRenderData> chunk = ChunksCreation.Pop();
+			OctreeMutex.Lock();
+			TSharedPtr<FVoxelOctreeData> chunk = ChunksCreation.Pop()->CurrentOctree.Pin();
+			OctreeMutex.Unlock();
 
 			//If our leaf is exist yet inside Octree, we create chunk for it
-			if (chunk->CurrentOctree.IsValid())
+			if (chunk.IsValid())
 			{
-				if (!chunk->CurrentOctree.Pin()->HasChildren())
+				if (!chunk->HasChildren())
 				{
-					if (IsValid(chunk->CurrentOctree.Pin()->chunk))
+					if (IsValid(chunk->chunk))
 					{
-						if (chunk->CurrentOctree.Pin()->chunk->Active == true)
+						if (chunk->chunk->Active == true)
 						{
-							ChunksRemoving.Add(chunk->CurrentOctree.Pin()->chunk);
+							ChunksRemoving.Add(chunk->chunk);
 						}
 					}
-				//	int timeBefore = FDateTime::Now().GetTicks();
-					SpawnChunk(chunk->CurrentOctree.Pin());
-				//	int timeNow = FDateTime::Now().GetTicks();
-				//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] time to element: %d ms"), timeNow - timeBefore);
+
+					SpawnChunk(chunk);
 					Index++;
 				}
 			}
 		}
-		//int timeNow = FDateTime::Now().GetTicks();
-		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] Total time to gen %d element: %d ms"), Index, timeNow - timeBefore);
-	}
-	{
-		FScopeLock Lock(&GlobalMutex);
 
-		while (ChunksGeneration.Num() > 0)
+		if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
+		{
+			auto AreAllTasksDone = [&]()
+			{
+				bool AreDone = true;
+
+				for (auto& it : PoolThreads)
+				{
+					if (!it->IsDone())
+					{
+						AreDone = false;
+					}
+				}
+				return AreDone;
+			};
+
+			if (AreAllTasksDone())
+			{
+				while (ChunksRemoving.Num() > 0)
+				{
+					UVoxelChunkComponent* chunk = ChunksRemoving.Pop();
+
+					if (IsValid(chunk))
+					{
+						if (chunk->Active == true)
+						{
+							chunk->SetActive(false);
+						}
+					}
+				}
+			}
+		}
+	}
+	/*{
+		int32 Index = 0;
+		while (Index < ChunksPerFrame && ChunksGeneration.Num() > 0)
 		{
 			AVoxelChunk* chunk = ChunksGeneration.Pop();
 			{
 				if (IsValid(chunk))
 				{
 					PutChunkOnGeneration(chunk);
+					Index++;
 				}
 			}
 		}
-	}
-	{
-		FScopeLock Lock(&GlobalMutex);
-
-		if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0) // && ChunksGeneration.Num() == 0
+	}*/
+	/*{
+		if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
 		{
 			auto AreAllTasksDone = [&]()
 			{
@@ -273,7 +371,7 @@ void AVoxelLandscape::UpdateOctree()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks)
@@ -284,7 +382,7 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 		{
 			if (Chunk->chunk->hasOwnGrid)
 			{
-				Chunk->Grid = Chunk->chunk->Grid;
+				Chunk->Grid = Chunk->chunk->DensityMap;
 				SavedChunks.Add(Chunk->nodeID, Chunk);
 			}
 		}
@@ -295,11 +393,6 @@ void AVoxelLandscape::GenerateLandscape()
 {
 	chunksBuffer = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData());
 	chunksBuffer->nodeID = (1 << 3) | 0x00;
-
-	chunksBuffer->x = 0;
-	chunksBuffer->y = 0;
-	chunksBuffer->z = 0;
-
 	chunksBuffer->level = 0;
 	chunksBuffer->radius = radiusOfChunk + 0.f;
 
@@ -455,9 +548,6 @@ void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 l
 			LeafChildren->ParentChunk = leaf;
 			LeafChildren->priority = 0;
 			LeafChildren->position = positionChunk;
-			LeafChildren->x = X;
-			LeafChildren->y = Y;
-			LeafChildren->z = Z;
 			LeafChildren->transvoxelDirection = 0x00;
 			LeafChildren->level = level;
 			LeafChildren->radius = radiusChild;
@@ -470,32 +560,27 @@ void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 l
 
 void AVoxelLandscape::SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData)
 {
-	//If we have free chunks in our pool we'll use it
-	//Else create new actor
+	UVoxelChunkComponent* PoolChunk = nullptr;
 
-	AVoxelChunk* chunkPool = PoolChunks->GetChunkFromPool();
-
-	if (IsValid(chunkPool))
+	if (IsValid(PoolChunk))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : World ] From pool"));
-
-		ChunkInit(chunkPool, chunkData);
-		chunkPool->SetActorLocation(chunkData->position);
-		chunkPool->SetActive(true);
+		ChunkInit(PoolChunk, chunkData);
+		PoolChunk->SetWorldLocation(chunkData->position);
+		PoolChunk->SetActive(true);
 	}
 	else
 	{
-		chunkPool = PoolChunks->AddChunkToPool();
+		PoolChunk = PoolChunks->AddChunkToPool();
 
-		ChunkInit(chunkPool, chunkData);
+		ChunkInit(PoolChunk, chunkData);
 
-		chunkPool->SetActorLocation(chunkData->position);
-		chunkPool->SetActive(true);
+		PoolChunk->SetWorldLocation(chunkData->position);
+		PoolChunk->SetActive(true);
 	}
-	PutChunkOnGeneration(chunkPool);
+	PutChunkOnGeneration(PoolChunk);
 }
 
-void AVoxelLandscape::PutChunkOnGeneration(AVoxelChunk* Chunk)
+void AVoxelLandscape::PutChunkOnGeneration(UVoxelChunkComponent* Chunk)
 {
 	FAsyncTask<TerrainGenerationAsyncTask>* FreeTask = nullptr;
 
@@ -516,7 +601,7 @@ void AVoxelLandscape::PutChunkOnGeneration(AVoxelChunk* Chunk)
 			Chunk->voxels,
 			Chunk->level,
 			Chunk->radius,
-			Chunk->GetActorLocation(),
+			Chunk->GetComponentLocation(),
 			Chunk->transvoxelDirection
 		);
 		PoolThreads.Add(FreeTask);
@@ -528,7 +613,7 @@ void AVoxelLandscape::PutChunkOnGeneration(AVoxelChunk* Chunk)
 	//	GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Total mesh tasks: %d"), TotalTasksCounter), false);
 }
 
-void AVoxelLandscape::ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData> chunkData)
+void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData)
 {
 	//FVector actorLocation = GetActorLocation();
 	FVector location = chunkData->position;
@@ -542,14 +627,16 @@ void AVoxelLandscape::ChunkInit(AVoxelChunk* chunk, TSharedPtr<FVoxelOctreeData>
 		chunk->radius = chunkData->radius;
 		chunk->voxels = voxelsOneChunk;
 		chunk->material = material;
-		chunk->mesh->SetMaterial(0, material);
-		chunk->Grid = chunkData->Grid;
-		chunk->meshTree = meshTree;
+		chunk->SetMaterial(0, material);
+		chunk->DensityMap = chunkData->Grid;
 		chunk->generatorLandscape = generatorLandscape;
 		chunkData->chunk = chunk;
 
-
 	//	int timeBefore = FDateTime::Now().GetTicks();
+
+		chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+		chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 	//	chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 		//chunk->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);

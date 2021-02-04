@@ -79,18 +79,51 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 		}
 		else
 		{
-			{
-				FScopeLock Lock(&World->GlobalMutex);
+			/*{
+				FScopeLock Lock(&World->OctreeMutex);
 				CheckOctree((World->chunksBuffer), 0);
+			}
+			for (auto& it : ChunksGeneration)
+			{
+				World->ChunksGeneration.Add(it);
+			}
+			ChunksGeneration.Empty();*/
 
-				for (auto& it : ChunksGeneration)
+			//FScopeLock Lock(&World->GlobalMutex);
+
+/*#if WITH_EDITOR
+
+			if (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview)
+			{
+				if (editorViewClient)
 				{
-					World->ChunksGeneration.Add(it);
+					PlayerPositionToWorld = editorViewClient->GetViewLocation() - World->GetActorLocation();
 				}
 			}
-			ChunksGeneration.Empty();
+			else
+			{
+				if (PlayerController->GetPawn() != nullptr)
+				{
+					PlayerPositionToWorld = PlayerController->GetPawn()->GetActorLocation() - World->GetActorLocation();
+				}
+			}
+#endif*/
+/*
+			for (auto& chunk : World->ChunksCreation)
+			{
+				float distancePlayer = sqrt(
+					pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
+					pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
+					pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
+				);
+				chunk->priority = distancePlayer;
+			}
+			World->ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
+				{
+					return A->priority > B->priority;
+				});*/
 
-			FPlatformProcess::Sleep(0.11);
+			FPlatformProcess::Sleep(0.5);
 		}
 	}
 	return 0;
@@ -362,7 +395,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk
 							for (auto& it : candidateNeighborFaceU) { chunk->neighborFaceU.Add(it); }
 							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }
 
-							ChunksGeneration.Add(chunk->chunk);
+							//ChunksGeneration.Add(chunk->chunk);
 						}
 					}
 				}
