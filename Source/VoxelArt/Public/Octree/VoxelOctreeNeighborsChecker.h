@@ -29,7 +29,7 @@ public:
 
 private:
 
-	TArray<AVoxelChunk*> ChunksGeneration;
+	TArray<UVoxelChunkComponent*> ChunksGeneration;
 
 private:
 

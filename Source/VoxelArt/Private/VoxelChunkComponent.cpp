@@ -56,7 +56,8 @@ FVector UVoxelChunkComponent::PositionToDirection(FVector directionPosition, flo
 	return directionPosition;
 }
 
-bool UVoxelChunkComponent::ChangeVoxel(UVoxelModificationLandscape* modificator,
+bool UVoxelChunkComponent::ChangeVoxel(
+	UVoxelModificationLandscape* modificator,
 	FVector positionCenterPoint,
 	float range,
 	float strength,
@@ -81,10 +82,6 @@ bool UVoxelChunkComponent::ChangeVoxel(UVoxelModificationLandscape* modificator,
 				positionNoise = positionNoise - (float)(radius / 2.f);
 
 				float calculateRadius = range - sqrt(pow(positionNoise.X, 2) + pow(positionNoise.Y, 2) + pow(positionNoise.Z, 2));
-
-				//float calculateRadius = 0.f;
-				//modificator->GetPainterData(positionNoise.X, positionNoise.Y, positionNoise.Z, calculateRadius, strength, dig, smooth);
-
 				float volume = dig ? -1.f : 1.f;
 
 				if (volume < 0)
@@ -146,8 +143,6 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vert, TArray<int32> Tri, T
 
 	if (Vert.Num() > 0)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Updated mesh %d"), Vert.Num());
-
 		CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), true);
 		SetMaterial(0, material);
 	}

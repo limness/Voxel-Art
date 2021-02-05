@@ -10,15 +10,12 @@
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 struct FVector;
 struct FVector2D;
-struct FColor;
 #ifdef VOXELART_VoxelLandscapeGenerator_generated_h
 #error "VoxelLandscapeGenerator.generated.h already included, missing '#pragma once' in VoxelLandscapeGenerator.h"
 #endif
 #define VOXELART_VoxelLandscapeGenerator_generated_h
 
 #define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
-	virtual void SetColorMap_Implementation(float const& X, float const& Y, float const& Z, FColor& color); \
-	virtual void SetDensityMap_Implementation(float const& X, float const& Y, float const& Z, float& noise); \
  \
 	DECLARE_FUNCTION(execVectorDistanceAB) \
 	{ \
@@ -108,37 +105,11 @@ struct FColor;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		*(float*)Z_Param__Result=P_THIS->FlatLandscape(Z_Param_A); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetColorMap) \
-	{ \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_X); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Y); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Z); \
-		P_GET_STRUCT_REF(FColor,Z_Param_Out_color); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		P_THIS->SetColorMap_Implementation(Z_Param_Out_X,Z_Param_Out_Y,Z_Param_Out_Z,Z_Param_Out_color); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetDensityMap) \
-	{ \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_X); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Y); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Z); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_noise); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		P_THIS->SetDensityMap_Implementation(Z_Param_Out_X,Z_Param_Out_Y,Z_Param_Out_Z,Z_Param_Out_noise); \
 		P_NATIVE_END; \
 	}
 
 
 #define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
-	virtual void SetColorMap_Implementation(float const& X, float const& Y, float const& Z, FColor& color); \
-	virtual void SetDensityMap_Implementation(float const& X, float const& Y, float const& Z, float& noise); \
  \
 	DECLARE_FUNCTION(execVectorDistanceAB) \
 	{ \
@@ -229,51 +200,9 @@ struct FColor;
 		P_NATIVE_BEGIN; \
 		*(float*)Z_Param__Result=P_THIS->FlatLandscape(Z_Param_A); \
 		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetColorMap) \
-	{ \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_X); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Y); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Z); \
-		P_GET_STRUCT_REF(FColor,Z_Param_Out_color); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		P_THIS->SetColorMap_Implementation(Z_Param_Out_X,Z_Param_Out_Y,Z_Param_Out_Z,Z_Param_Out_color); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetDensityMap) \
-	{ \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_X); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Y); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_Z); \
-		P_GET_PROPERTY_REF(UFloatProperty,Z_Param_Out_noise); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		P_THIS->SetDensityMap_Implementation(Z_Param_Out_X,Z_Param_Out_Y,Z_Param_Out_Z,Z_Param_Out_noise); \
-		P_NATIVE_END; \
 	}
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_EVENT_PARMS \
-	struct VoxelLandscapeGenerator_eventSetColorMap_Parms \
-	{ \
-		float X; \
-		float Y; \
-		float Z; \
-		FColor color; \
-	}; \
-	struct VoxelLandscapeGenerator_eventSetDensityMap_Parms \
-	{ \
-		float X; \
-		float Y; \
-		float Z; \
-		float noise; \
-	};
-
-
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_CALLBACK_WRAPPERS
 #define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUVoxelLandscapeGenerator(); \
@@ -319,16 +248,12 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(UVoxelLandscapeGenerator); \
 
 
 #define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_13_PROLOG \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_EVENT_PARMS
-
-
+#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_13_PROLOG
 #define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_CALLBACK_WRAPPERS \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_STANDARD_CONSTRUCTORS \
 public: \
@@ -340,7 +265,6 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_CALLBACK_WRAPPERS \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
 	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_ENHANCED_CONSTRUCTORS \
 static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class VoxelLandscapeGenerator."); \

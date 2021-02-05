@@ -23,9 +23,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_FlatLandscape();
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_FractalNoise();
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_IQNoise();
-	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap();
-	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FColor();
-	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap();
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SimplexNoise();
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SphereLandscape();
 	VOXELART_API UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_TorusLandscape();
@@ -33,28 +30,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 	ENGINE_API UClass* Z_Construct_UClass_UTexture2D_NoRegister();
 	VOXELART_API UClass* Z_Construct_UClass_AVoxelLandscape_NoRegister();
 // End Cross Module References
-	static FName NAME_UVoxelLandscapeGenerator_SetColorMap = FName(TEXT("SetColorMap"));
-	void UVoxelLandscapeGenerator::SetColorMap(float const& X, float const& Y, float const& Z, FColor& color)
-	{
-		VoxelLandscapeGenerator_eventSetColorMap_Parms Parms;
-		Parms.X=X;
-		Parms.Y=Y;
-		Parms.Z=Z;
-		Parms.color=color;
-		ProcessEvent(FindFunctionChecked(NAME_UVoxelLandscapeGenerator_SetColorMap),&Parms);
-		color=Parms.color;
-	}
-	static FName NAME_UVoxelLandscapeGenerator_SetDensityMap = FName(TEXT("SetDensityMap"));
-	void UVoxelLandscapeGenerator::SetDensityMap(float const& X, float const& Y, float const& Z, float& noise)
-	{
-		VoxelLandscapeGenerator_eventSetDensityMap_Parms Parms;
-		Parms.X=X;
-		Parms.Y=Y;
-		Parms.Z=Z;
-		Parms.noise=noise;
-		ProcessEvent(FindFunctionChecked(NAME_UVoxelLandscapeGenerator_SetDensityMap),&Parms);
-		noise=Parms.noise;
-	}
 	void UVoxelLandscapeGenerator::StaticRegisterNativesUVoxelLandscapeGenerator()
 	{
 		UClass* Class = UVoxelLandscapeGenerator::StaticClass();
@@ -63,8 +38,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 			{ "FlatLandscape", &UVoxelLandscapeGenerator::execFlatLandscape },
 			{ "FractalNoise", &UVoxelLandscapeGenerator::execFractalNoise },
 			{ "IQNoise", &UVoxelLandscapeGenerator::execIQNoise },
-			{ "SetColorMap", &UVoxelLandscapeGenerator::execSetColorMap },
-			{ "SetDensityMap", &UVoxelLandscapeGenerator::execSetDensityMap },
 			{ "SimplexNoise", &UVoxelLandscapeGenerator::execSimplexNoise },
 			{ "SphereLandscape", &UVoxelLandscapeGenerator::execSphereLandscape },
 			{ "TorusLandscape", &UVoxelLandscapeGenerator::execTorusLandscape },
@@ -252,130 +225,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		if (!ReturnFunction)
 		{
 			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_UVoxelLandscapeGenerator_IQNoise_Statics::FuncParams);
-		}
-		return ReturnFunction;
-	}
-	struct Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics
-	{
-		static const UE4CodeGen_Private::FStructPropertyParams NewProp_color;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_Z_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Z;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_Y_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Y;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_X_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_X;
-		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
-#endif
-		static const UE4CodeGen_Private::FFunctionParams FuncParams;
-	};
-	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_color = { UE4CodeGen_Private::EPropertyClass::Struct, "color", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000180, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetColorMap_Parms, color), Z_Construct_UScriptStruct_FColor, METADATA_PARAMS(nullptr, 0) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Z_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Z = { UE4CodeGen_Private::EPropertyClass::Float, "Z", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetColorMap_Parms, Z), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Z_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Z_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Y_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Y = { UE4CodeGen_Private::EPropertyClass::Float, "Y", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetColorMap_Parms, Y), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Y_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Y_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_X_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_X = { UE4CodeGen_Private::EPropertyClass::Float, "X", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetColorMap_Parms, X), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_X_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_X_MetaData)) };
-	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_color,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Z,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_Y,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::NewProp_X,
-	};
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::Function_MetaDataParams[] = {
-		{ "DisplayName", "Color Map" },
-		{ "ModuleRelativePath", "Public/Renders/VoxelLandscapeGenerator.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_UVoxelLandscapeGenerator, "SetColorMap", RF_Public|RF_Transient|RF_MarkAsNative, nullptr, (EFunctionFlags)0x08C20C00, sizeof(VoxelLandscapeGenerator_eventSetColorMap_Parms), Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::PropPointers, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::PropPointers), 0, 0, METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::Function_MetaDataParams, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::Function_MetaDataParams)) };
-	UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap()
-	{
-		static UFunction* ReturnFunction = nullptr;
-		if (!ReturnFunction)
-		{
-			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap_Statics::FuncParams);
-		}
-		return ReturnFunction;
-	}
-	struct Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics
-	{
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_noise;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_Z_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Z;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_Y_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Y;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_X_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_X;
-		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
-#endif
-		static const UE4CodeGen_Private::FFunctionParams FuncParams;
-	};
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_noise = { UE4CodeGen_Private::EPropertyClass::Float, "noise", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000180, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetDensityMap_Parms, noise), METADATA_PARAMS(nullptr, 0) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Z_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Z = { UE4CodeGen_Private::EPropertyClass::Float, "Z", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetDensityMap_Parms, Z), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Z_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Z_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Y_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Y = { UE4CodeGen_Private::EPropertyClass::Float, "Y", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetDensityMap_Parms, Y), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Y_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Y_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_X_MetaData[] = {
-		{ "NativeConst", "" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_X = { UE4CodeGen_Private::EPropertyClass::Float, "X", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000008000182, 1, nullptr, STRUCT_OFFSET(VoxelLandscapeGenerator_eventSetDensityMap_Parms, X), METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_X_MetaData, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_X_MetaData)) };
-	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_noise,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Z,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_Y,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::NewProp_X,
-	};
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::Function_MetaDataParams[] = {
-		{ "DisplayName", "Density Map" },
-		{ "ModuleRelativePath", "Public/Renders/VoxelLandscapeGenerator.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_UVoxelLandscapeGenerator, "SetDensityMap", RF_Public|RF_Transient|RF_MarkAsNative, nullptr, (EFunctionFlags)0x08420C00, sizeof(VoxelLandscapeGenerator_eventSetDensityMap_Parms), Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::PropPointers, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::PropPointers), 0, 0, METADATA_PARAMS(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::Function_MetaDataParams, ARRAY_COUNT(Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::Function_MetaDataParams)) };
-	UFunction* Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap()
-	{
-		static UFunction* ReturnFunction = nullptr;
-		if (!ReturnFunction)
-		{
-			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap_Statics::FuncParams);
 		}
 		return ReturnFunction;
 	}
@@ -607,8 +456,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_FlatLandscape, "FlatLandscape" }, // 3164569653
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_FractalNoise, "FractalNoise" }, // 1547549849
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_IQNoise, "IQNoise" }, // 1465666336
-		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_SetColorMap, "SetColorMap" }, // 834148620
-		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_SetDensityMap, "SetDensityMap" }, // 2554003617
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_SimplexNoise, "SimplexNoise" }, // 3069397514
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_SphereLandscape, "SphereLandscape" }, // 857204035
 		{ &Z_Construct_UFunction_UVoxelLandscapeGenerator_TorusLandscape, "TorusLandscape" }, // 4293347551
@@ -671,7 +518,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 189136253);
+	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 433807453);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_UVoxelLandscapeGenerator(Z_Construct_UClass_UVoxelLandscapeGenerator, &UVoxelLandscapeGenerator::StaticClass, TEXT("/Script/VoxelArt"), TEXT("UVoxelLandscapeGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(UVoxelLandscapeGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

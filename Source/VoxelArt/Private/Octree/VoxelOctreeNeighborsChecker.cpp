@@ -79,9 +79,19 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 		}
 		else
 		{
+			{
+				FScopeLock Lock(&World->OctreeMutex);
+				CheckOctree((World->MainOctree), 0);
+			}
+			for (auto& it : ChunksGeneration)
+			{
+				World->ChunksGenerationGroup.Enqueue(it);
+			}
+			ChunksGeneration.Empty();
+
 			/*{
 				FScopeLock Lock(&World->OctreeMutex);
-				CheckOctree((World->chunksBuffer), 0);
+				CheckOctree((World->MainOctree), 0);
 			}
 			for (auto& it : ChunksGeneration)
 			{
@@ -303,7 +313,7 @@ TArray<TWeakPtr<FVoxelOctreeData>> VoxelOctreeNeighborsChecker::GetSmallerNeighb
 
 TWeakPtr<FVoxelOctreeData> VoxelOctreeNeighborsChecker::GetChunkByNodeID(int level, uint64 nodeID)
 {
-	return FindNodeByID((World->chunksBuffer), level, 0, nodeID);
+	return FindNodeByID((World->MainOctree), level, 0, nodeID);
 }
 
 TWeakPtr<FVoxelOctreeData> VoxelOctreeNeighborsChecker::FindNodeByID(TWeakPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID)
@@ -395,7 +405,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk
 							for (auto& it : candidateNeighborFaceU) { chunk->neighborFaceU.Add(it); }
 							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }
 
-							//ChunksGeneration.Add(chunk->chunk);
+							ChunksGeneration.Add(chunk->chunk);
 						}
 					}
 				}

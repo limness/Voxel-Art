@@ -63,70 +63,24 @@ FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, f
 	X += WidthTexture / 2.f * RadiusHeighestVoxel;
 	Y += HeightTexture / 2.f * RadiusHeighestVoxel;
 
-	if (TextureMap.Num() < 1) return -1.f;
-	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return -1.f;
-	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return -1.f;
+	if (TextureMap.Num() < 1) return 0.f;
+	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return 0.f;
+	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return 0.f;
 	
-	return -(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
-}
-
-/*void UVoxelLandscapeGenerator::GetNoiseData(const float& X, const float& Y, const float& Z, float& noise)
-{
-	noise = 0.f;
-}
-
-void UVoxelLandscapeGenerator::GetColor(const FVector& POS, FLinearColor& color)
-{
-	color = FLinearColor(0.f, 0.f, 0.f);
-}
-
-float UVoxelLandscapeGenerator::GetNoiseData_Implementation(float Xxaf, float Ysdg, float ZwasfghJfwa)
-{
-	float noise = 450.f;
-
-	return noise;
-}
-
-*/
-
-/*void UVoxelLandscapeGenerator::GetColor(const FVector& POS, FLinearColor& color)
-{
-	color = FLinearColor(0.f, 0.f, 0.f);
-}*/
-
-void UVoxelLandscapeGenerator::SetColorMap_Implementation(const float& X, const float& Y, const float& Z, FColor& color)
-{
-	if (VectorDistanceAB(FVector(X, Y, Z), FVector(0, 0, 0)) > 60000.0f)
-	{
-		color = FColor(255, 18, 10);
-	}
-	else
-	{
-		color = FColor(128, 223, 255);
-	}
-	//color = FColor(121.f, 121.f, 121.f);
-}
-
-void UVoxelLandscapeGenerator::SetDensityMap_Implementation(const float& X, const float& Y, const float& Z, float& noise)
-{
-	//noise = SphereLandscape(X, Y, Z, 90000.f);
-	//noise -= FractalNoise(X, Y, Z, 0, 5, 15000.f, 0.00001f);
-
-	//noise = UKismetMathLibrary::FMin(noise, FlatLandscape(-X));
-	noise = -(Z + 5000.f);
+	return (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply;//-(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
 }
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
-	float noise = -(CellPosition.Z + 5000.f);//(GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
-	//SetDensityMap_Implementation(CellPosition.X, CellPosition.Y, CellPosition.Z, noise);
+	float noise = 0.f;
+	noise = -(CellPosition.Z + 5000.f);//(GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
 	return noise;
 }
 
 FColor UVoxelLandscapeGenerator::GetColorMap(const FVector& CellPosition)
 {
 	FColor color = FColor(121.f, 121.f, 121.f);
-	//SetColorMap(CellPosition.X, CellPosition.Y, CellPosition.Z, color);
+
 	if (VectorDistanceAB(FVector(CellPosition.X, CellPosition.Y, CellPosition.Z), FVector(0, 0, 0)) > 60000.0f)
 	{
 		color = FColor(255, 18, 10);
@@ -181,8 +135,6 @@ float UVoxelLandscapeGenerator::FractalNoise(float X, float Y, float Z, int seed
 {
 	float value = 0.f;
 
-	//USimplexNoiseBPLibrary::setNoiseSeed(seed);
-
 	for (int i = 0; i < octaves; i++)
 	{
 		value += USimplexNoiseBPLibrary::SimplexNoise3D(X * frequency, Y * frequency, Z * frequency) * amplitude;
@@ -210,22 +162,6 @@ float UVoxelLandscapeGenerator::Cone(FVector p, FVector2D c, float h)
 
 	return sqrt(d) * FMath::Sign(s);
 }
-
-/*float iqTurbulence(float2 p, float seed, int octaves, float lacunarity = 2.0, float gain = 0.5)
-{
-	float sum = 0.5;
-	float freq = 1.0, amp = 1.0;
-	float2 dsum = float2(0, 0);
-	for (int i = 0; i < octaves; i++)
-	{
-		FVector n = perlinNoisePseudoDeriv(p * freq, seed + i / 256.0);
-		dsum += n.yz;
-		sum += amp * n.X / (1 + dot(dsum, dsum));
-		freq *= lacunarity;
-		amp *= gain;
-	}
-	return sum;
-}*/
 
 float UVoxelLandscapeGenerator::IQNoise(FVector p)
 {

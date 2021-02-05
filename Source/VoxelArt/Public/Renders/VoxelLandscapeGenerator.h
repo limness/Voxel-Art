@@ -43,12 +43,6 @@ private:
 
 public:
 
-	UFUNCTION(BlueprintNativeEvent, meta = (DisplayName = "Density Map"))
-	void SetDensityMap(const float& X, const float& Y, const float& Z, float& noise);
-
-	UFUNCTION(BlueprintNativeEvent, meta = (DisplayName = "Color Map"))
-	void SetColorMap(const float& X, const float& Y, const float& Z, FColor& color);
-
 	float GetDensityMap(const FVector& CellPosition);
 	FColor GetColorMap(const FVector& CellPosition);
 

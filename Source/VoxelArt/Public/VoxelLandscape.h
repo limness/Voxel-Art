@@ -50,19 +50,11 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void PostLoad() override;
-
 	virtual void Destroyed() override;
-
-	virtual void OnConstruction(const FTransform& Transform) override;
-
-public:
-
 	virtual void Tick(float DeltaTime) override;
 
+public:
 
 #if WITH_EDITOR
 	virtual bool ShouldTickIfViewportsOnly() const override;
@@ -76,15 +68,12 @@ public:
 
 public:
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Level of Detail | Test")
-	TSharedPtr<FVoxelOctreeData> chunksBuffer;
-
+	TSharedPtr<FVoxelOctreeData> MainOctree;
 	TMap<uint64, TSharedPtr<FVoxelOctreeData>> SavedChunks;
 
 private:
 
 	UVoxelPoolComponent* PoolChunks;
-
 	TArray<UVoxelChunkComponent*> ChunkComponents;
 
 public:
@@ -221,24 +210,17 @@ private:
 
 public:
 
-	TArray <FChunksRenderInfo*> ChunksToRecomputeOctree;
-
 	TQueue<TSharedPtr<FVoxelChunkRenderData>> ChunksCreationGroup;
-
-	//Chunks which has to be created
-	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
-
-	//Chunks which has to be created
-	TArray<UVoxelChunkComponent*> ChunksGeneration;
-	//Chunks which has to be generated
-	//TArray<TSharedPtr<FVoxelOctreeData>> ChunksGeneration;
-
-	//TArray<TSharedPtr<FVoxelOctreeData>> ChunksGeneration;
-
+	TQueue<UVoxelChunkComponent*> ChunksGenerationGroup;
 	TQueue<UVoxelChunkComponent*> ChunksRemovingGroup;
 
-	//Chunks which has to be removed
+private:
+
+	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
 	TArray<UVoxelChunkComponent*> ChunksRemoving;
+	TArray<UVoxelChunkComponent*> ChunksGeneration;
+
+public:
 
 	int TotalTasksCounter = 0;
 

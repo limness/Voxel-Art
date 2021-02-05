@@ -63,7 +63,7 @@ uint32 VoxelManager::Run()
 		else
 		{
 #if WITH_EDITOR
-			if (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview)
+			if (World->GetWorld() && (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview))
 			{
 				if (editorViewClient)
 				{
@@ -83,7 +83,7 @@ uint32 VoxelManager::Run()
 				chunksToChange = new FChunksRenderInfo();
 				{
 					FScopeLock Lock(&World->OctreeMutex);
-					CheckOctree(World->chunksBuffer, 0);
+					CheckOctree(World->MainOctree, 0);
 				}
 				if (chunksToChange->ChunksCreation.Num() > 0 ||
 					chunksToChange->ChunksRemoving.Num() > 0 ||
