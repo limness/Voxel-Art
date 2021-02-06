@@ -49,7 +49,7 @@ void UVoxelLandscapeGenerator::PostLoad()
 
 		RadiusHeighestVoxel = World->radiusOfChunk / (float)World->voxelsOneChunk;
 
-		for (int i = 0; i < World->maximumLOD; i++)
+		for (int i = 0; i < World->MaximumLOD; i++)
 		{
 			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
 		}

@@ -2,6 +2,7 @@
 	"BuildId": "4541578",
 	"Modules": 
 	{
-		"VoxelArt": "UE4Editor-VoxelArt.dll"
+		"VoxelArt": "UE4Editor-VoxelArt-593.dll",
+		"VoxelArtEditor": "UE4Editor-VoxelArtEditor-2842.dll"
 	}
 }

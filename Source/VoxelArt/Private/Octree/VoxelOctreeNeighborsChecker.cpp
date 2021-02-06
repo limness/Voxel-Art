@@ -79,59 +79,17 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 		}
 		else
 		{
+			ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 			{
 				FScopeLock Lock(&World->OctreeMutex);
-				CheckOctree((World->MainOctree), 0);
+				CheckOctree(World->MainOctree, 0);
 			}
-			for (auto& it : ChunksGeneration)
+			if (ChangesOctree->ChunksGeneration.Num() > 0)
 			{
-				World->ChunksGenerationGroup.Enqueue(it);
+				World->ChangesOctree.Enqueue(ChangesOctree);
 			}
-			ChunksGeneration.Empty();
-
-			/*{
-				FScopeLock Lock(&World->OctreeMutex);
-				CheckOctree((World->MainOctree), 0);
-			}
-			for (auto& it : ChunksGeneration)
-			{
-				World->ChunksGeneration.Add(it);
-			}
-			ChunksGeneration.Empty();*/
-
-			//FScopeLock Lock(&World->GlobalMutex);
-
-/*#if WITH_EDITOR
-
-			if (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview)
-			{
-				if (editorViewClient)
-				{
-					PlayerPositionToWorld = editorViewClient->GetViewLocation() - World->GetActorLocation();
-				}
-			}
-			else
-			{
-				if (PlayerController->GetPawn() != nullptr)
-				{
-					PlayerPositionToWorld = PlayerController->GetPawn()->GetActorLocation() - World->GetActorLocation();
-				}
-			}
-#endif*/
-/*
-			for (auto& chunk : World->ChunksCreation)
-			{
-				float distancePlayer = sqrt(
-					pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
-					pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
-					pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
-				);
-				chunk->priority = distancePlayer;
-			}
-			World->ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
-				{
-					return A->priority > B->priority;
-				});*/
+			ChangesOctree->ChunksGeneration.Empty();
+			ChangesOctree.Reset();
 
 			FPlatformProcess::Sleep(0.5);
 		}
@@ -328,7 +286,7 @@ TWeakPtr<FVoxelOctreeData> VoxelOctreeNeighborsChecker::FindNodeByID(TWeakPtr<FV
 	{
 		if (chunk.Pin()->HasChildren())
 		{
-			if (level + 1 <= World->maximumLOD)
+			if (level + 1 <= World->MaximumLOD)
 			{
 				for (auto& child : chunk.Pin()->GetChildren())
 				{
@@ -405,7 +363,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk
 							for (auto& it : candidateNeighborFaceU) { chunk->neighborFaceU.Add(it); }
 							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }
 
-							ChunksGeneration.Add(chunk->chunk);
+							ChangesOctree->ChunksGeneration.Add(chunk->chunk);
 						}
 					}
 				}
@@ -413,7 +371,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk
 		}
 		else if (chunk->HasChildren())
 		{
-			if (level + 1 <= World->maximumLOD)
+			if (level + 1 <= World->MaximumLOD)
 			{
 				for (auto& child : chunk->GetChildren())
 				{

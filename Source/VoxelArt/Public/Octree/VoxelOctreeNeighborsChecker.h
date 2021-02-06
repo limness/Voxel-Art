@@ -29,7 +29,8 @@ public:
 
 private:
 
-	TArray<UVoxelChunkComponent*> ChunksGeneration;
+	//TArray<UVoxelChunkComponent*> ChunksGeneration;
+	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
 private:
 

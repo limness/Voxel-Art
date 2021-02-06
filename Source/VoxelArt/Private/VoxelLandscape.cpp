@@ -40,11 +40,11 @@ void AVoxelLandscape::CreateVoxelWorld()
 {
 	if (generatorLandscape)
 	{
-		if (minimumLOD < 0)
+		if (MinimumLOD < 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be under zero!"));
 		}
-		else if (minimumLOD > maximumLOD)
+		else if (MinimumLOD > MaximumLOD)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be upper Maximum LOD!"));
 		}
@@ -58,7 +58,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 			if (LODWorking)
 			{
-				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), distanceRadius, maximumLOD);
+				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), distanceRadius, MaximumLOD);
 
 				if (TransitionWorking)
 				{
@@ -93,7 +93,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 		MainOctree.Reset();
 
-//		ChunksToRecomputeOctree.Empty();
+		ChangesOctree.Empty();
 		ChunksCreation.Empty();
 		ChunksRemoving.Empty();
 		ChunksGeneration.Empty();
@@ -158,139 +158,122 @@ void AVoxelLandscape::Tick(float DeltaTime)
 
 void AVoxelLandscape::UpdateOctree()
 {
+	TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
+	while (ChangesOctree.Peek(ChunksChangesArray))
 	{
-		TSharedPtr<FVoxelChunkRenderData> ChunksCreationNewGroup;
+		ChangesOctree.Dequeue(ChunksChangesArray);
 
-		while (ChunksCreationGroup.Peek(ChunksCreationNewGroup))
+		for (auto& Chunk : ChunksChangesArray->ChunksCreation)
 		{
-			ChunksCreationGroup.Dequeue(ChunksCreationNewGroup);
-
-			ChunksCreation.Add(ChunksCreationNewGroup);
+			ChunksCreation.Add(Chunk);
 		}
-
-		UVoxelChunkComponent* ChunksRemovingNewGroup;
-
-		while (ChunksRemovingGroup.Peek(ChunksRemovingNewGroup))
+		for (auto& Chunk : ChunksChangesArray->ChunksRemoving)
 		{
-			ChunksRemovingGroup.Dequeue(ChunksRemovingNewGroup);
-
-			ChunksRemoving.Add(ChunksRemovingNewGroup);
+			ChunksRemoving.Add(Chunk);
 		}
-		
-		UVoxelChunkComponent* ChunksGenerationNewGroup;
-
-		while (ChunksGenerationGroup.Peek(ChunksGenerationNewGroup))
+		for (auto& Chunk : ChunksChangesArray->ChunksGeneration)
 		{
-			ChunksGenerationGroup.Dequeue(ChunksGenerationNewGroup);
-
-			ChunksGeneration.Add(ChunksGenerationNewGroup);
+			ChunksGeneration.Add(Chunk);
 		}
+		ChunksChangesArray->ChunksCreation.Empty();
+		ChunksChangesArray->ChunksRemoving.Empty();
+		ChunksChangesArray->ChunksGeneration.Empty();
+	}
+	{
 
-		{
-
-			FViewport* activeViewport = GEditor->GetActiveViewport();
-			FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
-			FVector PlayerPositionToWorld;
+		FViewport* activeViewport = GEditor->GetActiveViewport();
+		FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
+		FVector PlayerPositionToWorld;
 #if WITH_EDITOR
-			if (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview)
-			{
-				PlayerPositionToWorld = editorViewClient->GetViewLocation() - GetActorLocation();
-			}
-			else
-			{
-				PlayerPositionToWorld = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation() - GetActorLocation();
-			}
+		if (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview)
+		{
+			PlayerPositionToWorld = editorViewClient->GetViewLocation() - GetActorLocation();
+		}
+		else
+		{
+			PlayerPositionToWorld = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation() - GetActorLocation();
+		}
 #endif
 
-			for (auto& chunk : ChunksCreation)
-			{
-				float distancePlayer = sqrt(
-					pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
-					pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
-					pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
-				);
-				chunk->priority = distancePlayer;
-			}
-			ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
-				{
-					return A->priority > B->priority;
-				});
-			//ChunksGeneration.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
-			//	{
-			//		return A->priority > B->priority;
-			//	});
-		}
-
-		int32 Index = 0;
-		while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
+		for (auto& chunk : ChunksCreation)
 		{
-			OctreeMutex.Lock();
-			TSharedPtr<FVoxelOctreeData> chunk = ChunksCreation.Pop()->CurrentOctree.Pin();
-			OctreeMutex.Unlock();
-
-			//If our leaf is exist yet inside Octree, we create chunk for it
-			if (chunk.IsValid())
-			{
-				if (!chunk->HasChildren())
-				{
-					if (IsValid(chunk->chunk))
-					{
-						if (chunk->chunk->Active == true)
-						{
-							ChunksRemoving.Add(chunk->chunk);
-						}
-					}
-
-					SpawnChunk(chunk);
-					Index++;
-				}
-			}
+			float distancePlayer = sqrt(
+				pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
+				pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
+				pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
+			);
+			chunk->priority = distancePlayer;
 		}
-
-		if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
-		{
-			auto AreAllTasksDone = [&]()
+		ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
 			{
-				bool AreDone = true;
+				return A->priority > B->priority;
+			});
+	}
 
-				for (auto& it : PoolThreads)
+	int32 Index = 0;
+	while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
+	{
+		OctreeMutex.Lock();
+		TSharedPtr<FVoxelOctreeData> chunk = ChunksCreation.Pop()->CurrentOctree.Pin();
+		OctreeMutex.Unlock();
+
+		if (chunk.IsValid())
+		{
+			if (!chunk->HasChildren())
+			{
+				if (IsValid(chunk->chunk))
 				{
-					if (!it->IsDone())
+					if (chunk->chunk->Active == true)
 					{
-						AreDone = false;
+						ChunksRemoving.Add(chunk->chunk);
 					}
 				}
-				return AreDone;
-			};
 
-			if (AreAllTasksDone())
+				SpawnChunk(chunk);
+				Index++;
+			}
+		}
+	}
+
+	if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
+	{
+		auto AreAllTasksDone = [&]()
+		{
+			bool AreDone = true;
+
+			for (auto& it : PoolThreads)
 			{
-				while (ChunksRemoving.Num() > 0)
+				if (!it->IsDone())
 				{
-					UVoxelChunkComponent* chunk = ChunksRemoving.Pop();
+					AreDone = false;
+				}
+			}
+			return AreDone;
+		};
 
-					if (IsValid(chunk))
+		if (AreAllTasksDone())
+		{
+			while (ChunksRemoving.Num() > 0)
+			{
+				UVoxelChunkComponent* chunk = ChunksRemoving.Pop();
+
+				if (IsValid(chunk))
+				{
+					if (chunk->Active == true)
 					{
-						if (chunk->Active == true)
-						{
-							chunk->SetActive(false);
-						}
+						chunk->SetActive(false);
 					}
 				}
 			}
 		}
 	}
+	while (ChunksGeneration.Num() > 0)
 	{
-		int32 Index = 0;
-		while (Index < ChunksPerFrame && ChunksGeneration.Num() > 0)
+		UVoxelChunkComponent* chunk = ChunksGeneration.Pop();
 		{
-			UVoxelChunkComponent* chunk = ChunksGeneration.Pop();
+			if (IsValid(chunk))
 			{
-				if (IsValid(chunk))
-				{
-					PutChunkOnGeneration(chunk);
-					Index++;
-				}
+				PutChunkOnGeneration(chunk);
 			}
 		}
 	}
@@ -332,7 +315,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 		float StepTexture = radiusOfChunk / MapSize;
 
-		if (RenderType == RenderTexture::RedGreenBlack)
+		if (RenderType == RenderTexture::RedGreenBlue)
 		{
 			for (int y = 0; y < height; y++)
 			{
@@ -442,7 +425,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 level)
 {
-	if (level == minimumLOD)
+	if (level == MinimumLOD)
 	{
 		SpawnChunk(leaf);
 		//PoolableActor->CollisionMesh->SetBoxExtent(FVector(leaf->radius, leaf->radius, leaf->radius));

@@ -78,29 +78,20 @@ uint32 VoxelManager::Run()
 				}
 			}
 #endif
-			if (World->maximumLOD > 0)
+			if (World->MaximumLOD > 0)
 			{
-				chunksToChange = new FChunksRenderInfo();
+				ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 				{
 					FScopeLock Lock(&World->OctreeMutex);
 					CheckOctree(World->MainOctree, 0);
 				}
-				if (chunksToChange->ChunksCreation.Num() > 0 ||
-					chunksToChange->ChunksRemoving.Num() > 0 ||
-					chunksToChange->LeavesCreation.Num() > 0 ||
-					chunksToChange->LeavesDestroying.Num() > 0)
+				if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
 				{
-					for (auto& it : chunksToChange->ChunksCreation)
-					{
-						World->ChunksCreationGroup.Enqueue(it);
-					}
-					for (auto& it : chunksToChange->ChunksRemoving)
-					{
-						World->ChunksRemovingGroup.Enqueue(it);
-					}
+					World->ChangesOctree.Enqueue(ChangesOctree);
 				}
-				//chunksToChange = nullptr;
-				//delete chunksToChange;
+				ChangesOctree->ChunksCreation.Empty();
+				ChangesOctree->ChunksRemoving.Empty();
+				ChangesOctree.Reset();
 			}
 			FPlatformProcess::Sleep(0.01);
 		}
@@ -136,14 +127,14 @@ void VoxelManager::Stop()
 
 void VoxelManager::EnsureCompletion()
 {
-	if (chunksToChange)
+	if (ChangesOctree)
 	{
-		chunksToChange->LeavesCreation.Empty();
-		chunksToChange->LeavesDestroying.Empty();
-		chunksToChange->ChunksCreation.Empty();
-		chunksToChange->ChunksRemoving.Empty();
+		ChangesOctree->LeavesCreation.Empty();
+		ChangesOctree->LeavesDestroying.Empty();
+		ChangesOctree->ChunksCreation.Empty();
+		ChangesOctree->ChunksRemoving.Empty();
 
-		chunksToChange = nullptr;
+		ChangesOctree = nullptr;
 	}
 	Stop();
 
@@ -210,7 +201,7 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						ChildLeaf->ParentChunk = chunk;
 					}
 
-					if (World->maximumLOD > level + 1)
+					if (World->MaximumLOD > level + 1)
 					{
 						TArray<TSharedPtr<FVoxelOctreeData>> candidates = CheckOctreeWithoutExist(ChildLeaf, level + 1);
 						ChildLeaf->CreateChildren(candidates);
@@ -228,9 +219,8 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						ChunkCreation->radius = it->radius;
 						ChunkCreation->transvoxelDirection = it->transvoxelDirection;
 
-						chunksToChange->ChunksCreation.Add(ChunkCreation);
+						ChangesOctree->ChunksCreation.Add(ChunkCreation);
 					}
-					//chunksToChange->LeavesCreation.Add(chunkLittle);
 					chunk->ChildrenChunks.Add(ChildLeaf);
 				}
 
@@ -238,7 +228,7 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 				{
 					if (chunk->chunk->Active == true)
 					{
-						chunksToChange->ChunksRemoving.Add(chunk->chunk);
+						ChangesOctree->ChunksRemoving.Add(chunk->chunk);
 						chunk->chunk = nullptr;
 					}
 				}
@@ -246,7 +236,7 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 		}
 		else if (chunk->HasChildren())
 		{
-			if (World->minimumLOD < level + 1)
+			if (World->MinimumLOD < level + 1)
 			{
 				int farFromPlayer = 0;
 
@@ -254,26 +244,21 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 				{
 					if (!chunk->ChildrenChunks[i]->HasChildren())
 					{
-						//if (chunk->ChildrenChunks[i]->cUpdating == false)
-						{
-							float distancePlayer = sqrt(
-								pow(PlayerPositionToWorld.X - chunk->ChildrenChunks[i]->position.X, 2) +
-								pow(PlayerPositionToWorld.Y - chunk->ChildrenChunks[i]->position.Y, 2) +
-								pow(PlayerPositionToWorld.Z - chunk->ChildrenChunks[i]->position.Z, 2)
-							);
+						float distancePlayer = sqrt(
+							pow(PlayerPositionToWorld.X - chunk->ChildrenChunks[i]->position.X, 2) +
+							pow(PlayerPositionToWorld.Y - chunk->ChildrenChunks[i]->position.Y, 2) +
+							pow(PlayerPositionToWorld.Z - chunk->ChildrenChunks[i]->position.Z, 2)
+						);
 
-							if (!(distancePlayer <= distanceLODs / 2.f))
-							{
-								farFromPlayer += 1;
-							}
+						if (!(distancePlayer <= distanceLODs / 2.f))
+						{
+							farFromPlayer += 1;
 						}
 					}
 				}
 
 				if (farFromPlayer == 8)
 				{
-				//	chunk->cUpdating = true;
-
 					TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
 					ChunkCreation->CurrentOctree = chunk;
 					ChunkCreation->level = chunk->level;
@@ -289,30 +274,21 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 						{
 							if (it->chunk->Active == true)
 							{
-								chunksToChange->ChunksRemoving.Add(it->chunk);
+								ChangesOctree->ChunksRemoving.Add(it->chunk);
 								it->chunk = nullptr;
 							}
 						}
 					}
-
-					//chunksToChange->LeavesDestroying.Add(chunk);
 					chunk->DestroyChildren();
 
-					chunksToChange->ChunksCreation.Add(ChunkCreation);
-				}
-				else
-				{
-				//	chunk->cUpdating = false;
+					ChangesOctree->ChunksCreation.Add(ChunkCreation);
 				}
 			}
-			//if (!chunk->cUpdating)
+			if (World->MaximumLOD > level + 1)
 			{
-				if (World->maximumLOD > level + 1)
+				for (auto child : chunk->GetChildren())
 				{
-					for (auto child : chunk->GetChildren())
-					{
-						CheckOctree(child, level + 1);
-					}
+					CheckOctree(child, level + 1);
 				}
 			}
 		}
@@ -394,7 +370,7 @@ TArray<TSharedPtr<FVoxelOctreeData>> VoxelManager::CheckOctreeWithoutExist(TShar
 			{
 				chunkLittle->ParentChunk = chunk;
 			}
-			if (World->maximumLOD > level + 1)
+			if (World->MaximumLOD > level + 1)
 			{
 				TArray<TSharedPtr<FVoxelOctreeData>> candidates = CheckOctreeWithoutExist(chunkLittle, level + 1);
 				chunkLittle->CreateChildren(candidates);

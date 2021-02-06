@@ -35,7 +35,7 @@ UENUM()
 enum RenderTexture
 {
 	WhiteBlack		UMETA(DisplayName = "WB"),
-	RedGreenBlack	UMETA(DisplayName = "RGB")
+	RedGreenBlue	UMETA(DisplayName = "RGB")
 };
 
 UCLASS()
@@ -69,6 +69,7 @@ public:
 public:
 
 	TSharedPtr<FVoxelOctreeData> MainOctree;
+	TQueue<TSharedPtr<FChunksRenderInfo>> ChangesOctree;
 	TMap<uint64, TSharedPtr<FVoxelOctreeData>> SavedChunks;
 
 private:
@@ -78,14 +79,23 @@ private:
 
 public:
 
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
+	UVoxelLandscapeGenerator* generatorLandscape;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
 	bool TerrainRendering = true;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Main")
-	bool TerrainCreated = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
+	bool TransitionWorking = true;
 
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
-	UVoxelLandscapeGenerator *generatorLandscape;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transition Mesh")
+	float transitionSize = 0.25f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
+	float radiusOfChunk = 500000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
+	int voxelsOneChunk = 16;
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Main")
 	void CreateVoxelWorld();
@@ -96,64 +106,31 @@ public:
 
 public:	
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	bool TransitionWorking = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transition Mesh")
-	float transitionSize = 0.25f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NeighborTest")
-	int nodeID = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NeighborTest")
-	uint8 moveBit = 3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NeighborTest")
-	bool work = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Size")
-	float radiusOfChunk = 500000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Size")
-	int voxelsOneChunk = 9;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool TerrainCreated = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	bool LODWorking = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	int32 minimumLOD = 0;
+	int32 MinimumLOD = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	int32 maximumLOD = 8;
+	int32 MaximumLOD = 8;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	float distanceRadius = 2000000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
 	int32 ChunksPerFrame = 32;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
 	bool vertexSubdivision;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
 	bool normalsSmoothing;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layes")
-	FLinearColor ground;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layes")
-	FLinearColor grass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Noise")
-	float actave = 0.003f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Noise")
-	float period = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Noise")
-	float radiusSphere = 5000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage")
 	UStaticMesh* meshTree;
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
@@ -182,37 +159,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* material;
 
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Noise")
-	bool kost = false;
-
 private:
 
-	UFUNCTION(BlueprintCallable)
 	void GenerateLandscape();
-
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 level);
-
 	void SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData);
-
 	void ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
-
-	UFUNCTION(BlueprintCallable)
 	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
-	
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
-
 	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
-
-	UFUNCTION()
 	void UpdateOctree();
-
-public:
-
-	TQueue<TSharedPtr<FVoxelChunkRenderData>> ChunksCreationGroup;
-	TQueue<UVoxelChunkComponent*> ChunksGenerationGroup;
-	TQueue<UVoxelChunkComponent*> ChunksRemovingGroup;
 
 private:
 

@@ -86,7 +86,7 @@ uint32 VoxelRender::Run()
 
 			AVoxelLandscape* land = Cast<AVoxelLandscape>(VoxelLand);
 
-			if (land->maximumLOD > 0)
+			if (land->MaximumLOD > 0)
 			{
 				//FScopeLock Lock(&land->GlobalMutex);
 

@@ -213,7 +213,7 @@ struct FChunksRenderInfo
 	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
 
 	//Chunks which has to be generated
-	TArray<TWeakPtr<FVoxelOctreeData>> ChunksGeneration;
+	TArray<UVoxelChunkComponent*> ChunksGeneration;
 
 	//Chunks which has to be removed
 	TArray<UVoxelChunkComponent*> ChunksRemoving;

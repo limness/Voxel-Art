@@ -29,7 +29,7 @@ private:
 
 	AVoxelLandscape* World;
 	APlayerController* PlayerController;
-	FChunksRenderInfo* chunksToChange;
+	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
 	FVector PlayerPositionToWorld;
 
