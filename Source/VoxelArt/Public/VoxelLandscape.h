@@ -97,10 +97,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
 	int voxelsOneChunk = 16;
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Main")
+	UFUNCTION(BlueprintCallable, Category = "Main")
 	void CreateVoxelWorld();
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Main")
+	UFUNCTION(BlueprintCallable, Category = "Main")
 	void DestroyVoxelWorld();
 
 

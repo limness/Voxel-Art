@@ -88,7 +88,7 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 			{
 				World->ChangesOctree.Enqueue(ChangesOctree);
 			}
-			ChangesOctree->ChunksGeneration.Empty();
+			//ChangesOctree->ChunksGeneration.Empty();
 			ChangesOctree.Reset();
 
 			FPlatformProcess::Sleep(0.5);

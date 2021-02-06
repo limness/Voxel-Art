@@ -117,7 +117,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld_Statics::Function_MetaDataParams[] = {
-		{ "CallInEditor", "true" },
 		{ "Category", "Main" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
@@ -141,7 +140,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld_Statics::Function_MetaDataParams[] = {
-		{ "CallInEditor", "true" },
 		{ "Category", "Main" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
@@ -271,8 +269,8 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_AVoxelLandscape_Statics::FuncInfo[] = {
 		{ &Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap, "CreateTextureDensityMap" }, // 2299629249
-		{ &Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld, "CreateVoxelWorld" }, // 3986220376
-		{ &Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld, "DestroyVoxelWorld" }, // 1880527
+		{ &Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld, "CreateVoxelWorld" }, // 474152906
+		{ &Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld, "DestroyVoxelWorld" }, // 1493059625
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::Class_MetaDataParams[] = {
@@ -508,7 +506,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 2801471430);
+	IMPLEMENT_CLASS(AVoxelLandscape, 1347041569);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
