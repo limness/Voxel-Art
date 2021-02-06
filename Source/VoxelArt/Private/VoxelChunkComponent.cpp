@@ -143,7 +143,7 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vert, TArray<int32> Tri, T
 
 	if (Vert.Num() > 0)
 	{
-		CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), true);
+		CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), false);
 		SetMaterial(0, material);
 	}
 }

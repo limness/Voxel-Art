@@ -530,8 +530,8 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOc
 		chunk->generatorLandscape = generatorLandscape;
 		chunkData->chunk = chunk;
 
-		chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+		chunk->SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics
+		chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); //ECC_WorldDynamic
 		chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
