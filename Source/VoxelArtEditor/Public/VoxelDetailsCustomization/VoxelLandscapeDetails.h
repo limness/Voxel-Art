@@ -23,6 +23,7 @@ protected:
    // void OnModeRadioChanged(ECheckBoxState CheckType, AVoxelLandscape* actor, int optionIndex);
 
     FReply CreateWorldInEditor();
+    FReply DestroyWorldInEditor();
 
 private:
 

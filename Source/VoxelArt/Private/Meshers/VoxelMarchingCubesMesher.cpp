@@ -5,6 +5,7 @@
 #include "Helpers/MarchingCubes.h"
 
 VoxelMarchingCubesMesher::VoxelMarchingCubesMesher(
+	UVoxelLandscapeGenerator* _GeneratorLandscape,
 	int _Voxels,
 	int _LevelOctree,
 	int _Radius,
@@ -12,6 +13,7 @@ VoxelMarchingCubesMesher::VoxelMarchingCubesMesher(
 	uint8 _TransvoxelDirection,
 	TArray<float> _DensityMap)
 {
+	GeneratorLandscape = _GeneratorLandscape;
 	Voxels = _Voxels;
 	LevelOctree = _LevelOctree;
 	Radius = _Radius;
@@ -459,7 +461,7 @@ void VoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 				for (int a = 0; a < _VerticesTransition.Num(); a++)
 				{
 					Vertices.Add(_VerticesTransition[a]);
-					VertexColors.Add(generatorLandscape->GetColorMap(_VerticesTransition[a] + WorldLocation));
+					VertexColors.Add(GeneratorLandscape->GetColorMap(_VerticesTransition[a] + WorldLocation));
 				}
 
 				for (int j = 0; j < _NormalsTransition.Num(); j++)
@@ -478,7 +480,7 @@ void VoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 		}
 	}
 }
-#include "Misc/ScopeTryLock.h"
+//#include "Misc/ScopeTryLock.h"
 template<uint8 Direction>
 float VoxelMarchingCubesMesher::GetValue(float X, float Y, float size, int LOD)
 {
@@ -494,7 +496,7 @@ float VoxelMarchingCubesMesher::GetValue(float X, float Y, float size, int LOD)
 	{
 		value = GetValueNoise(GlobalPosition * GetVoxelSize() - (float)(Radius / 2.f));
 	}
-	if (true) {}
+	/*if (true) {}
 	else
 	{
 		TWeakPtr<FVoxelOctreeData> chunkNeihbor = nullptr;
@@ -543,7 +545,7 @@ float VoxelMarchingCubesMesher::GetValue(float X, float Y, float size, int LOD)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : VoxelChunk ] Error: neighbor empty"));
 		}
-	}
+	}*/
 	return value;
 }
 

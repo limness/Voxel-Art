@@ -80,22 +80,25 @@ private:
 public:
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
-	UVoxelLandscapeGenerator* generatorLandscape;
+	UVoxelLandscapeGenerator* GeneratorLandscape;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
-	bool TerrainRendering = true;
+	bool EnabledWorldInGame = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	bool TransitionWorking = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "5000000.0", UIMin = "0.0", UIMax = "5000000.0"))
+	float WorldRadius = 500000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transition Mesh")
-	float transitionSize = 0.25f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
-	float radiusOfChunk = 500000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0", ClampMax = "32", UIMin = "0", UIMax = "32"))
+	int VoxelsPerChunk = 16;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
-	int voxelsOneChunk = 16;
+	UMaterialInterface* material;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Main")
+	bool TransitionMesh = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"), Category = "Main")
+	float TransitionSize = 0.25f;
 
 	UFUNCTION(BlueprintCallable, Category = "Main")
 	void CreateVoxelWorld();
@@ -103,35 +106,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Main")
 	void DestroyVoxelWorld();
 
-
 public:	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool TerrainCreated = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	bool LODWorking = true;
+	bool EnabledLOD = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
+	uint8 DrawingRange = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "15", UIMin = "0", UIMax = "15"))
 	int32 MinimumLOD = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "15", UIMin = "0", UIMax = "15"))
 	int32 MaximumLOD = 8;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
-	float distanceRadius = 2000000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering", meta = (ClampMin = "1", ClampMax = "2048", UIMin = "1", UIMax = "2048"))
 	int32 ChunksPerFrame = 32;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
-	bool vertexSubdivision;
+	bool VertexSubdivision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
-	bool normalsSmoothing;
+	bool NormalsSmoothing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage")
-	UStaticMesh* meshTree;
+	UStaticMesh* MeshTree;
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
 	UVoxelLandscapeGenerator *GeneratorDensity;
@@ -148,16 +150,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
 	TEnumAsByte<RenderTexture> RenderType;
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Export Preview Heightmap")
+	UFUNCTION(BlueprintCallable, Category = "Export Preview Heightmap")
 	void CreateTextureDensityMap();
+
+private:
+
+	int TimeForWorldGenerate = 0;
+	bool StatsShowed = false;
 
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* SceneComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMaterialInterface* material;
 
 private:
 
@@ -276,12 +280,13 @@ public:
 								positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
 								positionNoise = positionNoise - (float)(Radius / 2.f);
 
-								DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)] = World->generatorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + WorldLocation);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
+								DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)] = World->GeneratorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + WorldLocation);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
 							}
 						}
 					}
 				}
 				VoxelMarchingCubesMesher* mesher = new VoxelMarchingCubesMesher(
+					World->GeneratorLandscape,
 					Voxels,
 					LevelOctree,
 					Radius,

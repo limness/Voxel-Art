@@ -89,8 +89,6 @@ uint32 VoxelManager::Run()
 				{
 					World->ChangesOctree.Enqueue(ChangesOctree);
 				}
-				//ChangesOctree->ChunksCreation.Empty();
-				//ChangesOctree->ChunksRemoving.Empty();
 				ChangesOctree.Reset();
 			}
 			FPlatformProcess::Sleep(0.01);

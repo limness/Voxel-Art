@@ -22,7 +22,7 @@ void AVoxelLandscape::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (TerrainRendering)
+	if (EnabledWorldInGame)
 	{
 		CreateVoxelWorld();
 	}
@@ -38,7 +38,7 @@ void AVoxelLandscape::Destroyed()
 
 void AVoxelLandscape::CreateVoxelWorld()
 {
-	if (generatorLandscape)
+	if (GeneratorLandscape)
 	{
 		if (MinimumLOD < 0)
 		{
@@ -54,13 +54,14 @@ void AVoxelLandscape::CreateVoxelWorld()
 			{
 				DestroyVoxelWorld();
 			}
+			TimeForWorldGenerate = FDateTime::Now().GetTicks();
 			GenerateLandscape();
 
-			if (LODWorking)
+			if (EnabledLOD)
 			{
-				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), distanceRadius, MaximumLOD);
+				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), (float)DrawingRange * WorldRadius, MaximumLOD);
 
-				if (TransitionWorking)
+				if (TransitionMesh)
 				{
 					OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
 				}
@@ -253,6 +254,12 @@ void AVoxelLandscape::UpdateOctree()
 
 		if (AreAllTasksDone())
 		{
+			if (!StatsShowed)
+			{
+				int timeAfter = FDateTime::Now().GetTicks();
+				UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 10000.f / 1000.f, PoolChunks->PoolChunks.Num());
+				StatsShowed = true;
+			}
 			while (ChunksRemoving.Num() > 0)
 			{
 				UVoxelChunkComponent* chunk = ChunksRemoving.Pop();
@@ -261,7 +268,7 @@ void AVoxelLandscape::UpdateOctree()
 				{
 					if (chunk->Active == true)
 					{
-						chunk->SetActive(false);
+						chunk->SetActive(false); 
 					}
 				}
 			}
@@ -299,7 +306,7 @@ void AVoxelLandscape::GenerateLandscape()
 	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData());
 	MainOctree->nodeID = (1 << 3) | 0x00;
 	MainOctree->level = 0;
-	MainOctree->radius = radiusOfChunk + 0.f;
+	MainOctree->radius = WorldRadius + 0.f;
 
 	GenerateOctree(MainOctree, 0);
 }
@@ -313,7 +320,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 		int height = MapSize;
 		uint8* pixels = (uint8*)malloc(width * height * 4);
 
-		float StepTexture = radiusOfChunk / MapSize;
+		float StepTexture = WorldRadius / MapSize;
 
 		if (RenderType == RenderTexture::RedGreenBlue)
 		{
@@ -523,11 +530,11 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOc
 		chunk->transvoxelDirection = chunkData->transvoxelDirection;
 		chunk->level = chunkData->level;
 		chunk->radius = chunkData->radius;
-		chunk->voxels = voxelsOneChunk;
+		chunk->voxels = VoxelsPerChunk;
 		chunk->material = material;
 		chunk->SetMaterial(0, material);
 		chunk->DensityMap = chunkData->Grid;
-		chunk->generatorLandscape = generatorLandscape;
+		chunk->generatorLandscape = GeneratorLandscape;
 		chunkData->chunk = chunk;
 
 		chunk->SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics

@@ -25,7 +25,10 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
 
     // add custom widget to "Options" category
     IDetailCategoryBuilder& OptionsCategory = DetailLayout.EditCategory("Main", FText::FromString(""), ECategoryPriority::Important);
-
+   
+  //  auto& Builder = static_cast<FDetailCategoryImpl&>(DetailLayout.EditCategory(Name, NewNameText));
+  //  Builder.SortCategories
+   //     OptionsCategory.Sort
     OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
         .NameContent()
         [
@@ -48,14 +51,69 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         .Text(FText::FromString(TEXT("Create World")))
         ]
         ];
+
+    OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
+        .NameContent()
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("")))
+        ]
+    .ValueContent()
+        .MaxDesiredWidth(125.f)
+        .MinDesiredWidth(125.f)
+        [
+            SNew(SButton)
+            .ContentPadding(2)
+        .VAlign(VAlign_Center)
+        .HAlign(HAlign_Center)
+        .OnClicked(this, &IVoxelLandscapeDetails::DestroyWorldInEditor)
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("Destroy World")))
+        ]
+        ];
+
+    DetailLayout.EditCategory("Export Preview Heightmap")
+        .AddCustomRow(FText::FromString(TEXT("")))
+        .NameContent()
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("Preview Density Map")))
+        ]
+    .ValueContent()
+        .MaxDesiredWidth(125.f)
+        .MinDesiredWidth(125.f)
+        [
+            SNew(SButton)
+            .ContentPadding(2)
+        .VAlign(VAlign_Center)
+        .HAlign(HAlign_Center)
+        .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("Create texture")))
+        ]
+        ];
 }
 
 FReply IVoxelLandscapeDetails::CreateWorldInEditor()
 {
     if (World.IsValid())
     {
-        //UE_LOG(LogTemp, Warning, TEXT("Startup %d"), World->voxelsOneChunk);
         World->CreateVoxelWorld();
+    }
+    return FReply::Handled();
+}
+
+FReply IVoxelLandscapeDetails::DestroyWorldInEditor()
+{
+    if (World.IsValid())
+    {
+        World->DestroyVoxelWorld();
     }
     return FReply::Handled();
 }

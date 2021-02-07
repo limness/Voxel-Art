@@ -21,10 +21,10 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld();
-	ENGINE_API UClass* Z_Construct_UClass_UMaterialInterface_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_USceneComponent_NoRegister();
 	VOXELART_API UClass* Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_UStaticMesh_NoRegister();
+	ENGINE_API UClass* Z_Construct_UClass_UMaterialInterface_NoRegister();
 // End Cross Module References
 	static UEnum* RenderTexture_StaticEnum()
 	{
@@ -93,7 +93,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap_Statics::Function_MetaDataParams[] = {
-		{ "CallInEditor", "true" },
 		{ "Category", "Export Preview Heightmap" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
@@ -166,10 +165,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		static const UE4CodeGen_Private::FMetaDataPairParam Class_MetaDataParams[];
 #endif
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_material_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_material;
-#if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_SceneComponent_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_SceneComponent;
@@ -194,27 +189,23 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #endif
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_GeneratorDensity;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_meshTree_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_MeshTree_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_meshTree;
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_MeshTree;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_normalsSmoothing_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_NormalsSmoothing_MetaData[];
 #endif
-		static void NewProp_normalsSmoothing_SetBit(void* Obj);
-		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_normalsSmoothing;
+		static void NewProp_NormalsSmoothing_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_NormalsSmoothing;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_vertexSubdivision_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_VertexSubdivision_MetaData[];
 #endif
-		static void NewProp_vertexSubdivision_SetBit(void* Obj);
-		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_vertexSubdivision;
+		static void NewProp_VertexSubdivision_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_VertexSubdivision;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_ChunksPerFrame_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FIntPropertyParams NewProp_ChunksPerFrame;
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_distanceRadius_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_distanceRadius;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_MaximumLOD_MetaData[];
 #endif
@@ -224,41 +215,49 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #endif
 		static const UE4CodeGen_Private::FIntPropertyParams NewProp_MinimumLOD;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_LODWorking_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_DrawingRange_MetaData[];
 #endif
-		static void NewProp_LODWorking_SetBit(void* Obj);
-		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_LODWorking;
+		static const UE4CodeGen_Private::FBytePropertyParams NewProp_DrawingRange;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_EnabledLOD_MetaData[];
+#endif
+		static void NewProp_EnabledLOD_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_EnabledLOD;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_TerrainCreated_MetaData[];
 #endif
 		static void NewProp_TerrainCreated_SetBit(void* Obj);
 		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_TerrainCreated;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_voxelsOneChunk_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_TransitionSize_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FUnsizedIntPropertyParams NewProp_voxelsOneChunk;
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_TransitionSize;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_radiusOfChunk_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_TransitionMesh_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_radiusOfChunk;
+		static void NewProp_TransitionMesh_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_TransitionMesh;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_transitionSize_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_material_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_transitionSize;
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_material;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_TransitionWorking_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_VoxelsPerChunk_MetaData[];
 #endif
-		static void NewProp_TransitionWorking_SetBit(void* Obj);
-		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_TransitionWorking;
+		static const UE4CodeGen_Private::FUnsizedIntPropertyParams NewProp_VoxelsPerChunk;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_TerrainRendering_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_WorldRadius_MetaData[];
 #endif
-		static void NewProp_TerrainRendering_SetBit(void* Obj);
-		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_TerrainRendering;
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_WorldRadius;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_generatorLandscape_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_EnabledWorldInGame_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_generatorLandscape;
+		static void NewProp_EnabledWorldInGame_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_EnabledWorldInGame;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_GeneratorLandscape_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_GeneratorLandscape;
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 		static const FCppClassTypeInfoStatic StaticCppClassTypeInfo;
 		static const UE4CodeGen_Private::FClassParams ClassParams;
@@ -268,7 +267,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		(UObject* (*)())Z_Construct_UPackage__Script_VoxelArt,
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_AVoxelLandscape_Statics::FuncInfo[] = {
-		{ &Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap, "CreateTextureDensityMap" }, // 2299629249
+		{ &Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap, "CreateTextureDensityMap" }, // 2744335584
 		{ &Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld, "CreateVoxelWorld" }, // 474152906
 		{ &Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld, "DestroyVoxelWorld" }, // 1493059625
 	};
@@ -278,13 +277,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData[] = {
-		{ "Category", "VoxelLandscape" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material = { UE4CodeGen_Private::EPropertyClass::Object, "material", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, material), Z_Construct_UClass_UMaterialInterface_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_SceneComponent_MetaData[] = {
 		{ "Category", "VoxelLandscape" },
@@ -330,73 +322,85 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #endif
 	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorDensity = { UE4CodeGen_Private::EPropertyClass::Object, "GeneratorDensity", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x001200000008000d, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, GeneratorDensity), Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorDensity_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorDensity_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_meshTree_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MeshTree_MetaData[] = {
 		{ "Category", "Foliage" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_meshTree = { UE4CodeGen_Private::EPropertyClass::Object, "meshTree", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, meshTree), Z_Construct_UClass_UStaticMesh_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_meshTree_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_meshTree_MetaData)) };
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MeshTree = { UE4CodeGen_Private::EPropertyClass::Object, "MeshTree", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, MeshTree), Z_Construct_UClass_UStaticMesh_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MeshTree_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MeshTree_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing_MetaData[] = {
 		{ "Category", "Rendering" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing_SetBit(void* Obj)
+	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing_SetBit(void* Obj)
 	{
-		((AVoxelLandscape*)Obj)->normalsSmoothing = 1;
+		((AVoxelLandscape*)Obj)->NormalsSmoothing = 1;
 	}
-	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing = { UE4CodeGen_Private::EPropertyClass::Bool, "normalsSmoothing", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing_MetaData)) };
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing = { UE4CodeGen_Private::EPropertyClass::Bool, "NormalsSmoothing", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision_MetaData[] = {
 		{ "Category", "Rendering" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision_SetBit(void* Obj)
+	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision_SetBit(void* Obj)
 	{
-		((AVoxelLandscape*)Obj)->vertexSubdivision = 1;
+		((AVoxelLandscape*)Obj)->VertexSubdivision = 1;
 	}
-	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision = { UE4CodeGen_Private::EPropertyClass::Bool, "vertexSubdivision", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision_MetaData)) };
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision = { UE4CodeGen_Private::EPropertyClass::Bool, "VertexSubdivision", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame_MetaData[] = {
 		{ "Category", "Rendering" },
+		{ "ClampMax", "2048" },
+		{ "ClampMin", "1" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "2048" },
+		{ "UIMin", "1" },
 	};
 #endif
 	const UE4CodeGen_Private::FIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame = { UE4CodeGen_Private::EPropertyClass::Int, "ChunksPerFrame", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, ChunksPerFrame), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_distanceRadius_MetaData[] = {
-		{ "Category", "Level of Detail" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_distanceRadius = { UE4CodeGen_Private::EPropertyClass::Float, "distanceRadius", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, distanceRadius), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_distanceRadius_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_distanceRadius_MetaData)) };
-#if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MaximumLOD_MetaData[] = {
 		{ "Category", "Level of Detail" },
+		{ "ClampMax", "15" },
+		{ "ClampMin", "0" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "15" },
+		{ "UIMin", "0" },
 	};
 #endif
 	const UE4CodeGen_Private::FIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MaximumLOD = { UE4CodeGen_Private::EPropertyClass::Int, "MaximumLOD", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, MaximumLOD), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MaximumLOD_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MaximumLOD_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MinimumLOD_MetaData[] = {
 		{ "Category", "Level of Detail" },
+		{ "ClampMax", "15" },
+		{ "ClampMin", "0" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "15" },
+		{ "UIMin", "0" },
 	};
 #endif
 	const UE4CodeGen_Private::FIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MinimumLOD = { UE4CodeGen_Private::EPropertyClass::Int, "MinimumLOD", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, MinimumLOD), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MinimumLOD_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MinimumLOD_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DrawingRange_MetaData[] = {
 		{ "Category", "Level of Detail" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking_SetBit(void* Obj)
+	const UE4CodeGen_Private::FBytePropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DrawingRange = { UE4CodeGen_Private::EPropertyClass::Byte, "DrawingRange", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, DrawingRange), nullptr, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DrawingRange_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DrawingRange_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD_MetaData[] = {
+		{ "Category", "Level of Detail" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+	};
+#endif
+	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD_SetBit(void* Obj)
 	{
-		((AVoxelLandscape*)Obj)->LODWorking = 1;
+		((AVoxelLandscape*)Obj)->EnabledLOD = 1;
 	}
-	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking = { UE4CodeGen_Private::EPropertyClass::Bool, "LODWorking", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking_MetaData)) };
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD = { UE4CodeGen_Private::EPropertyClass::Bool, "EnabledLOD", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated_MetaData[] = {
 		{ "Category", "VoxelLandscape" },
@@ -409,79 +413,98 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	}
 	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated = { UE4CodeGen_Private::EPropertyClass::Bool, "TerrainCreated", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000010015, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_voxelsOneChunk_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionSize_MetaData[] = {
+		{ "Category", "Main" },
+		{ "ClampMax", "1.0" },
+		{ "ClampMin", "0.0" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "1.0" },
+		{ "UIMin", "0.0" },
+	};
+#endif
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionSize = { UE4CodeGen_Private::EPropertyClass::Float, "TransitionSize", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010040000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, TransitionSize), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionSize_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionSize_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh_MetaData[] = {
 		{ "Category", "Main" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	const UE4CodeGen_Private::FUnsizedIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_voxelsOneChunk = { UE4CodeGen_Private::EPropertyClass::Int, "voxelsOneChunk", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, voxelsOneChunk), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_voxelsOneChunk_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_voxelsOneChunk_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_radiusOfChunk_MetaData[] = {
-		{ "Category", "Main" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_radiusOfChunk = { UE4CodeGen_Private::EPropertyClass::Float, "radiusOfChunk", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, radiusOfChunk), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_radiusOfChunk_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_radiusOfChunk_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_transitionSize_MetaData[] = {
-		{ "Category", "Transition Mesh" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_transitionSize = { UE4CodeGen_Private::EPropertyClass::Float, "transitionSize", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, transitionSize), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_transitionSize_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_transitionSize_MetaData)) };
-#if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking_MetaData[] = {
-		{ "Category", "Level of Detail" },
-		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-	};
-#endif
-	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking_SetBit(void* Obj)
+	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh_SetBit(void* Obj)
 	{
-		((AVoxelLandscape*)Obj)->TransitionWorking = 1;
+		((AVoxelLandscape*)Obj)->TransitionMesh = 1;
 	}
-	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking = { UE4CodeGen_Private::EPropertyClass::Bool, "TransitionWorking", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking_MetaData)) };
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh = { UE4CodeGen_Private::EPropertyClass::Bool, "TransitionMesh", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010040000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData[] = {
 		{ "Category", "Main" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_SetBit(void* Obj)
-	{
-		((AVoxelLandscape*)Obj)->TerrainRendering = 1;
-	}
-	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering = { UE4CodeGen_Private::EPropertyClass::Bool, "TerrainRendering", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering_MetaData)) };
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material = { UE4CodeGen_Private::EPropertyClass::Object, "material", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, material), Z_Construct_UClass_UMaterialInterface_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_generatorLandscape_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk_MetaData[] = {
+		{ "Category", "Main" },
+		{ "ClampMax", "32" },
+		{ "ClampMin", "0" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "32" },
+		{ "UIMin", "0" },
+	};
+#endif
+	const UE4CodeGen_Private::FUnsizedIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk = { UE4CodeGen_Private::EPropertyClass::Int, "VoxelsPerChunk", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, VoxelsPerChunk), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData[] = {
+		{ "Category", "Main" },
+		{ "ClampMax", "5000000.0" },
+		{ "ClampMin", "0.0" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+		{ "UIMax", "5000000.0" },
+		{ "UIMin", "0.0" },
+	};
+#endif
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius = { UE4CodeGen_Private::EPropertyClass::Float, "WorldRadius", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, WorldRadius), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_MetaData[] = {
+		{ "Category", "Main" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+	};
+#endif
+	void Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_SetBit(void* Obj)
+	{
+		((AVoxelLandscape*)Obj)->EnabledWorldInGame = 1;
+	}
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame = { UE4CodeGen_Private::EPropertyClass::Bool, "EnabledWorldInGame", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, sizeof(bool), UE4CodeGen_Private::ENativeBool::Native, sizeof(AVoxelLandscape), &Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_SetBit, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape_MetaData[] = {
 		{ "Category", "Main" },
 		{ "EditInline", "true" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
 	};
 #endif
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_generatorLandscape = { UE4CodeGen_Private::EPropertyClass::Object, "generatorLandscape", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x001200000008000d, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, generatorLandscape), Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_generatorLandscape_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_generatorLandscape_MetaData)) };
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape = { UE4CodeGen_Private::EPropertyClass::Object, "GeneratorLandscape", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x001200000008000d, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, GeneratorLandscape), Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister, METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AVoxelLandscape_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_SceneComponent,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_RenderType,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MapSize,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DirectoryName,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MapName,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorDensity,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_meshTree,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_normalsSmoothing,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_vertexSubdivision,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MeshTree,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_NormalsSmoothing,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VertexSubdivision,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_distanceRadius,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MaximumLOD,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_MinimumLOD,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_LODWorking,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_DrawingRange,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledLOD,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainCreated,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_voxelsOneChunk,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_radiusOfChunk,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_transitionSize,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionWorking,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TerrainRendering,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_generatorLandscape,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionSize,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_material,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape,
 	};
 	const FCppClassTypeInfoStatic Z_Construct_UClass_AVoxelLandscape_Statics::StaticCppClassTypeInfo = {
 		TCppClassTypeTraits<AVoxelLandscape>::IsAbstract,
@@ -506,7 +529,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 1347041569);
+	IMPLEMENT_CLASS(AVoxelLandscape, 3375463491);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

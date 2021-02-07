@@ -47,14 +47,13 @@ void UVoxelLandscapeGenerator::PostLoad()
 		HeightmapTexture->SRGB = OldSRGB;
 		HeightmapTexture->UpdateResource();
 
-		RadiusHeighestVoxel = World->radiusOfChunk / (float)World->voxelsOneChunk;
+		RadiusHeighestVoxel = World->WorldRadius / (float)World->VoxelsPerChunk;
 
 		for (int i = 0; i < World->MaximumLOD; i++)
 		{
 			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : GetheightmapData ] From here RadiusHeighestVoxel %f"), RadiusHeighestVoxel);
 }
 
 
@@ -63,17 +62,16 @@ FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, f
 	X += WidthTexture / 2.f * RadiusHeighestVoxel;
 	Y += HeightTexture / 2.f * RadiusHeighestVoxel;
 
-	if (TextureMap.Num() < 1) return 0.f;
-	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return 0.f;
-	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return 0.f;
+	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return -1.f;
+	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return -1.f;
 	
-	return (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply;//-(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
+	return -(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
 }
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
 	float noise = 0.f;
-	noise = -(CellPosition.Z + 5000.f);//(GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z));
+	noise = TextureMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : -(CellPosition.Z + 5000.f);
 	return noise;
 }
 
@@ -166,17 +164,7 @@ float UVoxelLandscapeGenerator::Cone(FVector p, FVector2D c, float h)
 float UVoxelLandscapeGenerator::IQNoise(FVector p)
 {
 	float a = 0.0;
-	float b = 1.0;
-	FVector d = FVector(0.f, 0.f, 0.f);
-
-	for (int i = 0; i < 15; i++)
-	{
-	/*	FVector n = USimplexNoiseBPLibrary::SimplexNoise3D(p);
-		d += n.yz;
-		a += b * n.X / (1.0 + dot(d, d));
-		b *= 0.5;
-		p = m * p * 2.0;*/
-	}
+	
 	return a;
 }
 

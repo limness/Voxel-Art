@@ -20,6 +20,7 @@ class VOXELART_API VoxelMarchingCubesMesher
 {
 public:
 	VoxelMarchingCubesMesher(
+		UVoxelLandscapeGenerator* _GeneratorLandscape,
 		int _Voxels,
 		int _LevelOctree,
 		int _Radius,
@@ -91,7 +92,7 @@ public:
 
 	float VoxelValueMin(float a, float b, float k);
 
-	UVoxelLandscapeGenerator* generatorLandscape;
+	UVoxelLandscapeGenerator* GeneratorLandscape;
 
 	TArray<FVector> positionSide;
 
@@ -108,7 +109,12 @@ public:
 
 		positionGrid += WorldLocation;
 
-		return generatorLandscape->GetDensityMap(FVector(positionGrid.X, positionGrid.Y, positionGrid.Z));//-(positionGrid.Z + 5000.f);
+		//if (GeneratorLandscape == nullptr)
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : GetheightmapData ] Error: 345435435"));
+		//}
+
+		return GeneratorLandscape->GetDensityMap(FVector(positionGrid.X, positionGrid.Y, positionGrid.Z));//-(positionGrid.Z + 5000.f);
 	}
 	/*FORCEINLINE float GetDensity(int x, int y, int z)
 	{
