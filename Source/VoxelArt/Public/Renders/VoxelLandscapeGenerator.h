@@ -18,6 +18,7 @@ class VOXELART_API UVoxelLandscapeGenerator : public UObject
 public:
 
 	virtual void PostLoad() override;
+	//void GeneratorInit();
 
 public:
 
@@ -28,18 +29,26 @@ public:
 	UTexture2D* HeightmapTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
+	UTexture2D* ColormapTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	float Multiply = 100.f;
 
 private:
 
 	float RadiusHeighestVoxel = 0.f;
 
-	int WidthTexture;
-	int HeightTexture;
+	int WidthHeightmap;
+	int HeightHeightmap;
 
-	TArray<FColor> TextureMap;
+	int WidthColormap;
+	int HeightColormap;
+
+	TArray<FColor> TextureHeightMap;
+	TArray<FColor> TextureColorMap;
 
 	FORCEINLINE float GetHeightmapData(float X, float Y, float Z) const;
+	FORCEINLINE FColor GetColormapData(float X, float Y, float Z) const;
 
 public:
 

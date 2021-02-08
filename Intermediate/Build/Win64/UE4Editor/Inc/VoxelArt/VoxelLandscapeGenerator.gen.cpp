@@ -436,6 +436,10 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 #endif
 		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Multiply;
 #if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_ColormapTexture_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_ColormapTexture;
+#if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_HeightmapTexture_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_HeightmapTexture;
@@ -477,6 +481,13 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 #endif
 	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Multiply = { UE4CodeGen_Private::EPropertyClass::Float, "Multiply", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(UVoxelLandscapeGenerator, Multiply), METADATA_PARAMS(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Multiply_MetaData, ARRAY_COUNT(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Multiply_MetaData)) };
 #if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture_MetaData[] = {
+		{ "Category", "Import Own Heightmap" },
+		{ "ModuleRelativePath", "Public/Renders/VoxelLandscapeGenerator.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture = { UE4CodeGen_Private::EPropertyClass::Object, "ColormapTexture", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(UVoxelLandscapeGenerator, ColormapTexture), Z_Construct_UClass_UTexture2D_NoRegister, METADATA_PARAMS(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture_MetaData, ARRAY_COUNT(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture_MetaData)) };
+#if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_HeightmapTexture_MetaData[] = {
 		{ "Category", "Import Own Heightmap" },
 		{ "ModuleRelativePath", "Public/Renders/VoxelLandscapeGenerator.h" },
@@ -492,6 +503,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World = { UE4CodeGen_Private::EPropertyClass::Object, "World", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(UVoxelLandscapeGenerator, World), Z_Construct_UClass_AVoxelLandscape_NoRegister, METADATA_PARAMS(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World_MetaData, ARRAY_COUNT(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::PropPointers[] = {
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Multiply,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_HeightmapTexture,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World,
 	};
@@ -518,7 +530,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 433807453);
+	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 1409445346);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_UVoxelLandscapeGenerator(Z_Construct_UClass_UVoxelLandscapeGenerator, &UVoxelLandscapeGenerator::StaticClass, TEXT("/Script/VoxelArt"), TEXT("UVoxelLandscapeGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(UVoxelLandscapeGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

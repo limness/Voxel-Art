@@ -55,6 +55,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 				DestroyVoxelWorld();
 			}
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
+		//	GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
 
 			if (EnabledLOD)

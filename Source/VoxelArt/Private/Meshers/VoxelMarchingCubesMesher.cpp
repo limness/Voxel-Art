@@ -274,16 +274,16 @@ void VoxelMarchingCubesMesher::MarchingCubes(int isolevel, int indexGrid, int x,
 		Vertices.Add(vertList[triTable[cubeIndex][i]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(-normList[triTable[cubeIndex][i + 0]].GetUnsafeNormal());
-		//VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 0]] + WorldLocation));
+		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 0]] + WorldLocation));
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(-normList[triTable[cubeIndex][i + 1]].GetUnsafeNormal());
-		//VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + WorldLocation));// - (1 * radius) / 2.0f));
+		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + WorldLocation));// - (1 * radius) / 2.0f));
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
-		//VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + WorldLocation));// - (1 * radius) / 2.0f));
+		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + WorldLocation));// - (1 * radius) / 2.0f));
 		Normals.Add(-normList[triTable[cubeIndex][i + 2]].GetUnsafeNormal());
 
 		/*AsyncTask(ENamedThreads::GameThread, [=]()

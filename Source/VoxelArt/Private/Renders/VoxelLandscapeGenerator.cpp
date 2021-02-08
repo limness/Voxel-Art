@@ -9,6 +9,7 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 }
 
 void UVoxelLandscapeGenerator::PostLoad()
+//void UVoxelLandscapeGenerator::GeneratorInit()
 {
 	Super::PostLoad();
 
@@ -16,8 +17,8 @@ void UVoxelLandscapeGenerator::PostLoad()
 	{
 		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
 
-		WidthTexture = (int)MyMipMap->SizeX;
-		HeightTexture = (int)MyMipMap->SizeY;
+		WidthHeightmap = (int)MyMipMap->SizeX;
+		HeightHeightmap = (int)MyMipMap->SizeY;
 
 		HeightmapTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
 		HeightmapTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
@@ -30,13 +31,13 @@ void UVoxelLandscapeGenerator::PostLoad()
 
 		const FColor* FormatedImageData = static_cast<const FColor*>(HeightmapTexture->PlatformData->Mips[0].BulkData.LockReadOnly());
 
-		TextureMap.Init(FColor(0, 0, 0), WidthTexture * HeightTexture);
+		TextureHeightMap.Init(FColor(0, 0, 0), WidthHeightmap * HeightHeightmap);
 
-		for (int y = 0; y < HeightTexture; y++)
+		for (int y = 0; y < HeightHeightmap; y++)
 		{
-			for (int x = 0; x < WidthTexture; x++)
+			for (int x = 0; x < WidthHeightmap; x++)
 			{
-				TextureMap[y * WidthTexture + x] = FormatedImageData[y * WidthTexture + x];
+				TextureHeightMap[y * WidthHeightmap + x] = FormatedImageData[y * WidthHeightmap + x];
 			}
 		}
 
@@ -54,24 +55,80 @@ void UVoxelLandscapeGenerator::PostLoad()
 			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
 		}
 	}
+	if (ColormapTexture && World)
+	{
+		FTexture2DMipMap* MyMipMap = &ColormapTexture->PlatformData->Mips[0];
+
+		WidthColormap = (int)MyMipMap->SizeX;
+		HeightColormap = (int)MyMipMap->SizeY;
+
+		ColormapTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+		ColormapTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+		ColormapTexture->SRGB = false;
+		ColormapTexture->UpdateResource();
+
+		TextureCompressionSettings OldCompressionSettings = ColormapTexture->CompressionSettings;
+		TextureMipGenSettings OldMipGenSettings = ColormapTexture->MipGenSettings;
+		bool OldSRGB = ColormapTexture->SRGB;
+
+		const FColor* FormatedImageData = static_cast<const FColor*>(ColormapTexture->PlatformData->Mips[0].BulkData.LockReadOnly());
+
+		TextureColorMap.Init(FColor(0, 0, 0), WidthColormap * HeightColormap);
+
+		for (int y = 0; y < HeightColormap; y++)
+		{
+			for (int x = 0; x < WidthColormap; x++)
+			{
+				TextureColorMap[y * WidthColormap + x] = FormatedImageData[y * WidthColormap + x];
+			}
+		}
+
+		ColormapTexture->PlatformData->Mips[0].BulkData.Unlock();
+
+		ColormapTexture->CompressionSettings = OldCompressionSettings;
+		ColormapTexture->MipGenSettings = OldMipGenSettings;
+		ColormapTexture->SRGB = OldSRGB;
+		ColormapTexture->UpdateResource();
+
+		RadiusHeighestVoxel = World->WorldRadius / (float)World->VoxelsPerChunk;
+
+		for (int i = 0; i < World->MaximumLOD; i++)
+		{
+			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
+		}
+	}
 }
 
 
 FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, float Z) const
 {
-	X += WidthTexture / 2.f * RadiusHeighestVoxel;
-	Y += HeightTexture / 2.f * RadiusHeighestVoxel;
+	X += WidthHeightmap / 2.f * RadiusHeighestVoxel;
+	Y += HeightHeightmap / 2.f * RadiusHeighestVoxel;
 
-	if (round(X / RadiusHeighestVoxel) > WidthTexture - 1 || round(X / RadiusHeighestVoxel) < 0) return -1.f;
-	if (round(Y / RadiusHeighestVoxel) > HeightTexture - 1 || round(Y / RadiusHeighestVoxel) < 0) return -1.f;
+	if (round(X / RadiusHeighestVoxel) > WidthHeightmap - 1 || round(X / RadiusHeighestVoxel) < 0) return -1.f;
+	if (round(Y / RadiusHeighestVoxel) > HeightHeightmap - 1 || round(Y / RadiusHeighestVoxel) < 0) return -1.f;
 	
-	return -(Z - (TextureMap[round(Y / RadiusHeighestVoxel) * WidthTexture + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
+	return -(Z - (TextureHeightMap[round(Y / RadiusHeighestVoxel) * WidthHeightmap + round(X / RadiusHeighestVoxel)].R - 128.f) / 63.f * Multiply);
+}
+
+FORCEINLINE FColor UVoxelLandscapeGenerator::GetColormapData(float X, float Y, float Z) const
+{
+	X += WidthColormap / 2.f * RadiusHeighestVoxel;
+	Y += HeightColormap / 2.f * RadiusHeighestVoxel;
+
+	//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : GetColormapData ] Error: 2 neighbor empty"));
+
+	if (round(X / RadiusHeighestVoxel) > WidthColormap - 1 || round(X / RadiusHeighestVoxel) < 0) return FColor(121.f, 121.f, 121.f);
+	if (round(Y / RadiusHeighestVoxel) > HeightColormap - 1 || round(Y / RadiusHeighestVoxel) < 0) return FColor(121.f, 121.f, 121.f);
+
+
+	return TextureColorMap[round(Y / RadiusHeighestVoxel) * WidthColormap + round(X / RadiusHeighestVoxel)];
 }
 
 float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
 {
 	float noise = 0.f;
-	noise = TextureMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : -(CellPosition.Z + 5000.f);
+	noise = TextureHeightMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : -(CellPosition.Z + 5000.f);
 	return noise;
 }
 
@@ -79,13 +136,20 @@ FColor UVoxelLandscapeGenerator::GetColorMap(const FVector& CellPosition)
 {
 	FColor color = FColor(121.f, 121.f, 121.f);
 
-	if (VectorDistanceAB(FVector(CellPosition.X, CellPosition.Y, CellPosition.Z), FVector(0, 0, 0)) > 60000.0f)
+	if (TextureColorMap.Num() > 0)
 	{
-		color = FColor(255, 18, 10);
+		color = GetColormapData(CellPosition.X, CellPosition.Y, CellPosition.Z);
 	}
 	else
 	{
-		color = FColor(128, 223, 255);
+		if (VectorDistanceAB(FVector(CellPosition.X, CellPosition.Y, CellPosition.Z), FVector(0, 0, 0)) > 60000.0f)
+		{
+			color = FColor(255, 18, 10);
+		}
+		else
+		{
+			color = FColor(128, 223, 255);
+		}
 	}
 	return color;
 }
