@@ -6,6 +6,12 @@
 #include "Editor.h"
 #include "EditorViewportClient.h"
 
+
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Create Voxel World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroying Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
+
+
 AVoxelLandscape::AVoxelLandscape()
 {
 	PrimaryActorTick.bCanEverTick = true; 
@@ -38,6 +44,8 @@ void AVoxelLandscape::Destroyed()
 
 void AVoxelLandscape::CreateVoxelWorld()
 {
+	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
+
 	if (GeneratorLandscape)
 	{
 		if (MinimumLOD < 0)
@@ -78,6 +86,8 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 void AVoxelLandscape::DestroyVoxelWorld()
 {
+	SCOPE_CYCLE_COUNTER(STAT_DestroyVoxelWorld);
+
 	if (TerrainCreated)
 	{
 		if (ManagerCheckPositionThreadHandle)
@@ -160,6 +170,8 @@ void AVoxelLandscape::Tick(float DeltaTime)
 
 void AVoxelLandscape::UpdateOctree()
 {
+	SCOPE_CYCLE_COUNTER(STAT_UpdateOctree);
+
 	TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
 	while (ChangesOctree.Peek(ChunksChangesArray))
 	{
@@ -199,12 +211,7 @@ void AVoxelLandscape::UpdateOctree()
 
 		for (auto& chunk : ChunksCreation)
 		{
-			float distancePlayer = sqrt(
-				pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
-				pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
-				pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
-			);
-			chunk->priority = distancePlayer;
+			chunk->priority = (PlayerPositionToWorld - chunk->position).Size();
 		}
 		ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
 			{

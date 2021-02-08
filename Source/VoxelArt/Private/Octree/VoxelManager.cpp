@@ -10,6 +10,10 @@
 #define NORMALS_SKIRT 2
 #define NORMALS_SKIRT_HALF 1
 
+
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
+
+
 VoxelManager::VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, float _UpdatingOctreeRadius, int _MaximumLOD) 
 	: World(_World)
 	, PlayerController(_PlayerController)
@@ -80,6 +84,8 @@ uint32 VoxelManager::Run()
 #endif
 			if (World->MaximumLOD > 0)
 			{
+				SCOPE_CYCLE_COUNTER(STAT_Run);
+
 				ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 				{
 					FScopeLock Lock(&World->OctreeMutex);
@@ -160,11 +166,7 @@ int VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 	{
 		if (!chunk->HasChildren())
 		{
-			float distancePlayer = sqrt(
-				pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
-				pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
-				pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
-			);
+			float distancePlayer = (PlayerPositionToWorld - chunk->position).Size();
 
 			if (distancePlayer <= distanceLODs / 2.f)
 			{
@@ -324,11 +326,7 @@ TArray<TSharedPtr<FVoxelOctreeData>> VoxelManager::CheckOctreeWithoutExist(TShar
 
 	float distanceLODs = UpdatingOctreeRadius;
 	float radiusChunk = chunk->radius;
-	float distancePlayer = sqrt(
-		pow(PlayerPositionToWorld.X - chunk->position.X, 2) +
-		pow(PlayerPositionToWorld.Y - chunk->position.Y, 2) +
-		pow(PlayerPositionToWorld.Z - chunk->position.Z, 2)
-	);
+	float distancePlayer = (PlayerPositionToWorld - chunk->position).Size();
 
 	for (int LevelSize = 0; LevelSize < level; LevelSize++)
 	{
