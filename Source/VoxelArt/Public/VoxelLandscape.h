@@ -179,6 +179,10 @@ private:
 
 private:
 
+	FORCEINLINE void SetVoxelValue(FVector Position, float Value) const;
+
+private:
+
 	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
 	TArray<UVoxelChunkComponent*> ChunksRemoving;
 	TArray<UVoxelChunkComponent*> ChunksGeneration;

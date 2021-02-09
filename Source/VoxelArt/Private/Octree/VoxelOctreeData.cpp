@@ -3,11 +3,15 @@
 
 #include "VoxelOctreeData.h"
 
-FVoxelOctreeData::FVoxelOctreeData()
+FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position)
+	: ParentChunk(_Parent)
+	, nodeID(_NodeID)
+	, level(_Level)
+	, radius(_Radius)
+	, position(_Position)
 {
 	chunk = nullptr;
 	ParentChunk.Reset();
-	//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Log: Init"));
 }
 
 FVoxelOctreeData::~FVoxelOctreeData()
@@ -22,7 +26,42 @@ FVoxelOctreeData::~FVoxelOctreeData()
 	Normals.Empty();
 	Colors.Empty();
 	Grid.Empty();
-	//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin ] Log: De-Init"));
+}
+
+//FORCEINLINE void FVoxelOctreeData::GetLeavesOnPosition(FVector Position)
+//{
+	
+//}
+
+void FVoxelOctreeData::AddChildren()
+{
+	float P = radius / 4.f;
+
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 0, level + 1, radius / 2.f, position + FVector(-P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 1, level + 1, radius / 2.f, position + FVector(+P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 2, level + 1, radius / 2.f, position + FVector(-P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 3, level + 1, radius / 2.f, position + FVector(+P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 4, level + 1, radius / 2.f, position + FVector(-P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 5, level + 1, radius / 2.f, position + FVector(+P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 6, level + 1, radius / 2.f, position + FVector(-P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 7, level + 1, radius / 2.f, position + FVector(+P, -P, +P))));
+
+	//for (auto& Leaf : GetChildren())
+	//{
+	//	bool GetExistLeafFromHash = World->SavedChunks.RemoveAndCopyValue(Leaf->nodeID, Leaf);
+	//}
+}
+
+TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
+{
+	if (!HasChildren())
+	{
+		return AsShared();
+	}
+	else
+	{
+	//	return ChildrenChunks[0]->GetLeaf();
+	}
 }
 
 template<uint8 Direction>

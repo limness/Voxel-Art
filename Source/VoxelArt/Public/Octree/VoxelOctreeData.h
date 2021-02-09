@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "VoxelOctreeData.generated.h"
 
-class AVoxelChunk;
+class UVoxelChunkComponent;
 
 /**
  * 
  */
-class VOXELART_API FVoxelOctreeData
+class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
 {
 
 public:
@@ -64,6 +64,8 @@ public:
 	bool cShouldBeUpdated = false;
 
 public:
+	UVoxelChunkComponent* World = nullptr;
+
 	//Actor of chunk
 	UVoxelChunkComponent* chunk = nullptr;
 
@@ -84,12 +86,6 @@ public:
 	TArray<float> Grid = TArray <float>();
 
 public:
-
-	int ChunksShouldBeRemovedCounter;
-
-	TArray<TSharedPtr<FVoxelOctreeData>> ChunksShouldBeRemoved;
-
-public:
 	//Parent chunk
 	//If a chunk is the first from the Octree, there is no parent
 	TWeakPtr<FVoxelOctreeData> ParentChunk;
@@ -98,20 +94,15 @@ public:
 	TArray<TSharedPtr<FVoxelOctreeData>> ChildrenChunks;
 
 public:
-	FVoxelOctreeData();
+	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position);
 	~FVoxelOctreeData();
 
 
 public:
 	inline void DestroyChildren()
 	{
-		//check(HasChildren());
-
-	//	FScopeLock Lock(&Mutex);
-
 		for (auto& it : GetChildren())
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : VoxelOctreeData ] removing from %p %d octree %p %d"), this, this->nodeID, it.Get(), it->nodeID);
 			it.Reset();
 		}
 		ChildrenChunks.Empty();
@@ -132,26 +123,23 @@ public:
 
 	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren()
 	{
-	//	check(HasChildren());
-
 		return ChildrenChunks;
 	}
 
 	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children)
 	{
-	//	FScopeLock Lock(&Mutex);
-
 		for (auto& it : children)
 		{
 			ChildrenChunks.Add(it);
 		}
 	}
 
+	void AddChildren();
+
+	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
+
 	template<uint8 Direction>
 	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetNeighbor(int position);
-//private:
-	//Critical section
-	//FCriticalSection Mutex;
 };
 
 
@@ -180,12 +168,6 @@ public:
 public:
 
 	TArray<float> DensityMap = TArray <float>();
-
-public:
-
-	int ChunksShouldBeRemovedCounter;
-
-	TArray<AVoxelChunk*> ChunksShouldBeRemoved;
 
 public:
 

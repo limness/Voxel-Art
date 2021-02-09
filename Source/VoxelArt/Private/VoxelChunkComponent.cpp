@@ -36,9 +36,71 @@ void UVoxelChunkComponent::SetActive(bool activeStatus)
 	ToggleVisibility(!activeStatus);
 }
 
+bool UVoxelChunkComponent::ChangeVoxel(
+	FVector positionCenterPoint,
+	float range,
+	float strength,
+	bool smooth,
+	bool dig,
+	float smoothInsert)
+{
+	float radiusVoxel = GetVoxelSize();
+
+	for (int z = 0; z < voxels + 1 + NORMALS_SKIRT; z++)
+	{
+		for (int y = 0; y < voxels + 1 + NORMALS_SKIRT; y++)
+		{
+			for (int x = 0; x < voxels + 1 + NORMALS_SKIRT; x++)
+			{
+				FVector positionNoise;
+
+				positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel;
+				positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel;
+				positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
+				positionNoise = positionNoise - (float)(radius / 2.f);
+				positionNoise += GetComponentLocation() - positionCenterPoint;
+
+				float calculateRadius = range - sqrt(pow(positionNoise.X, 2) + pow(positionNoise.Y, 2) + pow(positionNoise.Z, 2));
+				float volume = dig ? -1.f : 1.f;
+
+				if (volume < 0)
+				{
+					if (smooth)
+					{
+						if (UKismetMathLibrary::FMin(-1.f, calculateRadius * volume) != -1.f)
+						{
+							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] += UKismetMathLibrary::FMin(-1.f, calculateRadius * volume) * strength;
+						}
+					}
+					else
+					{
+						DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = VoxelValueMin(DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)], calculateRadius * volume, smoothInsert);//calculateRadius
+					}
+				}
+				else
+				{
+					if (smooth)
+					{
+						if (UKismetMathLibrary::FMax(1.f, calculateRadius * volume) != 1.f)
+						{
+							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] += UKismetMathLibrary::FMax(1.f, calculateRadius * volume) * strength;
+						}
+					}
+					else
+					{
+						DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = -VoxelValueMin(-DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)], -calculateRadius * volume, smoothInsert); //calculateRadius
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
 FORCEINLINE int UVoxelChunkComponent::PositionToIndices(FVector position)
 {
-	return ((int)position.X + NORMALS_SKIRT_HALF) +
+	return
+		((int)position.X + NORMALS_SKIRT_HALF) +
 		((int)position.Y + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) +
 		((int)position.Z + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT);
 }
@@ -54,78 +116,6 @@ FVector UVoxelChunkComponent::PositionToDirection(FVector directionPosition, flo
 	if ((Direction >> 5) & 0x01) { directionPosition = FVector(directionPosition.Y, directionPosition.X, size - directionPosition.Z); }		//0x20
 
 	return directionPosition;
-}
-
-bool UVoxelChunkComponent::ChangeVoxel(
-	UVoxelModificationLandscape* modificator,
-	FVector positionCenterPoint,
-	float range,
-	float strength,
-	bool smooth,
-	bool dig,
-	float smoothInsert)
-{
-
-	float radiusVoxel = GetVoxelSize();
-
-	for (int z = 0; z < voxels + 1 + NORMALS_SKIRT; z++)
-	{
-		for (int y = 0; y < voxels + 1 + NORMALS_SKIRT; y++)
-		{
-			for (int x = 0; x < voxels + 1 + NORMALS_SKIRT; x++)
-			{
-				FVector positionNoise;
-
-				positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-				positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-				positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-				positionNoise = positionNoise - (float)(radius / 2.f);
-
-				float calculateRadius = range - sqrt(pow(positionNoise.X, 2) + pow(positionNoise.Y, 2) + pow(positionNoise.Z, 2));
-				float volume = dig ? -1.f : 1.f;
-
-				if (volume < 0)
-				{
-					if (smooth)
-					{
-						if (UKismetMathLibrary::FMin(-1.f, calculateRadius * volume) != -1.f)
-						{
-							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] += UKismetMathLibrary::FMin(-1.f, calculateRadius * volume) * strength;
-							hasOwnGrid = true;
-						}
-					}
-					else
-					{
-						//if (sqrt(pow(positionNoise.X, 2) + pow(positionNoise.Y, 2) + pow(positionNoise.Z, 2)) <= range + GetVoxelSize()) // + GetVoxelSize()
-						{
-							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = VoxelValueMin(DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)], calculateRadius * volume, smoothInsert);//calculateRadius
-							hasOwnGrid = true;
-						}
-					}
-				}
-				else
-				{
-					if (smooth)
-					{
-						if (UKismetMathLibrary::FMax(1.f, calculateRadius * volume) != 1.f)
-						{
-							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] += UKismetMathLibrary::FMax(1.f, calculateRadius * volume) * strength;
-							hasOwnGrid = true;
-						}
-					}
-					else
-					{
-						//if (sqrt(pow(positionNoise.X, 2) + pow(positionNoise.Y, 2) + pow(positionNoise.Z, 2)) <= range + GetVoxelSize()) // + GetVoxelSize()
-						{
-							DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = -VoxelValueMin(-DensityMap[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)], -calculateRadius * volume, smoothInsert); //calculateRadius
-							hasOwnGrid = true;
-						}
-					}
-				}
-			}
-		}
-	}
-	return true;
 }
 
 //Thanks to

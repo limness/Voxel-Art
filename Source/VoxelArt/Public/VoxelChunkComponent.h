@@ -59,7 +59,7 @@ public:
 
 public:
 
-	bool ChangeVoxel(UVoxelModificationLandscape* modificator,
+	bool ChangeVoxel(
 		FVector positionCenterPoint,
 		float range,
 		float strength,

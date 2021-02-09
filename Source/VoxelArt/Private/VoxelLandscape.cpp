@@ -336,7 +336,6 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
 					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
@@ -345,8 +344,6 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 					if (PixelColorWB == 191)
 					{
-						//UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's 121"));
-
 						FColor PixelColorRGB = GeneratorDensity->GetColorMap(FVector(
 							static_cast<float>((x - width * 0.5f) * StepTexture),
 							static_cast<float>((y - height * 0.5f) * StepTexture),
@@ -360,8 +357,6 @@ void AVoxelLandscape::CreateTextureDensityMap()
 					}
 					else
 					{
-						//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's not 121 but it's %d"), PixelColorWB);
-
 						pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
 						pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
 						pixels[y * 4 * width + x * 4 + 2] = PixelColorWB; // B
@@ -376,14 +371,11 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Density color %d"), (uint8)(FMath::Clamp((GeneratorDensity->GetDensityMap(FVector(static_cast<float>((x - width * 0.5f) * StepTexture), static_cast<float>((y - height * 0.5f) * StepTexture), 0)) / 1), -1.f, 1.0f) * 63.f + 128));
 					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
 						0)
 					), -1.f, 1.0f) * 63.f + 128);
-
-					//	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] It's not 121 but it's %d"), PixelColorWB);
 
 					pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
 					pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
@@ -527,28 +519,33 @@ void AVoxelLandscape::PutChunkOnGeneration(UVoxelChunkComponent* Chunk)
 	FreeTask->StartBackgroundTask();
 }
 
-void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData)
+void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOctreeData> ChunkData)
 {
-	FVector location = chunkData->position;
+	FVector location = ChunkData->position;
 
-	if (chunk)
+	if (Chunk)
 	{
-		chunk->CurrentOctree = chunkData;
-		chunk->nodeID = chunkData->nodeID;
-		chunk->transvoxelDirection = chunkData->transvoxelDirection;
-		chunk->level = chunkData->level;
-		chunk->radius = chunkData->radius;
-		chunk->voxels = VoxelsPerChunk;
-		chunk->material = material;
-		chunk->SetMaterial(0, material);
-		chunk->DensityMap = chunkData->Grid;
-		chunk->generatorLandscape = GeneratorLandscape;
-		chunkData->chunk = chunk;
+		Chunk->CurrentOctree =			ChunkData;
+		Chunk->nodeID =					ChunkData->nodeID;
+		Chunk->transvoxelDirection =	ChunkData->transvoxelDirection;
+		Chunk->level =					ChunkData->level;
+		Chunk->radius =					ChunkData->radius;
+		Chunk->DensityMap =				ChunkData->Grid;
+		Chunk->voxels =					VoxelsPerChunk;
+		Chunk->material =				material;
+		Chunk->generatorLandscape =		GeneratorLandscape;
+		ChunkData->chunk =				Chunk;
 
-		chunk->SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics
-		chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); //ECC_WorldDynamic
-		chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
+		Chunk->SetMaterial(0, material);
+		Chunk->SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics
+		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); //ECC_WorldDynamic
+		Chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
+}
+
+void AVoxelLandscape::SetVoxelValue(FVector Position, float Value) const
+{
+	MainOctree->;
 }
 
 #if WITH_EDITOR
