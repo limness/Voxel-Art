@@ -169,7 +169,7 @@ public:
 private:
 
 	void GenerateLandscape();
-	void GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 level);
+	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan);
 	void SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData);
 	void ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
 	void SpawnBoxTest(FVector location, float radius, float width, FColor color);

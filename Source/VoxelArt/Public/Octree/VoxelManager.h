@@ -13,7 +13,7 @@ class AVoxelLandscape;
 class VOXELART_API VoxelManager : public FRunnable
 {
 public:
-	VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, float _UpdatingOctreeRadius, int _MaximumLOD);
+	VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
 	~VoxelManager();
 
 	void EnsureCompletion();
@@ -33,8 +33,9 @@ private:
 	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
 	FVector PlayerPositionToWorld;
+	FVector OldPlayerPositionToWorld;
 
-	float UpdatingOctreeRadius = 5000;
+	uint8 DrawingRange = 5;
 	int MaximumLOD = 8;
 
 private:
@@ -53,8 +54,7 @@ private:
 
 private:
 
-	TArray<TSharedPtr<FVoxelOctreeData>> CheckOctreeWithoutExist(TSharedPtr<FVoxelOctreeData> chunk, int level);
 	TArray<TSharedPtr<FVoxelOctreeData>> GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk);
 
-	int CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level);
+	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant);
 };

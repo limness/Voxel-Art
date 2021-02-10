@@ -2,6 +2,7 @@
 
 
 #include "VoxelOctreeData.h"
+#include "DrawDebugHelpers.h"
 
 FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position)
 	: ParentChunk(_Parent)
@@ -12,6 +13,9 @@ FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _N
 {
 	chunk = nullptr;
 	ParentChunk.Reset();
+
+	//land->SpawnBoxTest(it->position, it->radius / 2.f, 2500.f, FColor::Red);
+	//DrawDebugBox(GetWorld(), location, FVector(radius, radius, radius), color, false, 13.f, 5, width);
 }
 
 FVoxelOctreeData::~FVoxelOctreeData()
@@ -46,6 +50,7 @@ void FVoxelOctreeData::AddChildren()
 	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 6, level + 1, radius / 2.f, position + FVector(-P, -P, +P))));
 	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 7, level + 1, radius / 2.f, position + FVector(+P, -P, +P))));
 
+	//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Added 8 children"));
 	//for (auto& Leaf : GetChildren())
 	//{
 	//	bool GetExistLeafFromHash = World->SavedChunks.RemoveAndCopyValue(Leaf->nodeID, Leaf);
@@ -62,6 +67,7 @@ TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
 	{
 	//	return ChildrenChunks[0]->GetLeaf();
 	}
+	return AsShared();
 }
 
 template<uint8 Direction>

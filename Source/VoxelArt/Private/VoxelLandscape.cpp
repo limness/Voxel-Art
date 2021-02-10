@@ -68,7 +68,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 			if (EnabledLOD)
 			{
-				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), (float)DrawingRange * WorldRadius, MaximumLOD);
+				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), DrawingRange, MaximumLOD);
 
 				if (TransitionMesh)
 				{
@@ -237,7 +237,6 @@ void AVoxelLandscape::UpdateOctree()
 						ChunksRemoving.Add(chunk->chunk);
 					}
 				}
-
 				SpawnChunk(chunk);
 				Index++;
 			}
@@ -311,12 +310,8 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 
 void AVoxelLandscape::GenerateLandscape()
 {
-	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData());
-	MainOctree->nodeID = (1 << 3) | 0x00;
-	MainOctree->level = 0;
-	MainOctree->radius = WorldRadius + 0.f;
-
-	GenerateOctree(MainOctree, 0);
+	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldRadius, FVector(0, 0, 0)));
+	GenerateOctree(MainOctree);
 }
 
 void AVoxelLandscape::CreateTextureDensityMap()
@@ -430,40 +425,19 @@ void AVoxelLandscape::CreateTextureDensityMap()
 	}
 }
 
-void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> leaf, uint32 level)
+void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan)
 {
-	if (level == MinimumLOD)
+	if (Octan->level == MinimumLOD)
 	{
-		SpawnChunk(leaf);
-		//PoolableActor->CollisionMesh->SetBoxExtent(FVector(leaf->radius, leaf->radius, leaf->radius));
+		SpawnChunk(Octan);
 	}
 	else
 	{
-		for (int Index = 0; Index < 8; Index++)
+		Octan->AddChildren();
+
+		for (auto& Leaf : Octan->GetChildren())
 		{
-			int X = Index % 2;
-			int Y = Index % 4 / 2;
-			int Z = Index / 4;
-
-			float radiusChild = (float)(leaf->radius / 2.f);
-			FVector positionChunk = FVector(
-				X * radiusChild + leaf->position.X - radiusChild / 2.f,
-				Y * radiusChild + leaf->position.Y - radiusChild / 2.f,
-				Z * radiusChild + leaf->position.Z - radiusChild / 2.f
-			);
-
-			TSharedPtr<FVoxelOctreeData> LeafChildren(new FVoxelOctreeData());
-
-			LeafChildren->nodeID = (leaf->nodeID << 3) | Index;
-			LeafChildren->ParentChunk = leaf;
-			LeafChildren->priority = 0;
-			LeafChildren->position = positionChunk;
-			LeafChildren->transvoxelDirection = 0x00;
-			LeafChildren->level = level;
-			LeafChildren->radius = radiusChild;
-
-			GenerateOctree(LeafChildren, level + 1);
-			leaf->ChildrenChunks.Add(LeafChildren);
+			GenerateOctree(Leaf);
 		}
 	}
 }
@@ -545,7 +519,7 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOc
 
 void AVoxelLandscape::SetVoxelValue(FVector Position, float Value) const
 {
-	MainOctree->;
+//	MainOctree->;
 }
 
 #if WITH_EDITOR

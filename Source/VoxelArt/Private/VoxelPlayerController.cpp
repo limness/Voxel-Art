@@ -83,7 +83,7 @@ void AVoxelPlayerController::ChangeChunk(
 				FVector Position = FVector(x, y, z);
 				float SphereRadius = range - Position.Size();
 
-				World->SetVoxelValue(Position, SphereRadius);
+//				World->SetVoxelValue(Position, SphereRadius);
 			}
 		}
 	}

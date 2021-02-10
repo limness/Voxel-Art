@@ -149,28 +149,7 @@ class VOXELART_API FVoxelChunkRenderData
 public:
 
 	float priority = 0.f;
-
-	//Node ID
-	uint64 nodeID = 0x00;
-
-	//Level of detalization
-	int level = 0;
-
-	//Radius of chunkd
-	float radius = 0.f;
-
-	//Position of chunk
 	FVector position = FVector(0.f, 0.f, 0.f);
-
-	//Transvoxel info for sides
-	uint8 transvoxelDirection = 0x00;
-
-public:
-
-	TArray<float> DensityMap = TArray <float>();
-
-public:
-
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 
 public:
