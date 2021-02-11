@@ -3,13 +3,10 @@
 
 #include "Octree/VoxelManager.h"
 #include "VoxelLandscape.h"
+#include "Helpers/VoxelTools.h"
 
 #include "Editor.h"
 #include "EditorViewportClient.h"
-
-#define NORMALS_SKIRT 2
-#define NORMALS_SKIRT_HALF 1
-
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
 
@@ -42,7 +39,7 @@ VoxelManager::~VoxelManager()
 
 bool VoxelManager::Init()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin : Octree Manager init ]"));
+	UE_LOG(VoxelArt, Log, TEXT("Octree Manager init"));
 	return true;
 }
 

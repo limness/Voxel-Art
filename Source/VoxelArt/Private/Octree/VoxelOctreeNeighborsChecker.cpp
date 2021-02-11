@@ -2,6 +2,8 @@
 
 
 #include "Octree/VoxelOctreeNeighborsChecker.h"
+#include "Helpers/VoxelTools.h"
+
 #include "VoxelLandscape.h"
 #include "DrawDebugHelpers.h"
 
@@ -58,7 +60,7 @@ VoxelOctreeNeighborsChecker::~VoxelOctreeNeighborsChecker()
 
 bool VoxelOctreeNeighborsChecker::Init()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : Octree Neighbors Checker init ]"));
+	UE_LOG(VoxelArt, Log, TEXT("Octree Neighbors Checker init"));
 	return true;
 }
 

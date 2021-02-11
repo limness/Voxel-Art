@@ -17,8 +17,8 @@ class VOXELART_API UVoxelLandscapeGenerator : public UObject
 
 public:
 
-	virtual void PostLoad() override;
-	//void GeneratorInit();
+	//virtual void PostLoad() override;
+	void GeneratorInit();
 
 public:
 

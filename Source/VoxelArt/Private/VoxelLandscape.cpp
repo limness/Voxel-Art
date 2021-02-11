@@ -3,6 +3,8 @@
 #include "VoxelLandscape.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "Helpers/VoxelTools.h"
+
 #include "Editor.h"
 #include "EditorViewportClient.h"
 
@@ -11,6 +13,7 @@ DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Create Voxel World"), STAT_CreateVoxelWor
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroying Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
 
+DEFINE_LOG_CATEGORY(VoxelArt);
 
 AVoxelLandscape::AVoxelLandscape()
 {
@@ -50,11 +53,11 @@ void AVoxelLandscape::CreateVoxelWorld()
 	{
 		if (MinimumLOD < 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be under zero!"));
+			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be less then zero!"));
 		}
 		else if (MinimumLOD > MaximumLOD)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Minimum LOD can't be upper Maximum LOD!"));
+			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be greater then Maximum LOD!"));
 		}
 		else
 		{
@@ -63,7 +66,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 				DestroyVoxelWorld();
 			}
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
-		//	GeneratorLandscape->GeneratorInit();
+			GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
 
 			if (EnabledLOD)
@@ -80,7 +83,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[ Voxel Art Plugin ] Error: Generator of lansdcape is not exist!"));
+		UE_LOG(VoxelArt, Error, TEXT("Generator of lansdcape is not exist!"));
 	}
 }
 
@@ -90,15 +93,17 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 	if (TerrainCreated)
 	{
+		int TimeBeforeDestroy = FDateTime::Now().GetTicks();
+
 		if (ManagerCheckPositionThreadHandle)
 		{
-			ManagerCheckPositionThreadHandle->EnsureCompletion();
+			//ManagerCheckPositionThreadHandle->EnsureCompletion();
 			delete ManagerCheckPositionThreadHandle;
 			ManagerCheckPositionThreadHandle = nullptr;
 		}
 		if (OctreeNeighborsChecker)
 		{
-			OctreeNeighborsChecker->EnsureCompletion();
+			//OctreeNeighborsChecker->EnsureCompletion();
 			delete OctreeNeighborsChecker;
 			OctreeNeighborsChecker = nullptr;
 		}
@@ -118,6 +123,8 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		{
 			Chunk->DestroyComponent();
 		}
+		int TimeAfterDestroy = FDateTime::Now().GetTicks();
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s."), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f);
 		GEngine->ForceGarbageCollection(true);
 		TerrainCreated = false;
 	}
@@ -264,7 +271,7 @@ void AVoxelLandscape::UpdateOctree()
 			if (!StatsShowed)
 			{
 				int timeAfter = FDateTime::Now().GetTicks();
-				UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 10000.f / 1000.f, PoolChunks->PoolChunks.Num());
+				UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 10000.f / 1000.f, PoolChunks->PoolChunks.Num());
 				StatsShowed = true;
 			}
 			while (ChunksRemoving.Num() > 0)

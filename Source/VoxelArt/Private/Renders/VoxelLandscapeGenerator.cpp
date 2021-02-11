@@ -8,10 +8,10 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 {
 }
 
-void UVoxelLandscapeGenerator::PostLoad()
-//void UVoxelLandscapeGenerator::GeneratorInit()
+//void UVoxelLandscapeGenerator::PostLoad()
+void UVoxelLandscapeGenerator::GeneratorInit()
 {
-	Super::PostLoad();
+//	Super::PostLoad();
 
 	if (HeightmapTexture && World)
 	{

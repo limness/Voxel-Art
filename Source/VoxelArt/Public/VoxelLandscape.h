@@ -17,10 +17,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "VoxelLandscape.generated.h"
 
-
-DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);
-
-
 namespace EVoxelDirection
 {
 	enum Direction : uint8
