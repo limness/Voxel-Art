@@ -65,6 +65,13 @@ void AVoxelLandscape::CreateVoxelWorld()
 			{
 				DestroyVoxelWorld();
 			}
+			float RadiusHeighestVoxel = WorldRadius / (float)VoxelsPerChunk;
+
+			for (int i = 0; i < MaximumLOD; i++)
+			{
+				RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
+			}
+			SetActorScale3D(FVector(RadiusHeighestVoxel, RadiusHeighestVoxel, RadiusHeighestVoxel));
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
 			GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
@@ -97,13 +104,11 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 		if (ManagerCheckPositionThreadHandle)
 		{
-			//ManagerCheckPositionThreadHandle->EnsureCompletion();
 			delete ManagerCheckPositionThreadHandle;
 			ManagerCheckPositionThreadHandle = nullptr;
 		}
 		if (OctreeNeighborsChecker)
 		{
-			//OctreeNeighborsChecker->EnsureCompletion();
 			delete OctreeNeighborsChecker;
 			OctreeNeighborsChecker = nullptr;
 		}
@@ -526,11 +531,18 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOc
 
 void AVoxelLandscape::GetVoxelValue(FVector Position, float& Value)
 {
+
+	//UE_LOG(VoxelArt, Log, TEXT("TransitionSize %f"), TransitionSize);
+	{
+		//FScopeLock Lock(&OctreeMutex);
+		//TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->AsShared();
+	}
 	TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->GetLeaf(Position).Pin();
+	SpawnBoxTest(CurrentOctantTest->position, CurrentOctantTest->radius / 2.f, 30.f, FColor::Red);
 
-	SpawnBoxTest(CurrentOctantTest->position, CurrentOctantTest->radius / 2.f, 800.f, FColor::Red);
+	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position);
 
-	CurrentOctantTest->GetVoxelValue(Position, Value);
+	CurrentOctantTest->GetVoxelValue(PositionToWorld, Value);
 	//MainOctree->GetVoxelValue(Position, Value);
 }
 

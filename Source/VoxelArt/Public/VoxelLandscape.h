@@ -168,7 +168,6 @@ private:
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan);
 	void SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData);
 	void ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
-	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
 	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
 	void UpdateOctree();
@@ -177,6 +176,8 @@ public:
 
 	void GetVoxelValue(FVector Position, float& Value);
 	FORCEINLINE void SetVoxelValue(FVector Position, float& Value) const;
+
+	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
 
 private:
 

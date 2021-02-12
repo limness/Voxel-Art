@@ -54,7 +54,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					ChangeChunk(nullptr, MouseHitResult.Location, rangeEdit);
+					ChangeChunk(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location, rangeEdit);
 				}
 			}
 		}
@@ -69,6 +69,14 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 {
 	int radius = FMath::CeilToInt(Radius);
 
+	//World->SpawnBoxTest(HitPosition, 30.f, 25.f, FColor::Red);
+
+	FScopeLock Lock(&World->OctreeMutex);
+
+	float CurrentValue = 0.f;
+
+	World->GetVoxelValue(HitPosition, CurrentValue);
+/*
 	for (int z = -radius; z <= radius; z++)
 	{
 		for (int y = -radius; y <= radius; y++)
@@ -82,7 +90,7 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 				World->GetVoxelValue(Position, CurrentValue);
 			}
 		}
-	}
+	}*/
 
 /*	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	TArray<AActor*> OverlapActors;

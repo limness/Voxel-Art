@@ -108,12 +108,14 @@ public:
 
 	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren();
 
-	inline TWeakPtr<FVoxelOctreeData> GetChild(FVector Position);
+	inline TWeakPtr<FVoxelOctreeData> GetChildByPosition(FVector Position);
 
 	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
 
 	template<uint8 Direction>
 	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetNeighbor(int position);
+
+	void TransferToLocal(FVector& Position);
 };
 
 

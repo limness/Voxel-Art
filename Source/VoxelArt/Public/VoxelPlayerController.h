@@ -52,7 +52,7 @@ public:
 	float rangeEditMax = 1200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float rangeEdit = 800.f;
+	float rangeEdit = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float editorSpeed = -1.f;
