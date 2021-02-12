@@ -518,13 +518,23 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOc
 		ChunkData->chunk =				Chunk;
 
 		Chunk->SetMaterial(0, material);
-		Chunk->SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics
+		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
-void AVoxelLandscape::SetVoxelValue(FVector Position, float Value) const
+void AVoxelLandscape::GetVoxelValue(FVector Position, float& Value)
+{
+	TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->GetLeaf(Position).Pin();
+
+	SpawnBoxTest(CurrentOctantTest->position, CurrentOctantTest->radius / 2.f, 800.f, FColor::Red);
+
+	CurrentOctantTest->GetVoxelValue(Position, Value);
+	//MainOctree->GetVoxelValue(Position, Value);
+}
+
+void AVoxelLandscape::SetVoxelValue(FVector Position, float& Value) const
 {
 //	MainOctree->;
 }

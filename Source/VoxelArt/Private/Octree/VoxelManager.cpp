@@ -79,9 +79,9 @@ uint32 VoxelManager::Run()
 				}
 			}
 #endif
-			//if (PlayerPositionToWorld != OldPlayerPositionToWorld)
+			if (PlayerPositionToWorld != OldPlayerPositionToWorld)
 			{
-				//OldPlayerPositionToWorld = PlayerPositionToWorld;
+				OldPlayerPositionToWorld = PlayerPositionToWorld;
 
 				if (World->MaximumLOD > 0)
 				{
@@ -94,7 +94,6 @@ uint32 VoxelManager::Run()
 					}
 					if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
 					{
-						//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] ChangesOctree->ChunksCreation.Num() %d %d"), ChangesOctree->ChunksCreation.Num(), ChangesOctree->ChunksRemoving.Num());
 						World->ChangesOctree.Enqueue(ChangesOctree);
 					}
 					ChangesOctree.Reset();
@@ -136,8 +135,6 @@ void VoxelManager::EnsureCompletion()
 {
 	if (ChangesOctree)
 	{
-		ChangesOctree->LeavesCreation.Empty();
-		ChangesOctree->LeavesDestroying.Empty();
 		ChangesOctree->ChunksCreation.Empty();
 		ChangesOctree->ChunksRemoving.Empty();
 
@@ -193,8 +190,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	}
 	else if (Octant->HasChildren())
 	{
-		//TODO: Back add the Minimum LOD function
-		if (!(DistancePlayer <= distanceLODs / 2.f))
+		if (!(DistancePlayer <= distanceLODs / 2.f) && World->MinimumLOD < Octant->level + 1)
 		{
 			TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
 			ChunkCreation->CurrentOctree = Octant;

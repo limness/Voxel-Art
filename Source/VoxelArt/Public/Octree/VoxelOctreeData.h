@@ -14,15 +14,6 @@ class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
 {
 
 public:
-	int x = 0;
-	int y = 0;
-	int z = 0;
-
-	//Set up the kostyl
-	float priority = 0.f;
-
-	//Set up the kostyl
-	bool kostyl = false;
 
 	//Node ID
 	uint64 nodeID = 0x00;
@@ -32,6 +23,9 @@ public:
 
 	//Radius of chunkd
 	float radius = 0.f;
+
+	//Set up the priority
+	float priority = 0.f;
 
 	//Position of chunk
 	FVector position = FVector(0.f, 0.f, 0.f);
@@ -99,42 +93,22 @@ public:
 
 
 public:
-	inline void DestroyChildren()
-	{
-		for (auto& it : GetChildren())
-		{
-			it.Reset();
-		}
-		ChildrenChunks.Empty();
-		ChildrenChunks.Reset();
-	}
-
-	inline bool HasChildren()
-	{
-		return !!(ChildrenChunks.Num());
-	}
-
-	inline TWeakPtr<FVoxelOctreeData> GetParent()
-	{
-		check((ParentChunk != nullptr));
-
-		return ParentChunk;
-	}
-
-	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren()
-	{
-		return ChildrenChunks;
-	}
-
-	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children)
-	{
-		for (auto& it : children)
-		{
-			ChildrenChunks.Add(it);
-		}
-	}
 
 	void AddChildren();
+
+	inline void DestroyChildren();
+
+	inline bool HasChildren();
+
+	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
+
+	inline void GetVoxelValue(FVector Position, float& Value);
+
+	inline TWeakPtr<FVoxelOctreeData> GetParent();
+
+	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren();
+
+	inline TWeakPtr<FVoxelOctreeData> GetChild(FVector Position);
 
 	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
 
@@ -163,12 +137,6 @@ USTRUCT(BlueprintType)
 struct FChunksRenderInfo
 {
 	GENERATED_USTRUCT_BODY()
-
-	//Leaves which has to be created
-	TArray<TSharedPtr<FVoxelOctreeData>> LeavesCreation;
-
-	//Leaves which has to be destroyd
-	TArray<TSharedPtr<FVoxelOctreeData>> LeavesDestroying;
 
 	//Chunks which has to be created
 	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;

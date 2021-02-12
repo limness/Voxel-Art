@@ -173,9 +173,10 @@ private:
 	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
 	void UpdateOctree();
 
-private:
+public:
 
-	FORCEINLINE void SetVoxelValue(FVector Position, float Value) const;
+	void GetVoxelValue(FVector Position, float& Value);
+	FORCEINLINE void SetVoxelValue(FVector Position, float& Value) const;
 
 private:
 

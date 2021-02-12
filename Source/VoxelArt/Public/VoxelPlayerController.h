@@ -70,7 +70,7 @@ public:
 	float smoothInsert = 10.f;
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeChunk(AVoxelLandscape* terrain, AVoxelChunk* chunkCenter, FVector position, float range);
+	void ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius);
 	//void ChangeChunk(AVoxelLandscape* terrain, AVoxelChunk* chunkCenter, FVector hitPosition, float range, float volume, bool sphereMinus);
 
 };

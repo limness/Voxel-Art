@@ -15,7 +15,7 @@ FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _N
 	ParentChunk.Reset();
 
 	//land->SpawnBoxTest(it->position, it->radius / 2.f, 2500.f, FColor::Red);
-	//DrawDebugBox(GetWorld(), location, FVector(radius, radius, radius), color, false, 13.f, 5, width);
+	
 }
 
 FVoxelOctreeData::~FVoxelOctreeData()
@@ -32,10 +32,40 @@ FVoxelOctreeData::~FVoxelOctreeData()
 	Grid.Empty();
 }
 
-//FORCEINLINE void FVoxelOctreeData::GetLeavesOnPosition(FVector Position)
-//{
-	
-//}
+void FVoxelOctreeData::DestroyChildren()
+{
+	for (auto& it : GetChildren())
+	{
+		it.Reset();
+	}
+	ChildrenChunks.Empty();
+	ChildrenChunks.Reset();
+}
+
+bool FVoxelOctreeData::HasChildren()
+{
+	return !!(ChildrenChunks.Num());
+}
+
+TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetParent()
+{
+	check((ParentChunk != nullptr));
+
+	return ParentChunk;
+}
+
+TArray<TSharedPtr<FVoxelOctreeData>> FVoxelOctreeData::GetChildren()
+{
+	return ChildrenChunks;
+}
+
+void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children)
+{
+	for (auto& it : children)
+	{
+		ChildrenChunks.Add(it);
+	}
+}
 
 void FVoxelOctreeData::AddChildren()
 {
@@ -57,17 +87,42 @@ void FVoxelOctreeData::AddChildren()
 	//}
 }
 
+void FVoxelOctreeData::GetVoxelValue(FVector Position, float& Value)
+{
+	Value = 0.f;
+}
+
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
 {
 	if (!HasChildren())
 	{
+//		SpawnBoxTest(it->position, it->radius / 2.f, 2500.f, FColor::Red);
+
 		return AsShared();
 	}
 	else
 	{
-	//	return ChildrenChunks[0]->GetLeaf();
+		return AsShared();
+		//return GetChild(Position).Pin()->GetLeaf(Position);
 	}
 	return AsShared();
+}
+
+//0 1 0
+//1 1 0
+//0 0 0
+//1 0 0
+
+//0 1 1
+//1 1 1
+//0 0 1
+//1 0 1
+
+TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChild(FVector Position)
+{
+	check(HasChildren());
+
+	return ChildrenChunks[(Position.X > 0) + (Position.Y > 0) * 2 + (Position.Z > 0) * 4];
 }
 
 template<uint8 Direction>

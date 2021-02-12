@@ -19,7 +19,6 @@ void EmptyLinkFunctionForGeneratedCodeVoxelPlayerController() {}
 	UPackage* Z_Construct_UPackage__Script_VoxelArt();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk();
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector();
-	VOXELART_API UClass* Z_Construct_UClass_AVoxelChunk_NoRegister();
 	VOXELART_API UClass* Z_Construct_UClass_AVoxelLandscape_NoRegister();
 // End Cross Module References
 	void AVoxelPlayerController::StaticRegisterNativesAVoxelPlayerController()
@@ -34,30 +33,26 @@ void EmptyLinkFunctionForGeneratedCodeVoxelPlayerController() {}
 	{
 		struct VoxelPlayerController_eventChangeChunk_Parms
 		{
-			AVoxelLandscape* terrain;
-			AVoxelChunk* chunkCenter;
-			FVector position;
-			float range;
+			AVoxelLandscape* World;
+			FVector HitPosition;
+			float Radius;
 		};
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_range;
-		static const UE4CodeGen_Private::FStructPropertyParams NewProp_position;
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_chunkCenter;
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_terrain;
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Radius;
+		static const UE4CodeGen_Private::FStructPropertyParams NewProp_HitPosition;
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_World;
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
 #endif
 		static const UE4CodeGen_Private::FFunctionParams FuncParams;
 	};
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_range = { UE4CodeGen_Private::EPropertyClass::Float, "range", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, range), METADATA_PARAMS(nullptr, 0) };
-	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_position = { UE4CodeGen_Private::EPropertyClass::Struct, "position", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, position), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(nullptr, 0) };
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_chunkCenter = { UE4CodeGen_Private::EPropertyClass::Object, "chunkCenter", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, chunkCenter), Z_Construct_UClass_AVoxelChunk_NoRegister, METADATA_PARAMS(nullptr, 0) };
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_terrain = { UE4CodeGen_Private::EPropertyClass::Object, "terrain", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, terrain), Z_Construct_UClass_AVoxelLandscape_NoRegister, METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_Radius = { UE4CodeGen_Private::EPropertyClass::Float, "Radius", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, Radius), METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_HitPosition = { UE4CodeGen_Private::EPropertyClass::Struct, "HitPosition", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, HitPosition), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_World = { UE4CodeGen_Private::EPropertyClass::Object, "World", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000080, 1, nullptr, STRUCT_OFFSET(VoxelPlayerController_eventChangeChunk_Parms, World), Z_Construct_UClass_AVoxelLandscape_NoRegister, METADATA_PARAMS(nullptr, 0) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_range,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_position,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_chunkCenter,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_terrain,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_Radius,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_HitPosition,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::NewProp_World,
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk_Statics::Function_MetaDataParams[] = {
@@ -145,7 +140,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelPlayerController() {}
 		(UObject* (*)())Z_Construct_UPackage__Script_VoxelArt,
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_AVoxelPlayerController_Statics::FuncInfo[] = {
-		{ &Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk, "ChangeChunk" }, // 1494268869
+		{ &Z_Construct_UFunction_AVoxelPlayerController_ChangeChunk, "ChangeChunk" }, // 4220527585
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelPlayerController_Statics::Class_MetaDataParams[] = {
@@ -287,7 +282,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelPlayerController() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelPlayerController, 69683629);
+	IMPLEMENT_CLASS(AVoxelPlayerController, 2913056388);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelPlayerController(Z_Construct_UClass_AVoxelPlayerController, &AVoxelPlayerController::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelPlayerController"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelPlayerController);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

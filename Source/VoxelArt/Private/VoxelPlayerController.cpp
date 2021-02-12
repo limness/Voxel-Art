@@ -54,7 +54,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					ChangeChunk(nullptr, nullptr, MouseHitResult.Location, rangeEdit);
+					ChangeChunk(nullptr, MouseHitResult.Location, rangeEdit);
 				}
 			}
 		}
@@ -65,14 +65,9 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void AVoxelPlayerController::ChangeChunk(
-	AVoxelLandscape* terrain,
-	AVoxelChunk* chunkCenter,
-	FVector position,
-	float range)
+void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius)
 {
-	int radius = FMath::CeilToInt(range);
-	//float radiusVoxel = GetVoxelSize();
+	int radius = FMath::CeilToInt(Radius);
 
 	for (int z = -radius; z <= radius; z++)
 	{
@@ -80,10 +75,11 @@ void AVoxelPlayerController::ChangeChunk(
 		{
 			for (int x = -radius; x <= radius; x++)
 			{
-				FVector Position = FVector(x, y, z);
-				float SphereRadius = range - Position.Size();
+				FVector Position = HitPosition + FVector(x, y, z);
+				float SphereRadius = Radius - Position.Size();
 
-//				World->SetVoxelValue(Position, SphereRadius);
+				float CurrentValue = 0.f;
+				World->GetVoxelValue(Position, CurrentValue);
 			}
 		}
 	}
