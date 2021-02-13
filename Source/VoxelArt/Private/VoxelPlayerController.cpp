@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VoxelPlayerController.h"
+#include "Helpers/VoxelTools.h"
 
 void AVoxelPlayerController::BeginPlay()
 {
@@ -48,7 +49,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	{
 		FHitResult MouseHitResult;
 
-		if(this->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, true, MouseHitResult))
+		if(this->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, MouseHitResult))
 		{
 			if (MouseHitResult.bBlockingHit)
 			{
@@ -71,11 +72,23 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 
 	//World->SpawnBoxTest(HitPosition, 30.f, 25.f, FColor::Red);
 
-	FScopeLock Lock(&World->OctreeMutex);
+	//FScopeLock Lock(&World->OctreeMutex);
 
 	float CurrentValue = 0.f;
 
-	World->GetVoxelValue(HitPosition, CurrentValue);
+	if (World)
+	{
+		World->OctreeMutex.Lock();
+		World->GetVoxelValue(HitPosition, CurrentValue);
+		World->OctreeMutex.Unlock();
+
+		//UE_LOG(VoxelArt, Log, TEXT("Value %f"), CurrentValue);
+	}
+	else
+	{
+		UE_LOG(VoxelArt, Error, TEXT("Controller ~ World is NULL"));
+
+	}
 /*
 	for (int z = -radius; z <= radius; z++)
 	{

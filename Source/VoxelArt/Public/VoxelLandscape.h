@@ -85,7 +85,7 @@ public:
 	bool EnabledWorldInGame = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "5000000.0", UIMin = "0.0", UIMax = "5000000.0"))
-	float WorldRadius = 500000.f;
+	float WorldRadius = 524288.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0", ClampMax = "32", UIMin = "0", UIMax = "32"))
 	int VoxelsPerChunk = 16;
@@ -300,7 +300,7 @@ public:
 					DensityMap
 				);
 				mesher->GenerateMarchingCubesMesh();
-				//VoxelTerrainActor->Grid = DensityMap;
+				//VoxelChunkComponent->DensityMap = DensityMap;
 				//VoxelTerrainActor->GenerateVertexCube(false);
 
 				TArray<FVector> Vertices = mesher->Vertices;

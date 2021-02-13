@@ -70,8 +70,8 @@ void AVoxelLandscape::CreateVoxelWorld()
 			for (int i = 0; i < MaximumLOD; i++)
 			{
 				RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
-			}
-			SetActorScale3D(FVector(RadiusHeighestVoxel, RadiusHeighestVoxel, RadiusHeighestVoxel));*/
+			}*/
+			SetActorScale3D(FVector(128.f, 128.f, 128.f));
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
 			GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
@@ -513,18 +513,13 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOc
 	{
 		Chunk->CurrentOctree =			ChunkData;
 		Chunk->nodeID =					ChunkData->nodeID;
-		Chunk->transvoxelDirection =	ChunkData->transvoxelDirection;
-		Chunk->level =					ChunkData->level;
-		Chunk->radius =					ChunkData->radius;
-		Chunk->DensityMap =				ChunkData->Grid;
-		Chunk->voxels =					VoxelsPerChunk;
 		Chunk->material =				material;
 		Chunk->generatorLandscape =		GeneratorLandscape;
 		ChunkData->chunk =				Chunk;
 
 		Chunk->SetMaterial(0, material);
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
-		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); //ECC_WorldDynamic
+		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
@@ -534,7 +529,7 @@ void AVoxelLandscape::GetVoxelValue(FVector Position, float& Value)
 	TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->GetLeaf(Position).Pin();
 	SpawnBoxTest(CurrentOctantTest->position, CurrentOctantTest->radius / 2.f, 30.f, FColor::Red);
 
-	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position);
+	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position - CurrentOctantTest->position + CurrentOctantTest->radius / 2.f);
 
 	CurrentOctantTest->GetVoxelDensity(PositionToWorld, Value);
 	//MainOctree->GetVoxelValue(Position, Value);

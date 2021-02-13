@@ -81,6 +81,7 @@ void FVoxelOctreeData::AddChildren()
 	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 6, level + 1, radius / 2.f, position + FVector(-P, +P, +P))));
 	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 7, level + 1, radius / 2.f, position + FVector(+P, +P, +P))));
 
+	//UE_LOG(VoxelArt, Error, TEXT("Size %f"), (radius / 2.f) / 16.f);
 	//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Added 8 children"));
 	//for (auto& Leaf : GetChildren())
 	//{
@@ -90,18 +91,48 @@ void FVoxelOctreeData::AddChildren()
 
 void FVoxelOctreeData::GetVoxelDensity(FVector Position, float& Value)
 {
-	FIntVector PositionInt = FIntVector(FMath::RoundToInt(Position.X), FMath::RoundToInt(Position.Y), FMath::RoundToInt(Position.Z));
+//	TransferToLocal(Position);
+
+	FIntVector PositionInt = FIntVector(Position.X, Position.Y, Position.Z);
 
 	//TransferToLocal(PositionInt);
 
-	UE_LOG(VoxelArt, Log, TEXT("Local Position Voxel %s"), *PositionInt.ToString());
-
 	Value = 0.f;
+
+	if(LIKELY(chunk && chunk->DensityMap.Num() > 0))
+	{
+		//Value = chunk->DensityMap[PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
+
+		if (PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT) >= chunk->DensityMap.Num())
+		{
+			UE_LOG(VoxelArt, Error, TEXT("Level %d Value %s Our Num %d Num %d"), 
+				level,
+				*PositionInt.ToString(),
+				PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT),
+				chunk->DensityMap.Num());
+		}
+		else
+		{
+			UE_LOG(VoxelArt, Log, TEXT("Level %d Value %s Our Num %d Num %d"),
+				level,
+				*PositionInt.ToString(),
+				PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT),
+				chunk->DensityMap.Num());
+		}
+	}
 }
 
-void FVoxelOctreeData::TransferToLocal(FIntVector& Position)
+void FVoxelOctreeData::TransferToLocal(FVector& Position)
 {
-	//Position = F;//Position - position + radius / 2.f;
+	//Position = Position - position;
+}
+
+FORCEINLINE int FVoxelOctreeData::PositionToIndices(FVector position)
+{
+	return
+		(position.X + NORMALS_SKIRT_HALF) +
+		(position.Y + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) +
+		(position.Z + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT);
 }
 
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)

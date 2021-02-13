@@ -21,6 +21,8 @@ public:
 	//Level of detalization
 	int level = 0;
 
+	int Voxels = 16;
+
 	//Radius of chunkd
 	float radius = 0.f;
 
@@ -115,7 +117,9 @@ public:
 	template<uint8 Direction>
 	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetNeighbor(int position);
 
-	void TransferToLocal(FIntVector& Position);
+	FORCEINLINE int PositionToIndices(FVector position);
+
+	void TransferToLocal(FVector& Position);
 };
 
 
