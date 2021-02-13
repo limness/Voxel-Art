@@ -88,20 +88,20 @@ void FVoxelOctreeData::AddChildren()
 	//}
 }
 
-void FVoxelOctreeData::GetVoxelValue(FVector Position, float& Value)
+void FVoxelOctreeData::GetVoxelDensity(FVector Position, float& Value)
 {
-	FIntVector PosInt = FIntVector(FMath::RoundToInt(Position.X), FMath::RoundToInt(Position.Y), FMath::RoundToInt(Position.Z));
+	FIntVector PositionInt = FIntVector(FMath::RoundToInt(Position.X), FMath::RoundToInt(Position.Y), FMath::RoundToInt(Position.Z));
 
-	//TransferToLocal(Position);
+	//TransferToLocal(PositionInt);
 
-	UE_LOG(VoxelArt, Log, TEXT("Local Position Voxel %s"), *PosInt.ToString());
+	UE_LOG(VoxelArt, Log, TEXT("Local Position Voxel %s"), *PositionInt.ToString());
 
 	Value = 0.f;
 }
 
-void FVoxelOctreeData::TransferToLocal(FVector& Position)
+void FVoxelOctreeData::TransferToLocal(FIntVector& Position)
 {
-	Position = Position - position + radius / 2.f;
+	//Position = F;//Position - position + radius / 2.f;
 }
 
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)

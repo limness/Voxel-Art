@@ -102,7 +102,7 @@ public:
 
 	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
 
-	inline void GetVoxelValue(FVector Position, float& Value);
+	inline void GetVoxelDensity(FVector Position, float& Value);
 
 	inline TWeakPtr<FVoxelOctreeData> GetParent();
 
@@ -115,7 +115,7 @@ public:
 	template<uint8 Direction>
 	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetNeighbor(int position);
 
-	void TransferToLocal(FVector& Position);
+	void TransferToLocal(FIntVector& Position);
 };
 
 
