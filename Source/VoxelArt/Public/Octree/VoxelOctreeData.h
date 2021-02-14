@@ -7,86 +7,33 @@
 
 class UVoxelChunkComponent;
 
-/**
- * 
- */
+
 class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
 {
 
 public:
 
-	//Node ID
-	uint64 nodeID = 0x00;
+	uint64 NodeID = 0x00;
+	uint8 TransitionSides = 0x00;
 
-	//Level of detalization
-	int level = 0;
-
+	int Level = 0;
 	int Voxels = 16;
 
-	//Radius of chunkd
-	float radius = 0.f;
+	float Size = 0.f;
+	float Priority = 0.f;
 
-	//Set up the priority
-	float priority = 0.f;
+	FVector Position = FVector(0.f, 0.f, 0.f);
 
-	//Position of chunk
-	FVector position = FVector(0.f, 0.f, 0.f);
+	TArray<float> DensityMap = TArray <float>();
 
 public:
 
-	//Transvoxel info for sides
-	uint8 transvoxelDirection = 0x00;
-
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceN;
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceS;
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceE;
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceW;
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceD;
-	TArray<TWeakPtr<FVoxelOctreeData>> neighborFaceU;
+	//Chunk itself
+	UVoxelChunkComponent* Chunk = nullptr;
 
 public:
-	//We can update this chunk from another thread
-	//For update mesh or respawn this.
-	//So we need check the chunk before moves
-	bool cUpdating = false;
 
-	//Checker of nehighbors updating
-	bool cUpdatingNeighbors = false;
-
-	//Hide our actor instead remove
-	bool cVisible = true;
-
-	//If our should be juse updated
-	bool cShouldBeUpdated = false;
-
-public:
-	UVoxelChunkComponent* World = nullptr;
-
-	//Actor of chunk
-	UVoxelChunkComponent* chunk = nullptr;
-
-public:
-	//Vertices mesh
-	TArray <FVector> Vertices = TArray <FVector>();
-
-	//Triangles mesh
-	TArray <int32> Triangles = TArray <int32>();
-
-	//Normals mesh
-	TArray <FVector> Normals = TArray <FVector>();
-
-	//Colors mesh
-	TArray <FLinearColor> Colors = TArray <FLinearColor>();
-
-	//Grids mesh
-	TArray<float> Grid = TArray <float>();
-
-public:
-	//Parent chunk
-	//If a chunk is the first from the Octree, there is no parent
 	TWeakPtr<FVoxelOctreeData> ParentChunk;
-
-	//Childs of chunk, if they exist
 	TArray<TSharedPtr<FVoxelOctreeData>> ChildrenChunks;
 
 public:

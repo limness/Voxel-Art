@@ -11,7 +11,6 @@
 #include "Octree/VoxelManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Octree/VoxelOctreeData.h"
-#include "Meshers/VoxelMarchingCubesMesher.h"
 #include "VoxelPoolComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -91,7 +90,7 @@ public:
 	int VoxelsPerChunk = 16;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
-	UMaterialInterface* material;
+	UMaterialInterface* Material;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Main")
 	bool TransitionMesh = true;
@@ -160,14 +159,14 @@ private:
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USceneComponent* SceneComponent;
+	USceneComponent* WorldComponent;
 
 private:
 
 	void GenerateLandscape();
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan);
-	void SpawnChunk(TSharedPtr<FVoxelOctreeData> chunkData);
-	void ChunkInit(UVoxelChunkComponent* chunk, TSharedPtr<FVoxelOctreeData> chunkData);
+	void SpawnChunk(TSharedPtr<FVoxelOctreeData> ChunkData);
+	void ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOctreeData> OctantData);
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
 	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
 	void UpdateOctree();
@@ -189,142 +188,7 @@ public:
 
 	int TotalTasksCounter = 0;
 
-	friend class TerrainGenerationAsyncTask;
-	class TerrainGenerationAsyncTask : public FNonAbandonableTask
-	{
-		UVoxelChunkComponent* VoxelChunkComponent;
-		FThreadSafeBool isActive;
-		AVoxelLandscape* World;
-
-		int Voxels;
-		int LevelOctree;
-		int Radius;
-		FVector WorldLocation;
-		uint8 TransvoxelDirection;
-
-		TArray<float> DensityMap;
-
-	public:
-
-		TerrainGenerationAsyncTask(
-			AVoxelLandscape* World,
-			UVoxelChunkComponent* InComponent,
-			bool isActive, 
-			int Voxels,
-			int LevelOctree,
-			int Radius,
-			FVector WorldLocation,
-			uint8 TransvoxelDirection)
-		{
-			this->VoxelChunkComponent = InComponent;
-			this->isActive = isActive;
-			this->World = World;
-
-			this->Voxels = Voxels;
-			this->LevelOctree = LevelOctree;
-			this->Radius = Radius;
-			this->WorldLocation = WorldLocation;
-			this->TransvoxelDirection = TransvoxelDirection;
-		}
-
-		FORCEINLINE TStatId GetStatId() const
-		{
-			RETURN_QUICK_DECLARE_CYCLE_STAT(TerrainGenerationAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
-		}
-
-		void SetActor(UVoxelChunkComponent* InActor)
-		{
-			VoxelChunkComponent = InActor;
-		}
-
-		void SetActive(bool Active)
-		{
-			isActive = Active;
-		}
-
-		bool GetActive()
-		{
-			return isActive;
-		}
-
-		void DoWork()
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : VoxelLandscape ] Async started"));
-
-			//FPlatformProcess::Sleep(0.03f);
-			{
-
-				/*if (VoxelTerrainActor->Grid.Num() == 0)
-				{
-					//World->GenerateDensityMap(VoxelTerrainActor);
-					VoxelTerrainActor->GenerateDensityMap();
-				}
-				else
-				{
-					VoxelTerrainActor->hasOwnGrid = true;
-				}*/
-
-				//void AVoxelChunk::GenerateDensityMap()
-				{
-					DensityMap.Init(-1.0, (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT));
-
-					float radiusVoxel = Radius / (float)Voxels;
-
-					//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : Voxel Async Generator ] radiusVoxel %f"), radiusVoxel);
-
-					for (int z = 0; z < Voxels + 1 + NORMALS_SKIRT; z++)
-					{
-						for (int y = 0; y < Voxels + 1 + NORMALS_SKIRT; y++)
-						{
-							for (int x = 0; x < Voxels + 1 + NORMALS_SKIRT; x++)
-							{
-								FVector positionNoise;
-
-								positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel;
-								positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel;
-								positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
-								positionNoise = positionNoise - (float)(Radius / 2.f);
-
-								DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)] = World->GeneratorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + WorldLocation);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
-							}
-						}
-					}
-				}
-				VoxelMarchingCubesMesher* mesher = new VoxelMarchingCubesMesher(
-					World->GeneratorLandscape,
-					Voxels,
-					LevelOctree,
-					Radius,
-					WorldLocation,
-					TransvoxelDirection,
-					DensityMap
-				);
-				mesher->GenerateMarchingCubesMesh();
-				//VoxelChunkComponent->DensityMap = DensityMap;
-				//VoxelTerrainActor->GenerateVertexCube(false);
-
-				TArray<FVector> Vertices = mesher->Vertices;
-				TArray<int32> Triangles = mesher->Triangles;
-				TArray<FVector> Normals = mesher->Normals;
-				TArray<FLinearColor> VertexColors = mesher->VertexColors;
-				
-				AsyncTask(ENamedThreads::GameThread, [=]()
-					{
-						VoxelChunkComponent->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
-					});
-
-
-				delete mesher;
-				mesher = nullptr;
-			}
-			isActive = false;
-		}
-
-	private:
-
-	};
-
-	TArray<FAsyncTask<TerrainGenerationAsyncTask>*> PoolThreads;
+	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
 	FThreadSafeCounter TaskWorkGlobalCounter;
 
 	FCriticalSection OctreeMutex;

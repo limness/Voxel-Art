@@ -155,21 +155,21 @@ bool VoxelManager::IsThreadPaused()
 
 bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 {
-	float distanceLODs = DrawingRange * Octant->radius; 
-	float DistancePlayer = (PlayerPositionToWorld - Octant->position).Size();
+	float DistanceLODs = DrawingRange * Octant->Size; 
+	float DistancePlayer = (PlayerPositionToWorld - Octant->Position).Size();
 
 	if (!Octant->HasChildren())
 	{
-		if (World->MaximumLOD > Octant->level)
+		if (World->MaximumLOD > Octant->Level)
 		{
-			if (DistancePlayer <= distanceLODs / 2.f)
+			if (DistancePlayer <= DistanceLODs / 2.f)
 			{
 				Octant->AddChildren();
 
-				if (IsValid(Octant->chunk))
+				if (IsValid(Octant->Chunk))
 				{
-					ChangesOctree->ChunksRemoving.Add(Octant->chunk);
-					Octant->chunk = nullptr;
+					ChangesOctree->ChunksRemoving.Add(Octant->Chunk);
+					Octant->Chunk = nullptr;
 				}
 				for (auto& Leaf : Octant->GetChildren())
 				{
@@ -179,7 +179,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 					{
 						TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
 						ChunkCreation->CurrentOctree = Leaf;
-						ChunkCreation->position = Leaf->position;
+						ChunkCreation->position = Leaf->Position;
 						ChunkCreation->priority = DistancePlayer;
 						ChangesOctree->ChunksCreation.Add(ChunkCreation);
 					}
@@ -190,20 +190,20 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	}
 	else if (Octant->HasChildren())
 	{
-		if (!(DistancePlayer <= distanceLODs / 2.f) && World->MinimumLOD < Octant->level + 1)
+		if (!(DistancePlayer <= DistanceLODs / 2.f) && World->MinimumLOD < Octant->Level + 1)
 		{
 			TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
 			ChunkCreation->CurrentOctree = Octant;
-			ChunkCreation->position = Octant->position;
-			ChunkCreation->priority = Octant->priority;
+			ChunkCreation->position = Octant->Position;
+			ChunkCreation->priority = Octant->Priority;
 			ChangesOctree->ChunksCreation.Add(ChunkCreation);
 
 			for (auto& Leaf : GetLeavesChunk(Octant))
 			{
-				if (IsValid(Leaf->chunk))
+				if (IsValid(Leaf->Chunk))
 				{
-					ChangesOctree->ChunksRemoving.Add(Leaf->chunk);
-					Leaf->chunk = nullptr;
+					ChangesOctree->ChunksRemoving.Add(Leaf->Chunk);
+					Leaf->Chunk = nullptr;
 				}
 			}
 			Octant->DestroyChildren();

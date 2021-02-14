@@ -131,14 +131,7 @@ void VoxelMarchingCubesMesher::GenerateMarchingCubesMesh(/*
 		if ((TransvoxelDirection & EVoxelDirection::MinimumZ) == EVoxelDirection::MinimumZ) GeometryTransitionCubes<EVoxelDirection::MinimumZ>(Radius);
 		if ((TransvoxelDirection & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) GeometryTransitionCubes<EVoxelDirection::MaximumZ>(Radius);
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : VoxelLandscape ] Inside _DensityMap %d Location %s radius %f voxels %d"), DensityMap.Num(), *WorldLocation.ToString(), Radius, Voxels);
-
 	positionSide.Empty();
-	/*
-	AsyncTask(ENamedThreads::GameThread, [this]()
-		{
-			UpdateMesh(Vertices, Triangles, Normals, VertexColors);
-		});*/
 }
 
 void VoxelMarchingCubesMesher::MarchingCubes(int isolevel, int indexGrid, int x, int y, int z, int normalIndex)
@@ -338,19 +331,19 @@ void VoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 	{
 		for (int y = 0; y < Voxels; y++)
 		{
-			cornerNoise[0] = GetValue<Direction>((x + 0), (y + 0), Voxels, LevelOctree / 2.f);		// 0 - 9
+			cornerNoise[0] = GetValue<Direction>((x + 0), (y + 0), Voxels, LevelOctree / 2.f);			// 0 - 9
 			cornerNoise[1] = GetValue<Direction>((x + 0.5f), (y + 0), Voxels, LevelOctree / 2.f);		// 1
 			cornerNoise[2] = GetValue<Direction>((x + 1.f), (y + 0), Voxels, LevelOctree / 2.f);		// 2 - A
 			cornerNoise[3] = GetValue<Direction>((x + 0), (y + 0.5f), Voxels, LevelOctree / 2.f);		// 3
 			cornerNoise[4] = GetValue<Direction>((x + 0.5f), (y + 0.5f), Voxels, LevelOctree / 2.f);	// 4
-			cornerNoise[5] = GetValue<Direction>((x + 1.f), (y + 0.5f), Voxels, LevelOctree / 2.f);	// 5
+			cornerNoise[5] = GetValue<Direction>((x + 1.f), (y + 0.5f), Voxels, LevelOctree / 2.f);		// 5
 			cornerNoise[6] = GetValue<Direction>((x + 0), (y + 1.f), Voxels, LevelOctree / 2.f);		// 6 - B
-			cornerNoise[7] = GetValue<Direction>((x + 0.5f), (y + 1.f), Voxels, LevelOctree / 2.f);	// 7
-			cornerNoise[8] = GetValue<Direction>((x + 1.f), (y + 1.f), Voxels, LevelOctree / 2.f);	// 8 - C
+			cornerNoise[7] = GetValue<Direction>((x + 0.5f), (y + 1.f), Voxels, LevelOctree / 2.f);		// 7
+			cornerNoise[8] = GetValue<Direction>((x + 1.f), (y + 1.f), Voxels, LevelOctree / 2.f);		// 8 - C
 
-			cornerNoise[9] = GetValue<Direction>((x + 0), (y + 0), Voxels, LevelOctree);				// 9
-			cornerNoise[10] = GetValue<Direction>((x + 1.f), (y + 0), Voxels, LevelOctree);			// A
-			cornerNoise[11] = GetValue<Direction>((x + 0), (y + 1.f), Voxels, LevelOctree);			// B
+			cornerNoise[9] =  GetValue<Direction>((x + 0), (y + 0), Voxels, LevelOctree);				// 9
+			cornerNoise[10] = GetValue<Direction>((x + 1.f), (y + 0), Voxels, LevelOctree);				// A
+			cornerNoise[11] = GetValue<Direction>((x + 0), (y + 1.f), Voxels, LevelOctree);				// B
 			cornerNoise[12] = GetValue<Direction>((x + 1.f), (y + 1.f), Voxels, LevelOctree);			// C
 
 			uint32 caseValue =
@@ -394,7 +387,7 @@ void VoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 					const int Y = (i - 1) % 4 / 2;
 
 					cornerPosition[i] = positionSide[
-						(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).X) +
+							(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).X) +
 							(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).Y) * (Voxels + 1 + NORMALS_SKIRT) +
 							(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).Z) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
 
@@ -551,7 +544,8 @@ float VoxelMarchingCubesMesher::GetValue(float X, float Y, float size, int LOD)
 
 FORCEINLINE int VoxelMarchingCubesMesher::PositionToIndices(FVector position)
 {
-	return ((int)position.X + NORMALS_SKIRT_HALF) +
+	return 
+		((int)position.X + NORMALS_SKIRT_HALF) +
 		((int)position.Y + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) +
 		((int)position.Z + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT);
 }

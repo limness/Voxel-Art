@@ -7,12 +7,12 @@
 
 FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position)
 	: ParentChunk(_Parent)
-	, nodeID(_NodeID)
-	, level(_Level)
-	, radius(_Radius)
-	, position(_Position)
+	, NodeID(_NodeID)
+	, Level(_Level)
+	, Size(_Radius)
+	, Position(_Position)
 {
-	chunk = nullptr;
+	Chunk = nullptr;
 	ParentChunk.Reset();
 
 	//land->SpawnBoxTest(it->position, it->radius / 2.f, 2500.f, FColor::Red);
@@ -21,16 +21,10 @@ FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _N
 
 FVoxelOctreeData::~FVoxelOctreeData()
 {
-	chunk = nullptr;
+	Chunk = nullptr;
 
 	ParentChunk.Reset();
 	ChildrenChunks.Reset();
-
-	Vertices.Empty();
-	Triangles.Empty();
-	Normals.Empty();
-	Colors.Empty();
-	Grid.Empty();
 }
 
 void FVoxelOctreeData::DestroyChildren()
@@ -70,16 +64,16 @@ void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> child
 
 void FVoxelOctreeData::AddChildren()
 {
-	float P = radius / 4.f;
+	float P = Size / 4.f;
 
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 0, level + 1, radius / 2.f, position + FVector(-P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 1, level + 1, radius / 2.f, position + FVector(+P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 2, level + 1, radius / 2.f, position + FVector(-P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 3, level + 1, radius / 2.f, position + FVector(+P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 4, level + 1, radius / 2.f, position + FVector(-P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 5, level + 1, radius / 2.f, position + FVector(+P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 6, level + 1, radius / 2.f, position + FVector(-P, +P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (nodeID << 3) | 7, level + 1, radius / 2.f, position + FVector(+P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 0, Level + 1, Size / 2.f, Position + FVector(-P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 1, Level + 1, Size / 2.f, Position + FVector(+P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 2, Level + 1, Size / 2.f, Position + FVector(-P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 3, Level + 1, Size / 2.f, Position + FVector(+P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 4, Level + 1, Size / 2.f, Position + FVector(-P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 5, Level + 1, Size / 2.f, Position + FVector(+P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 6, Level + 1, Size / 2.f, Position + FVector(-P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Level + 1, Size / 2.f, Position + FVector(+P, +P, +P))));
 
 	//UE_LOG(VoxelArt, Error, TEXT("Size %f"), (radius / 2.f) / 16.f);
 	//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Added 8 children"));
@@ -99,10 +93,10 @@ void FVoxelOctreeData::GetVoxelDensity(FVector Position, float& Value)
 
 	Value = 0.f;
 
-	if(LIKELY(chunk && chunk->DensityMap.Num() > 0))
+//	if(LIKELY(chunk && chunk->DensityMap.Num() > 0))
 	{
 		//Value = chunk->DensityMap[PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
-
+/*
 		if (PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT) >= chunk->DensityMap.Num())
 		{
 			UE_LOG(VoxelArt, Error, TEXT("Level %d Value %s Our Num %d Num %d"), 
@@ -118,7 +112,7 @@ void FVoxelOctreeData::GetVoxelDensity(FVector Position, float& Value)
 				*PositionInt.ToString(),
 				PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT),
 				chunk->DensityMap.Num());
-		}
+		} */
 	}
 }
 
@@ -162,7 +156,7 @@ TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChildByPosition(FVector Position
 {
 	check(HasChildren());
 
-	return ChildrenChunks[(Position.X > position.X) + (Position.Y > position.Y) * 2 + (Position.Z > position.Z) * 4];
+	return ChildrenChunks[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
 template<uint8 Direction>

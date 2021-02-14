@@ -280,7 +280,7 @@ TWeakPtr<FVoxelOctreeData> VoxelOctreeNeighborsChecker::FindNodeByID(TWeakPtr<FV
 {
 	TWeakPtr<FVoxelOctreeData> candidate = nullptr;
 
-	if (nodeID == chunk.Pin()->nodeID)
+	if (nodeID == chunk.Pin()->NodeID)
 	{
 		candidate = chunk;
 	}
@@ -294,7 +294,7 @@ TWeakPtr<FVoxelOctreeData> VoxelOctreeNeighborsChecker::FindNodeByID(TWeakPtr<FV
 				{
 					uint64 privateNodeID = nodeID >> ((levelTo - 1 - level) * 3);
 
-					if (privateNodeID == child->nodeID) //here
+					if (privateNodeID == child->NodeID) //here
 					{
 						candidate = FindNodeByID(child, levelTo, level + 1, nodeID);
 					}
@@ -317,7 +317,7 @@ TArray<TWeakPtr<FVoxelOctreeData>> VoxelOctreeNeighborsChecker::GetNodeNeighbors
 
 	if (biggerNeighbor.Pin().IsValid())
 	{
-		if (!biggerNeighbor.Pin()->cUpdating)
+		//if (!biggerNeighbor.Pin()->cUpdating)
 		{
 			smallerNeighbors = GetSmallerNeighbors<Direction>(biggerNeighbor.Pin()->level, level, nodeID, biggerNeighbor);
 		}
@@ -327,45 +327,45 @@ TArray<TWeakPtr<FVoxelOctreeData>> VoxelOctreeNeighborsChecker::GetNodeNeighbors
 
 bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level)
 {
-	if (!chunk->cUpdating)
+	//if (!chunk->cUpdating)
 	{
 		if (!chunk->HasChildren())
 		{
-			if (chunk->chunk != nullptr)
+			if (chunk->Chunk != nullptr)
 			{
-				if (chunk->chunk->IsActive())
+				if (chunk->Chunk->IsActive())
 				{
 					//if ((int)chunk->nodeID == World->nodeID)
 					if (true)
 					{
-						uint8 transvoxelDirection = 0x00;
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceN = GetNodeNeighbors<DirectionOctree::FaceN>(chunk->level, chunk->nodeID);
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceS = GetNodeNeighbors<DirectionOctree::FaceS>(chunk->level, chunk->nodeID);
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceE = GetNodeNeighbors<DirectionOctree::FaceE>(chunk->level, chunk->nodeID);
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceW = GetNodeNeighbors<DirectionOctree::FaceW>(chunk->level, chunk->nodeID);
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceD = GetNodeNeighbors<DirectionOctree::FaceD>(chunk->level, chunk->nodeID);
-						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceU = GetNodeNeighbors<DirectionOctree::FaceU>(chunk->level, chunk->nodeID);
+						uint8 TransitionSides = 0x00;
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceN = GetNodeNeighbors<DirectionOctree::FaceN>(chunk->Level, chunk->NodeID);
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceS = GetNodeNeighbors<DirectionOctree::FaceS>(chunk->Level, chunk->NodeID);
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceE = GetNodeNeighbors<DirectionOctree::FaceE>(chunk->Level, chunk->NodeID);
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceW = GetNodeNeighbors<DirectionOctree::FaceW>(chunk->Level, chunk->NodeID);
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceD = GetNodeNeighbors<DirectionOctree::FaceD>(chunk->Level, chunk->NodeID);
+						TArray<TWeakPtr<FVoxelOctreeData>> candidateNeighborFaceU = GetNodeNeighbors<DirectionOctree::FaceU>(chunk->Level, chunk->NodeID);
 						 
-						transvoxelDirection = ((uint8)(candidateNeighborFaceN.Num() > 1) << 3) |
+						TransitionSides =	((uint8)(candidateNeighborFaceN.Num() > 1) << 3) |
 											((uint8)(candidateNeighborFaceS.Num() > 1) << 2) |
 											((uint8)(candidateNeighborFaceE.Num() > 1) << 1) |
 											((uint8)(candidateNeighborFaceW.Num() > 1) << 0) |
 											((uint8)(candidateNeighborFaceD.Num() > 1) << 4) |
 											((uint8)(candidateNeighborFaceU.Num() > 1) << 5);
 
-						if (chunk->transvoxelDirection != transvoxelDirection)
+						if (chunk->TransitionSides != TransitionSides)
 						{
-							chunk->transvoxelDirection = transvoxelDirection;
-							chunk->chunk->transvoxelDirection = transvoxelDirection;
+							chunk->TransitionSides = TransitionSides;
+							//chunk->chunk->transvoxelDirection = transvoxelDirection;
 
-							for (auto& it : candidateNeighborFaceD) { chunk->neighborFaceD.Add(it); }
+							/*for (auto& it : candidateNeighborFaceD) { chunk->neighborFaceD.Add(it); }
 							for (auto& it : candidateNeighborFaceE) { chunk->neighborFaceE.Add(it); }
 							for (auto& it : candidateNeighborFaceN) { chunk->neighborFaceN.Add(it); }
 							for (auto& it : candidateNeighborFaceS) { chunk->neighborFaceS.Add(it); }
 							for (auto& it : candidateNeighborFaceU) { chunk->neighborFaceU.Add(it); }
-							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }
+							for (auto& it : candidateNeighborFaceW) { chunk->neighborFaceW.Add(it); }*/
 
-							ChangesOctree->ChunksGeneration.Add(chunk->chunk);
+							ChangesOctree->ChunksGeneration.Add(chunk->Chunk);
 						}
 					}
 				}
