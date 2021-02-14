@@ -72,5 +72,5 @@ private:
 
 	TWeakPtr<FVoxelOctreeData> FindNodeByID(TWeakPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
 
-	bool CheckOctree(TSharedPtr<FVoxelOctreeData> chunk, int level);
+	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant, int level);
 };

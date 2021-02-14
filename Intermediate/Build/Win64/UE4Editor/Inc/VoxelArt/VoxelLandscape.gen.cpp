@@ -246,9 +246,9 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #endif
 		static const UE4CodeGen_Private::FUnsizedIntPropertyParams NewProp_VoxelsPerChunk;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_WorldRadius_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_WorldSize_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_WorldRadius;
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_WorldSize;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_EnabledWorldInGame_MetaData[];
 #endif
@@ -453,7 +453,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #endif
 	const UE4CodeGen_Private::FUnsizedIntPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk = { UE4CodeGen_Private::EPropertyClass::Int, "VoxelsPerChunk", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, VoxelsPerChunk), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldSize_MetaData[] = {
 		{ "Category", "Main" },
 		{ "ClampMax", "5000000.0" },
 		{ "ClampMin", "0.0" },
@@ -462,7 +462,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		{ "UIMin", "0.0" },
 	};
 #endif
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius = { UE4CodeGen_Private::EPropertyClass::Float, "WorldRadius", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, WorldRadius), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius_MetaData)) };
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldSize = { UE4CodeGen_Private::EPropertyClass::Float, "WorldSize", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(AVoxelLandscape, WorldSize), METADATA_PARAMS(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldSize_MetaData, ARRAY_COUNT(Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldSize_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame_MetaData[] = {
 		{ "Category", "Main" },
@@ -502,7 +502,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_TransitionMesh,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_Material,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_VoxelsPerChunk,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldRadius,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_WorldSize,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_EnabledWorldInGame,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_GeneratorLandscape,
 	};
@@ -529,7 +529,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 2137487467);
+	IMPLEMENT_CLASS(AVoxelLandscape, 4224662868);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

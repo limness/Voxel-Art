@@ -16,27 +16,20 @@ class UVoxelLandscapeGenerator;
  * 
  */
 //UCLASS()
-class VOXELART_API VoxelMarchingCubesMesher
+class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
-	VoxelMarchingCubesMesher(
-		UVoxelLandscapeGenerator* _GeneratorLandscape,
-		int _Voxels,
-		int _LevelOctree,
-		int _Radius,
-		FVector _WorldLocation,
-		uint8 _TransvoxelDirection,
-		TArray<float> _DensityMap);
-	~VoxelMarchingCubesMesher();
+	FVoxelMarchingCubesMesher(UVoxelLandscapeGenerator* _GeneratorLandscape, FVoxelChunkData* _Data);
+	~FVoxelMarchingCubesMesher();
 
 private:
 
 	int Voxels;
-	int LevelOctree;
-	float Radius;
+	int Depth;
+	float Size;
 
-	FVector WorldLocation;
-	uint8 TransvoxelDirection;
+	FVector Position;
+	uint8 TransitionSides;
 	TArray<float> DensityMap;
 
 private:
@@ -58,15 +51,7 @@ public:
 
 public:
 
-	//void GenerateDensityMap();
-
-	void GenerateMarchingCubesMesh(/*
-		TArray<FVector>& Vertices,
-		TArray<int32>& Triangles,
-		TArray<FVector>& Normals,
-		TArray<FLinearColor>& VertexColors,
-		TArray<FProcMeshTangent>& Tangents,
-		TArray<FVector2D>& TextureCoordinates*/);
+	void GenerateMarchingCubesMesh();
 
 	void MarchingCubes(int isolevel, int indexGrid, int x, int y, int z, int normalIndex);
 
@@ -86,7 +71,7 @@ public:
 	FVector PositionToDirection(FVector directionPosition, float size);
 
 	template<uint8 Direction>
-	float GetValue(float X, float Y, float size, int LOD);
+	float GetValue(float X, float Y, float size, bool CurrentDepth);
 
 	FORCEINLINE int PositionToIndices(FVector position);
 
@@ -107,7 +92,7 @@ public:
 	{
 		float noise = 0.f;
 
-		positionGrid += WorldLocation;
+		positionGrid += Position;
 
 		//if (GeneratorLandscape == nullptr)
 		//{

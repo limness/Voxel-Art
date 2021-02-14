@@ -84,7 +84,7 @@ public:
 	bool EnabledWorldInGame = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "5000000.0", UIMin = "0.0", UIMax = "5000000.0"))
-	float WorldRadius = 524288.f;
+	float WorldSize = 524288.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0", ClampMax = "32", UIMin = "0", UIMax = "32"))
 	int VoxelsPerChunk = 16;
@@ -164,11 +164,11 @@ public:
 private:
 
 	void GenerateLandscape();
-	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan);
-	void SpawnChunk(TSharedPtr<FVoxelOctreeData> ChunkData);
-	void ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOctreeData> OctantData);
+	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
+	void SpawnChunk(FVoxelChunkData* ChunkData);
+	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
-	void PutChunkOnGeneration(UVoxelChunkComponent* Chunk);
+	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
 	void UpdateOctree();
 
 public:
@@ -180,14 +180,15 @@ public:
 
 private:
 
-	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
+	TArray<FVoxelChunkData*> ChunksCreation;
+	TArray<FVoxelChunkData*> ChunksGeneration;
 	TArray<UVoxelChunkComponent*> ChunksRemoving;
-	TArray<UVoxelChunkComponent*> ChunksGeneration;
 
 public:
 
 	int TotalTasksCounter = 0;
 
+	FQueuedThreadPool* ThreadPool;
 	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
 	FThreadSafeCounter TaskWorkGlobalCounter;
 

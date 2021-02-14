@@ -25,6 +25,8 @@ AVoxelLandscape::AVoxelLandscape()
 
 	/* Object pooler component */
 	PoolChunks = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("PoolChunks"));
+
+	//ThreadPool = FQueuedThreadPool::Allocate();
 }
 
 void AVoxelLandscape::BeginPlay()
@@ -39,10 +41,7 @@ void AVoxelLandscape::BeginPlay()
 
 void AVoxelLandscape::Destroyed()
 {
-	for (auto& Chunk : ChunkComponents)
-	{
-		Chunk->DestroyComponent();
-	}
+	DestroyVoxelWorld();
 }
 
 void AVoxelLandscape::CreateVoxelWorld()
@@ -61,11 +60,13 @@ void AVoxelLandscape::CreateVoxelWorld()
 		}
 		else
 		{
+		//	ThreadPool->Create(1, 128 * 1024);
+
 			if (TerrainCreated)
 			{
 				DestroyVoxelWorld();
 			}
-			/*float RadiusHeighestVoxel = WorldRadius / (float)VoxelsPerChunk * 2.f;
+			/*float RadiusHeighestVoxel = WorldSize / (float)VoxelsPerChunk * 2.f;
 
 			for (int i = 0; i < MaximumLOD; i++)
 			{
@@ -131,6 +132,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		int TimeAfterDestroy = FDateTime::Now().GetTicks();
 		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s."), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f);
 		GEngine->ForceGarbageCollection(true);
+		//ThreadPool->Destroy();
 		TerrainCreated = false;
 	}
 }
@@ -142,22 +144,8 @@ void AVoxelLandscape::SpawnBoxTest(FVector location, float radius, float width, 
 
 void AVoxelLandscape::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (ManagerCheckPositionThreadHandle)
-	{
-		ManagerCheckPositionThreadHandle->EnsureCompletion();
-		delete ManagerCheckPositionThreadHandle;
-		ManagerCheckPositionThreadHandle = nullptr;
-	}
-	if (OctreeNeighborsChecker)
-	{
-		OctreeNeighborsChecker->EnsureCompletion();
-		delete OctreeNeighborsChecker;
-		OctreeNeighborsChecker = nullptr;
-	}
-	for (auto& it : PoolThreads)
-	{
-		it->Cancel();
-	}
+	DestroyVoxelWorld();
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -186,6 +174,7 @@ void AVoxelLandscape::UpdateOctree()
 
 	TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
 	while (ChangesOctree.Peek(ChunksChangesArray))
+	//if(false)
 	{
 		ChangesOctree.Dequeue(ChunksChangesArray);
 
@@ -205,6 +194,7 @@ void AVoxelLandscape::UpdateOctree()
 		ChunksChangesArray->ChunksRemoving.Empty();
 		ChunksChangesArray->ChunksGeneration.Empty();
 	}
+	//if(false)
 	{
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
@@ -221,43 +211,48 @@ void AVoxelLandscape::UpdateOctree()
 		}
 #endif
 
-		for (auto& Chunk : ChunksCreation)
+		for (auto& ChunkData : ChunksCreation)
 		{
-			Chunk->priority = (PlayerPositionToWorld - Chunk->position).Size();
+			ChunkData->Priority = (PlayerPositionToWorld - ChunkData->Position).Size();
 		}
-		ChunksCreation.Sort([](const TSharedPtr<FVoxelChunkRenderData> A, const TSharedPtr<FVoxelChunkRenderData> B)
+		ChunksCreation.Sort([](const FVoxelChunkData& A, const FVoxelChunkData& B)
 			{
-				return A->priority > B->priority;
+				return A.Priority > B.Priority;
 			});
 	}
 
 	int32 Index = 0;
 	while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
+	//if(false)
 	{
+		FVoxelChunkData* ChunkData = ChunksCreation.Pop();
 		OctreeMutex.Lock();
-		TSharedPtr<FVoxelOctreeData> Octant = ChunksCreation.Pop()->CurrentOctree.Pin();
+		TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
 		OctreeMutex.Unlock();
 
 		if (Octant.IsValid())
 		{
+			Octant->Data = ChunkData;
+
 			if (!Octant->HasChildren())
 			{
-				if (IsValid(Octant->Chunk))
+				if (IsValid(ChunkData->Chunk))
 				{
-					if (Octant->Chunk->Active == true)
+					if (ChunkData->Chunk->Active == true)
 					{
-						ChunksRemoving.Add(Octant->Chunk);
+						ChunksRemoving.Add(ChunkData->Chunk);
 					}
 				}
-				SpawnChunk(Octant);
+				SpawnChunk(ChunkData);
 				Index++;
 			}
 		}
 	}
 
 	if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
+	//if(false)
 	{
-		auto AreAllTasksDone = [&]()
+		/*auto AreAllTasksDone = [&]()
 		{
 			bool AreDone = true;
 
@@ -269,9 +264,10 @@ void AVoxelLandscape::UpdateOctree()
 				}
 			}
 			return AreDone;
-		};
+		};*/
 
-		if (AreAllTasksDone())
+		//if (AreAllTasksDone())
+		if(TaskWorkGlobalCounter.GetValue() == 0)
 		{
 			if (!StatsShowed)
 			{
@@ -295,11 +291,12 @@ void AVoxelLandscape::UpdateOctree()
 	}
 	while (ChunksGeneration.Num() > 0)
 	{
-		UVoxelChunkComponent* Chunk = ChunksGeneration.Pop();
+		FVoxelChunkData* ChunkData = ChunksGeneration.Pop();
 		{
-			if (IsValid(Chunk))
+			//if (IsValid(Chunk))
 			{
-				PutChunkOnGeneration(Chunk);
+				//UE_LOG(VoxelArt, Error, TEXT("You should choose generator of the density!"));
+				PutChunkOnGeneration(ChunkData);
 			}
 		}
 	}
@@ -309,9 +306,9 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 {
 	for (auto& Chunk : Chunks)
 	{
-		if (Chunk->Chunk != nullptr)
+		//if (Chunk->Chunk != nullptr)
 		{
-			if (Chunk->Chunk->hasOwnGrid)
+			//if (Chunk->Chunk->hasOwnGrid)
 			{
 			//	Chunk->Grid = Chunk->chunk->DensityMap;
 				SavedChunks.Add(Chunk->NodeID, Chunk);
@@ -322,7 +319,7 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 
 void AVoxelLandscape::GenerateLandscape()
 {
-	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldRadius, FVector(0, 0, 0)));
+	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, FVector(0, 0, 0)));
 	GenerateOctree(MainOctree);
 }
 
@@ -335,7 +332,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 		int height = MapSize;
 		uint8* pixels = (uint8*)malloc(width * height * 4);
 
-		float StepTexture = WorldRadius / MapSize;
+		float StepTexture = WorldSize / MapSize;
 
 		if (RenderType == RenderTexture::RedGreenBlue)
 		{
@@ -437,24 +434,25 @@ void AVoxelLandscape::CreateTextureDensityMap()
 	}
 }
 
-void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octan)
+void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant)
 {
-	if (Octan->Level == MinimumLOD)
+	if (Octant->Depth == MinimumLOD)
 	{
-		SpawnChunk(Octan);
+		Octant->Data = new FVoxelChunkData(Octant, Octant->Position, Octant->Size, VoxelsPerChunk, 0.f);
+		SpawnChunk(Octant->Data);
 	}
 	else
 	{
-		Octan->AddChildren();
+		Octant->AddChildren();
 
-		for (auto& Leaf : Octan->GetChildren())
+		for (auto& Leaf : Octant->GetChildren())
 		{
 			GenerateOctree(Leaf);
 		}
 	}
 }
 
-void AVoxelLandscape::SpawnChunk(TSharedPtr<FVoxelOctreeData> ChunkData)
+void AVoxelLandscape::SpawnChunk(FVoxelChunkData* ChunkData)
 {
 	UVoxelChunkComponent* PoolChunk = PoolChunks->GetChunkFromPool();
 
@@ -462,55 +460,32 @@ void AVoxelLandscape::SpawnChunk(TSharedPtr<FVoxelOctreeData> ChunkData)
 	{
 		PoolChunk = PoolChunks->AddChunkToPool();
 	}
-
 	ChunkInit(PoolChunk, ChunkData);
-	PutChunkOnGeneration(PoolChunk);
+	PutChunkOnGeneration(ChunkData);
 }
 
-void AVoxelLandscape::PutChunkOnGeneration(UVoxelChunkComponent* Chunk)
+void AVoxelLandscape::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
-	FAsyncTask<MesherAsyncTask>* FreeTask = nullptr;
-
-/*	for (auto& it : PoolThreads)
-	{
-		if (it->IsDone())
-		{
-			FreeTask = it;
-			break;
-		}
-	}*/
-	if (FreeTask == nullptr)
-	{
-		FreeTask = new FAsyncTask<MesherAsyncTask>(
-			this,
-			Chunk,
-			false,
-			Chunk->voxels,
-			Chunk->level,
-			Chunk->radius,
-			Chunk->GetComponentLocation(),
-			Chunk->transvoxelDirection
-		);
-		PoolThreads.Add(FreeTask);
-	}
-	FreeTask->StartBackgroundTask();
+	TaskWorkGlobalCounter.Increment();
+	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
+	MesherTask->StartBackgroundTask();
 }
 
-void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOctreeData> OctantData)
+void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
 {
 	if (Chunk)
 	{
-		Chunk->CurrentOctree =			OctantData;
-		Chunk->NodeID =					OctantData->NodeID;
+		ChunkData->Chunk = Chunk;
+
+		Chunk->CurrentOctree =			ChunkData->CurrentOctree;
 		Chunk->Material =				Material;
 		Chunk->GeneratorLandscape =		GeneratorLandscape;
-		OctantData->Chunk =				Chunk;
 
 		Chunk->SetMaterial(0, Material);
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(WorldComponent, FAttachmentTransformRules::KeepWorldTransform);
-		Chunk->SetWorldLocation(OctantData->Position);
+		Chunk->SetWorldLocation(ChunkData->Position);
 		Chunk->SetActive(true);
 	}
 }
@@ -518,9 +493,9 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, TSharedPtr<FVoxelOc
 void AVoxelLandscape::GetVoxelValue(FVector Position, float& Value)
 {
 	TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->GetLeaf(Position).Pin();
-	SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Size / 2.f, 30.f, FColor::Red);
+	SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Data->Size / 2.f, 30.f, FColor::Red);
 
-	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position - CurrentOctantTest->Position + CurrentOctantTest->Size / 2.f);
+	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position - CurrentOctantTest->Position + CurrentOctantTest->Data->Size / 2.f);
 
 	CurrentOctantTest->GetVoxelDensity(PositionToWorld, Value);
 	//MainOctree->GetVoxelValue(Position, Value);

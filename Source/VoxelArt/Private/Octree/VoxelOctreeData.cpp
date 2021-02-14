@@ -5,26 +5,25 @@
 #include "Helpers/VoxelTools.h"
 #include "DrawDebugHelpers.h"
 
-FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position)
+FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Depth, float _Radius, FVector _Position)
 	: ParentChunk(_Parent)
 	, NodeID(_NodeID)
-	, Level(_Level)
+	, Depth(_Depth)
 	, Size(_Radius)
 	, Position(_Position)
 {
-	Chunk = nullptr;
-	ParentChunk.Reset();
-
-	//land->SpawnBoxTest(it->position, it->radius / 2.f, 2500.f, FColor::Red);
-	
 }
 
 FVoxelOctreeData::~FVoxelOctreeData()
 {
-	Chunk = nullptr;
-
 	ParentChunk.Reset();
 	ChildrenChunks.Reset();
+
+	/*if (Data != nullptr)
+	{
+		delete Data;
+		Data = nullptr;
+	}*/
 }
 
 void FVoxelOctreeData::DestroyChildren()
@@ -66,14 +65,14 @@ void FVoxelOctreeData::AddChildren()
 {
 	float P = Size / 4.f;
 
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 0, Level + 1, Size / 2.f, Position + FVector(-P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 1, Level + 1, Size / 2.f, Position + FVector(+P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 2, Level + 1, Size / 2.f, Position + FVector(-P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 3, Level + 1, Size / 2.f, Position + FVector(+P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 4, Level + 1, Size / 2.f, Position + FVector(-P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 5, Level + 1, Size / 2.f, Position + FVector(+P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 6, Level + 1, Size / 2.f, Position + FVector(-P, +P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Level + 1, Size / 2.f, Position + FVector(+P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 0, Depth + 1, Size / 2.f, Position + FVector(-P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 1, Depth + 1, Size / 2.f, Position + FVector(+P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 2, Depth + 1, Size / 2.f, Position + FVector(-P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 3, Depth + 1, Size / 2.f, Position + FVector(+P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 4, Depth + 1, Size / 2.f, Position + FVector(-P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 5, Depth + 1, Size / 2.f, Position + FVector(+P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 6, Depth + 1, Size / 2.f, Position + FVector(-P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Depth + 1, Size / 2.f, Position + FVector(+P, +P, +P))));
 
 	//UE_LOG(VoxelArt, Error, TEXT("Size %f"), (radius / 2.f) / 16.f);
 	//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Added 8 children"));
@@ -125,8 +124,8 @@ FORCEINLINE int FVoxelOctreeData::PositionToIndices(FVector position)
 {
 	return
 		(position.X + NORMALS_SKIRT_HALF) +
-		(position.Y + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) +
-		(position.Z + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT);
+		(position.Y + NORMALS_SKIRT_HALF) * (Data->Voxels + 1 + NORMALS_SKIRT) +
+		(position.Z + NORMALS_SKIRT_HALF) * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT);
 }
 
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
@@ -174,12 +173,16 @@ FORCEINLINE TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetNeighbor(int positio
 	return neighbor;
 }
 
-FVoxelChunkRenderData::FVoxelChunkRenderData()
+FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, FVector _Position, float _Size, int _Voxels, float _Priority)
+	: CurrentOctree(_CurrentOctree)
+	, Position(_Position)
+	, Size(_Size)
+	, Voxels(_Voxels)
+	, Priority(_Priority)
 {
-	CurrentOctree.Reset();
 }
 
-FVoxelChunkRenderData::~FVoxelChunkRenderData()
+FVoxelChunkData::~FVoxelChunkData()
 {
-	CurrentOctree.Reset();
+	//Chunk = nullptr;
 }

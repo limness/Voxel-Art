@@ -679,7 +679,7 @@ float AVoxelChunk::GetValue(float X, float Y, float size, int LOD)
 	{
 		value = GetValueNoise(GlobalPosition * GetVoxelSize() - (float)(radius / 2.f));
 	}
-	if (true) {}
+	/*if (true) {}
 	else
 	{
 		TWeakPtr<FVoxelOctreeData> chunkNeihbor = nullptr;
@@ -694,7 +694,7 @@ float AVoxelChunk::GetValue(float X, float Y, float size, int LOD)
 		}
 		if (chunkNeihbor.IsValid())
 		{
-			if (chunkNeihbor.Pin()->chunk->DensityMap.Num() > 0)
+			if (chunkNeihbor.Pin()->Chunk->DensityMap.Num() > 0)
 			{
 				FScopeTryLock ScopeTryLock(&chunkNeihbor.Pin()->chunk->ChunkMutex);
 				if (ScopeTryLock.IsLocked())
@@ -728,7 +728,7 @@ float AVoxelChunk::GetValue(float X, float Y, float size, int LOD)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : VoxelChunk ] Error: neighbor empty"));
 		}
-	}
+	}*/
 	return value;
 }
 

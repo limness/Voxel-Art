@@ -14,22 +14,15 @@ class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
 public:
 
 	uint64 NodeID = 0x00;
-	uint8 TransitionSides = 0x00;
-
-	int Level = 0;
-	int Voxels = 16;
+	uint8 Depth = 0;
 
 	float Size = 0.f;
-	float Priority = 0.f;
 
 	FVector Position = FVector(0.f, 0.f, 0.f);
 
-	TArray<float> DensityMap = TArray <float>();
-
 public:
 
-	//Chunk itself
-	UVoxelChunkComponent* Chunk = nullptr;
+	FVoxelChunkData* Data = nullptr;
 
 public:
 
@@ -37,7 +30,7 @@ public:
 	TArray<TSharedPtr<FVoxelOctreeData>> ChildrenChunks;
 
 public:
-	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Level, float _Radius, FVector _Position);
+	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Depth, float _Radius, FVector _Position);
 	~FVoxelOctreeData();
 
 
@@ -70,7 +63,36 @@ public:
 };
 
 
-class VOXELART_API FVoxelChunkRenderData
+class VOXELART_API FVoxelChunkData
+{
+
+public:
+
+	int Voxels = 16;
+
+	float Size = 0.f;
+	float Priority = 0.f;
+
+	uint8 TransitionSides = 0x00;
+
+	FVector Position = FVector(0.f, 0.f, 0.f);
+
+public:
+
+	TArray<float> DensityMap = TArray <float>();
+
+public:
+
+	UVoxelChunkComponent* Chunk = nullptr;
+	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+
+public:
+	FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, FVector _Position, float _Size, int _Voxels, float _Priority);
+	~FVoxelChunkData();
+
+};
+
+/*class VOXELART_API FVoxelChunkRenderData
 {
 
 public:
@@ -83,7 +105,7 @@ public:
 	FVoxelChunkRenderData();
 	~FVoxelChunkRenderData();
 
-};
+};*/
 
 
 USTRUCT(BlueprintType)
@@ -92,10 +114,10 @@ struct FChunksRenderInfo
 	GENERATED_USTRUCT_BODY()
 
 	//Chunks which has to be created
-	TArray<TSharedPtr<FVoxelChunkRenderData>> ChunksCreation;
+	TArray<FVoxelChunkData*> ChunksCreation;
 
 	//Chunks which has to be generated
-	TArray<UVoxelChunkComponent*> ChunksGeneration;
+	TArray<FVoxelChunkData*> ChunksGeneration;
 
 	//Chunks which has to be removed
 	TArray<UVoxelChunkComponent*> ChunksRemoving;

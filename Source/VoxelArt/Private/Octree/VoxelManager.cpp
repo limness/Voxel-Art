@@ -160,28 +160,27 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 
 	if (!Octant->HasChildren())
 	{
-		if (World->MaximumLOD > Octant->Level)
+		if (World->MaximumLOD > Octant->Depth)
 		{
 			if (DistancePlayer <= DistanceLODs / 2.f)
 			{
+				/*Create new branch*/
 				Octant->AddChildren();
 
-				if (IsValid(Octant->Chunk))
+				/*Remove old chunk*/
+				if (Octant->Data != nullptr)
 				{
-					ChangesOctree->ChunksRemoving.Add(Octant->Chunk);
-					Octant->Chunk = nullptr;
+					ChangesOctree->ChunksRemoving.Add(Octant->Data->Chunk);
+
+					delete Octant->Data;
+					Octant->Data = nullptr;
 				}
+				/*Create new chunks*/
 				for (auto& Leaf : Octant->GetChildren())
 				{
-					bool IsDivided = CheckOctree(Leaf);
-
-					if (!IsDivided)
+					if (!CheckOctree(Leaf))
 					{
-						TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
-						ChunkCreation->CurrentOctree = Leaf;
-						ChunkCreation->position = Leaf->Position;
-						ChunkCreation->priority = DistancePlayer;
-						ChangesOctree->ChunksCreation.Add(ChunkCreation);
+						ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
 					}
 				}
 				return true;
@@ -190,22 +189,23 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	}
 	else if (Octant->HasChildren())
 	{
-		if (!(DistancePlayer <= DistanceLODs / 2.f) && World->MinimumLOD < Octant->Level + 1)
+		if (!(DistancePlayer <= DistanceLODs / 2.f) && World->MinimumLOD < Octant->Depth + 1) 
 		{
-			TSharedPtr<FVoxelChunkRenderData> ChunkCreation(new FVoxelChunkRenderData());
-			ChunkCreation->CurrentOctree = Octant;
-			ChunkCreation->position = Octant->Position;
-			ChunkCreation->priority = Octant->Priority;
-			ChangesOctree->ChunksCreation.Add(ChunkCreation);
+			/*Create old chunk*/
+			ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
 
+			/*Remove old chunks*/
 			for (auto& Leaf : GetLeavesChunk(Octant))
 			{
-				if (IsValid(Leaf->Chunk))
+				if (Leaf->Data != nullptr)
 				{
-					ChangesOctree->ChunksRemoving.Add(Leaf->Chunk);
-					Leaf->Chunk = nullptr;
+					ChangesOctree->ChunksRemoving.Add(Leaf->Data->Chunk);
+
+					delete Octant->Data;
+					Octant->Data = nullptr;
 				}
 			}
+			/*Remove old branch*/
 			Octant->DestroyChildren();
 		}
 		else
