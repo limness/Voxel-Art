@@ -15,7 +15,7 @@ struct FVector2D;
 #endif
 #define VOXELART_VoxelLandscapeGenerator_generated_h
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
  \
 	DECLARE_FUNCTION(execVectorDistanceAB) \
 	{ \
@@ -109,7 +109,7 @@ struct FVector2D;
 	}
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
  \
 	DECLARE_FUNCTION(execVectorDistanceAB) \
 	{ \
@@ -203,7 +203,7 @@ struct FVector2D;
 	}
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUVoxelLandscapeGenerator(); \
 	friend struct Z_Construct_UClass_UVoxelLandscapeGenerator_Statics; \
@@ -212,7 +212,7 @@ public: \
 	DECLARE_SERIALIZER(UVoxelLandscapeGenerator)
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS \
 private: \
 	static void StaticRegisterNativesUVoxelLandscapeGenerator(); \
 	friend struct Z_Construct_UClass_UVoxelLandscapeGenerator_Statics; \
@@ -221,7 +221,7 @@ public: \
 	DECLARE_SERIALIZER(UVoxelLandscapeGenerator)
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_STANDARD_CONSTRUCTORS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API UVoxelLandscapeGenerator(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UVoxelLandscapeGenerator) \
@@ -234,7 +234,7 @@ private: \
 public:
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_ENHANCED_CONSTRUCTORS \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_ENHANCED_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API UVoxelLandscapeGenerator(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()) : Super(ObjectInitializer) { }; \
 private: \
@@ -247,32 +247,32 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(UVoxelLandscapeGenerator); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UVoxelLandscapeGenerator)
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_13_PROLOG
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_GENERATED_BODY_LEGACY \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_13_PROLOG
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_STANDARD_CONSTRUCTORS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_GENERATED_BODY \
+#define TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
-	Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_ENHANCED_CONSTRUCTORS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_PRIVATE_PROPERTY_OFFSET \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_INCLASS_NO_PURE_DECLS \
+	TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h_16_ENHANCED_CONSTRUCTORS \
 static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class VoxelLandscapeGenerator."); \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h
+#define CURRENT_FILE_ID TestPlugin_Plugins_VoxelArt_Source_VoxelArt_Public_Renders_VoxelLandscapeGenerator_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

@@ -120,5 +120,5 @@ struct FChunksRenderInfo
 	TArray<FVoxelChunkData*> ChunksGeneration;
 
 	//Chunks which has to be removed
-	TArray<UVoxelChunkComponent*> ChunksRemoving;
+	TArray<FVoxelChunkData*> ChunksRemoving;
 };

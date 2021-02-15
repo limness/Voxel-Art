@@ -83,7 +83,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 				if (TransitionMesh)
 				{
-					OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
+				//	OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
 				}
 			}
 			TerrainCreated = true;
@@ -124,13 +124,14 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		for (auto& it : PoolThreads)
 		{
 			it->Cancel();
-		}
+		}		
+		int TotalChunks = PoolChunks->PoolChunks.Num();
 		for (auto& Chunk : PoolChunks->PoolChunks)
 		{
 			Chunk->DestroyComponent();
 		}
 		int TimeAfterDestroy = FDateTime::Now().GetTicks();
-		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s."), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f);
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f, TotalChunks);
 		GEngine->ForceGarbageCollection(true);
 		//ThreadPool->Destroy();
 		TerrainCreated = false;
@@ -174,7 +175,6 @@ void AVoxelLandscape::UpdateOctree()
 
 	TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
 	while (ChangesOctree.Peek(ChunksChangesArray))
-	//if(false)
 	{
 		ChangesOctree.Dequeue(ChunksChangesArray);
 
@@ -194,7 +194,6 @@ void AVoxelLandscape::UpdateOctree()
 		ChunksChangesArray->ChunksRemoving.Empty();
 		ChunksChangesArray->ChunksGeneration.Empty();
 	}
-	//if(false)
 	{
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
@@ -223,7 +222,6 @@ void AVoxelLandscape::UpdateOctree()
 
 	int32 Index = 0;
 	while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
-	//if(false)
 	{
 		FVoxelChunkData* ChunkData = ChunksCreation.Pop();
 		OctreeMutex.Lock();
@@ -232,17 +230,12 @@ void AVoxelLandscape::UpdateOctree()
 
 		if (Octant.IsValid())
 		{
-			Octant->Data = ChunkData;
-
 			if (!Octant->HasChildren())
 			{
-				if (IsValid(ChunkData->Chunk))
-				{
-					if (ChunkData->Chunk->Active == true)
-					{
-						ChunksRemoving.Add(ChunkData->Chunk);
-					}
-				}
+				OctreeMutex.Lock();
+				Octant->Data = ChunkData;
+				OctreeMutex.Unlock();
+
 				SpawnChunk(ChunkData);
 				Index++;
 			}
@@ -250,23 +243,7 @@ void AVoxelLandscape::UpdateOctree()
 	}
 
 	if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
-	//if(false)
 	{
-		/*auto AreAllTasksDone = [&]()
-		{
-			bool AreDone = true;
-
-			for (auto& it : PoolThreads)
-			{
-				if (!it->IsDone())
-				{
-					AreDone = false;
-				}
-			}
-			return AreDone;
-		};*/
-
-		//if (AreAllTasksDone())
 		if(TaskWorkGlobalCounter.GetValue() == 0)
 		{
 			if (!StatsShowed)
@@ -277,14 +254,14 @@ void AVoxelLandscape::UpdateOctree()
 			}
 			while (ChunksRemoving.Num() > 0)
 			{
-				UVoxelChunkComponent* Chunk = ChunksRemoving.Pop();
+				FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
 
-				if (IsValid(Chunk))
+				if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
 				{
-					if (Chunk->Active == true)
-					{
-						Chunk->SetActive(false);
-					}
+					ChunkData->Chunk->SetActive(false);
+
+					delete ChunkData;
+					ChunkData = nullptr;
 				}
 			}
 		}
@@ -292,12 +269,10 @@ void AVoxelLandscape::UpdateOctree()
 	while (ChunksGeneration.Num() > 0)
 	{
 		FVoxelChunkData* ChunkData = ChunksGeneration.Pop();
+
+		if (ChunkData != nullptr)
 		{
-			//if (IsValid(Chunk))
-			{
-				//UE_LOG(VoxelArt, Error, TEXT("You should choose generator of the density!"));
-				PutChunkOnGeneration(ChunkData);
-			}
+			PutChunkOnGeneration(ChunkData);
 		}
 	}
 }

@@ -170,9 +170,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				/*Remove old chunk*/
 				if (Octant->Data != nullptr)
 				{
-					ChangesOctree->ChunksRemoving.Add(Octant->Data->Chunk);
-
-					delete Octant->Data;
+					ChangesOctree->ChunksRemoving.Add(Octant->Data);
 					Octant->Data = nullptr;
 				}
 				/*Create new chunks*/
@@ -199,9 +197,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 			{
 				if (Leaf->Data != nullptr)
 				{
-					ChangesOctree->ChunksRemoving.Add(Leaf->Data->Chunk);
-
-					delete Octant->Data;
+					ChangesOctree->ChunksRemoving.Add(Leaf->Data);
 					Octant->Data = nullptr;
 				}
 			}

@@ -182,7 +182,7 @@ private:
 
 	TArray<FVoxelChunkData*> ChunksCreation;
 	TArray<FVoxelChunkData*> ChunksGeneration;
-	TArray<UVoxelChunkComponent*> ChunksRemoving;
+	TArray<FVoxelChunkData*> ChunksRemoving;
 
 public:
 
