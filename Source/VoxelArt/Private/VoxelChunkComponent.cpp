@@ -86,7 +86,6 @@ void FMesherAsyncTask::DoWork()
 						positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
 						positionNoise = positionNoise - (float)(Data->Size / 2.f);
 
-						//UE_LOG(VoxelArt, Log, TEXT("Octree Neighbors Checker init %d"), World->VoxelsPerChunk);
 						Data->DensityMap[x + y * (Data->Voxels + 1 + NORMALS_SKIRT) + z * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT)] = World->GeneratorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + Data->Position);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
 					}
 				}

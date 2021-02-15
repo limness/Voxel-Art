@@ -26,7 +26,7 @@ AVoxelLandscape::AVoxelLandscape()
 	/* Object pooler component */
 	PoolChunks = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("PoolChunks"));
 
-	//ThreadPool = FQueuedThreadPool::Allocate();
+	ThreadPool = FQueuedThreadPool::Allocate();
 }
 
 void AVoxelLandscape::BeginPlay()
@@ -60,7 +60,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 		}
 		else
 		{
-		//	ThreadPool->Create(1, 128 * 1024);
+			ThreadPool->Create(4, 64 * 1024);
 
 			if (TerrainCreated)
 			{
@@ -83,7 +83,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 				if (TransitionMesh)
 				{
-				//	OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
+					OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
 				}
 			}
 			TerrainCreated = true;
@@ -133,7 +133,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		int TimeAfterDestroy = FDateTime::Now().GetTicks();
 		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f, TotalChunks);
 		GEngine->ForceGarbageCollection(true);
-		//ThreadPool->Destroy();
+		ThreadPool->Destroy();
 		TerrainCreated = false;
 	}
 }
@@ -232,6 +232,14 @@ void AVoxelLandscape::UpdateOctree()
 		{
 			if (!Octant->HasChildren())
 			{
+				if(Octant->Data != nullptr)
+				{
+					//if (chunk->chunk->Active == true)
+					{
+						ChunksRemoving.Add(Octant->Data);
+					}
+				}
+
 				OctreeMutex.Lock();
 				Octant->Data = ChunkData;
 				OctreeMutex.Unlock();
@@ -239,7 +247,7 @@ void AVoxelLandscape::UpdateOctree()
 				SpawnChunk(ChunkData);
 				Index++;
 			}
-		}
+		} 
 	}
 
 	if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
@@ -443,7 +451,7 @@ void AVoxelLandscape::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
 	TaskWorkGlobalCounter.Increment();
 	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
-	MesherTask->StartBackgroundTask();
+	MesherTask->StartBackgroundTask(ThreadPool);
 }
 
 void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
