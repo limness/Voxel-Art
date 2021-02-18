@@ -116,6 +116,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 			}
 		}
 	}
+	//int timeBefore = FDateTime::Now().GetTicks();
 	if (true)
 	{
 		if ((TransitionSides & EVoxelDirection::MinimumX) == EVoxelDirection::MinimumX) GeometryTransitionCubes<EVoxelDirection::MinimumX>(Size);
@@ -125,6 +126,9 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 		if ((TransitionSides & EVoxelDirection::MinimumZ) == EVoxelDirection::MinimumZ) GeometryTransitionCubes<EVoxelDirection::MinimumZ>(Size);
 		if ((TransitionSides & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) GeometryTransitionCubes<EVoxelDirection::MaximumZ>(Size);
 	}
+	//int timeAfter = FDateTime::Now().GetTicks();
+	//UE_LOG(VoxelArt, Log, TEXT("transition was generated in %d"), (timeAfter - timeBefore));
+
 	positionSide.Empty();
 }
 

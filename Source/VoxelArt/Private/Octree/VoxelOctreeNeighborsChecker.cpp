@@ -81,9 +81,6 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 		}
 		else
 		{
-			//TODO: Remove this line (85). Its needed for test new Data system
-			FPlatformProcess::Sleep(5.0);
-
 			ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 			{
 				FScopeLock Lock(&World->OctreeMutex);
