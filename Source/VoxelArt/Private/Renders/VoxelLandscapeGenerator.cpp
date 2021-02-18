@@ -8,11 +8,8 @@ UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitialize
 {
 }
 
-//void UVoxelLandscapeGenerator::PostLoad()
 void UVoxelLandscapeGenerator::GeneratorInit()
 {
-//	Super::PostLoad();
-
 	if (HeightmapTexture && World)
 	{
 		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
@@ -121,15 +118,13 @@ FORCEINLINE FColor UVoxelLandscapeGenerator::GetColormapData(float X, float Y, f
 	if (round(X / RadiusHeighestVoxel) > WidthColormap - 1 || round(X / RadiusHeighestVoxel) < 0) return FColor(121.f, 121.f, 121.f);
 	if (round(Y / RadiusHeighestVoxel) > HeightColormap - 1 || round(Y / RadiusHeighestVoxel) < 0) return FColor(121.f, 121.f, 121.f);
 
-
 	return TextureColorMap[round(Y / RadiusHeighestVoxel) * WidthColormap + round(X / RadiusHeighestVoxel)];
 }
 
-float UVoxelLandscapeGenerator::GetDensityMap(const FVector& CellPosition)
+float UVoxelLandscapeGenerator::GetDensityMap(const FIntVector& CellPosition)
 {
-	float noise = 0.f;
-	noise = TextureHeightMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : -(CellPosition.Z + 5000.f);
-	return noise;
+	float offset = 0.001f;
+	return TextureHeightMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : ((CellPosition.Z + Height) + offset);
 }
 
 FColor UVoxelLandscapeGenerator::GetColorMap(const FVector& CellPosition)

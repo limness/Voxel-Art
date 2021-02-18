@@ -5,24 +5,26 @@
 #include "CoreMinimal.h"
 #include "VoxelOctreeData.generated.h"
 
+class AVoxelLandscape;
 class UVoxelChunkComponent;
+class UVoxelLandscapeGenerator;
 
 
 class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
 {
-
 public:
 
 	uint64 NodeID = 0x00;
 	uint8 Depth = 0;
 
-	float Size = 0.f;
+	int Size = 0;
 
-	FVector Position = FVector(0.f, 0.f, 0.f);
+	FIntVector Position = FIntVector(0, 0, 0);
 
 public:
 
 	FVoxelChunkData* Data = nullptr;
+//	FVoxelOctreeDensity* DensityOctant = nullptr;
 
 public:
 
@@ -30,7 +32,7 @@ public:
 	TArray<TSharedPtr<FVoxelOctreeData>> ChildrenChunks;
 
 public:
-	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Depth, float _Radius, FVector _Position);
+	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Radius, FIntVector _Position);
 	~FVoxelOctreeData();
 
 
@@ -44,7 +46,6 @@ public:
 
 	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
 
-	inline void GetVoxelDensity(FVector Position, float& Value);
 
 	inline TWeakPtr<FVoxelOctreeData> GetParent();
 
@@ -54,32 +55,27 @@ public:
 
 	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
 
-	template<uint8 Direction>
-	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetNeighbor(int position);
-
 	FORCEINLINE int PositionToIndices(FVector position);
-
-	void TransferToLocal(FVector& Position);
 };
-
 
 class VOXELART_API FVoxelChunkData
 {
-
 public:
 
 	int Voxels = 16;
 
-	float Size = 0.f;
+	int Size = 0;
 	float Priority = 0.f;
 
+	uint8 Depth = 0;
 	uint8 TransitionSides = 0x00;
 
-	FVector Position = FVector(0.f, 0.f, 0.f);
+	FIntVector Position = FIntVector(0, 0, 0);
 
 public:
 
 	TArray<float> DensityMap = TArray <float>();
+	//FVoxelOctreeDensity* DensityOctant = nullptr;
 
 public:
 
@@ -87,25 +83,62 @@ public:
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 
 public:
-	FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, FVector _Position, float _Size, int _Voxels, float _Priority);
+	FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority);
 	~FVoxelChunkData();
 
 };
 
-/*class VOXELART_API FVoxelChunkRenderData
+
+/*
+* FVoxelOctreeDensity is needed to save info
+* about the entire density of the world.
+* We will then be able to store and load it.
+*/
+
+class VOXELART_API FVoxelOctreeDensity
 {
+public:
+
+	uint8 Depth = 0;
+
+	int Size = 0;
+	FIntVector Position = FIntVector(0, 0, 0);
+	TArray<float> DensityMap = TArray <float>();
+
+private:
+
+	bool OwnDensity = false;
 
 public:
 
-	float priority = 0.f;
-	FVector position = FVector(0.f, 0.f, 0.f);
-	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+	UVoxelLandscapeGenerator* WorldGenerator;
+	TArray<FVoxelOctreeDensity*> ChildrenOctants;
 
 public:
-	FVoxelChunkRenderData();
-	~FVoxelChunkRenderData();
 
-};*/
+	void AddChildren();
+
+	inline bool HasChildren() { return ChildrenOctants.Num() == 8; };
+
+	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value);
+
+	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value);
+
+	void TransferToLocal(AVoxelLandscape* World, FIntVector& Position);
+
+	inline bool HasOwnDensity() { return OwnDensity; }
+
+	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
+
+	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
+
+	void SetDefaultDensityMap(AVoxelLandscape* World);
+
+public:
+	FVoxelOctreeDensity(UVoxelLandscapeGenerator* _WorldGenerator, uint8 _Depth, int _Size, FIntVector _Position);
+	~FVoxelOctreeDensity() {}
+
+};
 
 
 USTRUCT(BlueprintType)

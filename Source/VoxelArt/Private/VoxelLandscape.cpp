@@ -198,17 +198,18 @@ void AVoxelLandscape::UpdateOctree()
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
 		FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
-		FVector PlayerPositionToWorld;
+		FIntVector PlayerPositionToWorld;
 #if WITH_EDITOR
 		if (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview)
 		{
-			PlayerPositionToWorld = editorViewClient->GetViewLocation() - GetActorLocation();
+			PlayerPositionToWorld = TransferToVoxelWorld(editorViewClient->GetViewLocation());
 		}
 		else
 		{
-			PlayerPositionToWorld = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation() - GetActorLocation();
+			PlayerPositionToWorld = TransferToVoxelWorld(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation());
 		}
 #endif
+		//FIntVector PlayerPositionToWorld = TransferToWorld(PlayerPositionToWorld);
 
 		for (auto& ChunkData : ChunksCreation)
 		{
@@ -302,7 +303,9 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 
 void AVoxelLandscape::GenerateLandscape()
 {
-	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, FVector(0, 0, 0)));
+	OctreeDensity = new FVoxelOctreeDensity(GeneratorLandscape, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0)));
+	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0))));
+
 	GenerateOctree(MainOctree);
 }
 
@@ -323,11 +326,11 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
+					uint8 PixelColorWB = 0;/*(uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
 						0)
-					), -1.f, 1.0f) * 63.f + 128);
+					), -1.f, 1.0f) * 63.f + 128);*/
 
 					if (PixelColorWB == 191)
 					{
@@ -358,7 +361,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-					uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
+				/*	uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
 						static_cast<float>((x - width * 0.5f) * StepTexture),
 						static_cast<float>((y - height * 0.5f) * StepTexture),
 						0)
@@ -367,7 +370,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 					pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
 					pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
 					pixels[y * 4 * width + x * 4 + 2] = PixelColorWB; // B
-					pixels[y * 4 * width + x * 4 + 3] = 255;
+					pixels[y * 4 * width + x * 4 + 3] = 255;*/
 				}
 			}
 		}
@@ -421,7 +424,7 @@ void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant)
 {
 	if (Octant->Depth == MinimumLOD)
 	{
-		Octant->Data = new FVoxelChunkData(Octant, Octant->Position, Octant->Size, VoxelsPerChunk, 0.f);
+		Octant->Data = new FVoxelChunkData(Octant, Octant->Depth, Octant->Position, Octant->Size, VoxelsPerChunk, 0.f);
 		SpawnChunk(Octant->Data);
 	}
 	else
@@ -468,25 +471,38 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(WorldComponent, FAttachmentTransformRules::KeepWorldTransform);
-		Chunk->SetWorldLocation(ChunkData->Position);
+		Chunk->SetWorldLocation(TransferToGameWorld(ChunkData->Position));
 		Chunk->SetActive(true);
+
+//		DrawDebugPoint(GetWorld(), TransferToGameWorld(ChunkData->Position), 30, FColor::Blue, false, 25);
+
+//		SpawnBoxTest(Chunk->GetComponentLocation(), (ChunkData->Size * VoxelMin) / 2.f, 900.f, FColor::Red);
 	}
 }
 
-void AVoxelLandscape::GetVoxelValue(FVector Position, float& Value)
+void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value)
 {
-	TSharedPtr<FVoxelOctreeData> CurrentOctantTest = MainOctree->GetLeaf(Position).Pin();
-	SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Data->Size / 2.f, 30.f, FColor::Red);
+	//FVoxelOctreeDensity* CurrentOctantTest = OctreeDensity->GetLeaf((FVector)Position);
+	//SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Size / 2.f, 30.f, FColor::Red);
+	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value);
+	//FVector PositionToWorld = GetTransform().InverseTransformPosition((FVector)Position);
 
-	FVector PositionToWorld = GetTransform().InverseTransformPosition(Position - CurrentOctantTest->Position + CurrentOctantTest->Data->Size / 2.f);
-
-	CurrentOctantTest->GetVoxelDensity(PositionToWorld, Value);
-	//MainOctree->GetVoxelValue(Position, Value);
+	//CurrentOctantTest->GetVoxelDensity(this, PositionToWorld, Value);
 }
 
-void AVoxelLandscape::SetVoxelValue(FVector Position, float& Value) const
+FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector Position)
 {
-//	MainOctree->;
+	return (FIntVector)GetTransform().InverseTransformPosition(Position);
+}
+
+FVector AVoxelLandscape::TransferToGameWorld(FIntVector Position)
+{
+	return GetTransform().TransformPosition((FVector)Position);
+}
+
+void AVoxelLandscape::SetVoxelValue(FIntVector Position, float& Value)
+{
+	OctreeDensity->GetLeaf(Position)->SetVoxelDensity(this, Position, Value);
 }
 
 #if WITH_EDITOR

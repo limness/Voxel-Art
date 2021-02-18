@@ -447,6 +447,10 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_World_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_World;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_Height_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_Height;
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 		static const FCppClassTypeInfoStatic StaticCppClassTypeInfo;
 		static const UE4CodeGen_Private::FClassParams ClassParams;
@@ -501,11 +505,19 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 	};
 #endif
 	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World = { UE4CodeGen_Private::EPropertyClass::Object, "World", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(UVoxelLandscapeGenerator, World), Z_Construct_UClass_AVoxelLandscape_NoRegister, METADATA_PARAMS(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World_MetaData, ARRAY_COUNT(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Height_MetaData[] = {
+		{ "Category", "Settings Density" },
+		{ "ModuleRelativePath", "Public/Renders/VoxelLandscapeGenerator.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Height = { UE4CodeGen_Private::EPropertyClass::Float, "Height", RF_Public|RF_Transient|RF_MarkAsNative, (EPropertyFlags)0x0010000000000005, 1, nullptr, STRUCT_OFFSET(UVoxelLandscapeGenerator, Height), METADATA_PARAMS(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Height_MetaData, ARRAY_COUNT(Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Height_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::PropPointers[] = {
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Multiply,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_ColormapTexture,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_HeightmapTexture,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_World,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::NewProp_Height,
 	};
 	const FCppClassTypeInfoStatic Z_Construct_UClass_UVoxelLandscapeGenerator_Statics::StaticCppClassTypeInfo = {
 		TCppClassTypeTraits<UVoxelLandscapeGenerator>::IsAbstract,
@@ -530,7 +542,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscapeGenerator() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 1409445346);
+	IMPLEMENT_CLASS(UVoxelLandscapeGenerator, 4114077410);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_UVoxelLandscapeGenerator(Z_Construct_UClass_UVoxelLandscapeGenerator, &UVoxelLandscapeGenerator::StaticClass, TEXT("/Script/VoxelArt"), TEXT("UVoxelLandscapeGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(UVoxelLandscapeGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

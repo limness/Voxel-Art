@@ -68,14 +68,14 @@ uint32 VoxelManager::Run()
 			{
 				if (editorViewClient)
 				{
-					PlayerPositionToWorld = editorViewClient->GetViewLocation() - World->GetActorLocation();
+					PlayerPositionToWorld = World->TransferToVoxelWorld(editorViewClient->GetViewLocation());
 				}
 			}
 			else
 			{
 				if (PlayerController->GetPawn() != nullptr)
 				{
-					PlayerPositionToWorld = PlayerController->GetPawn()->GetActorLocation() - World->GetActorLocation();
+					PlayerPositionToWorld = World->TransferToVoxelWorld(PlayerController->GetPawn()->GetActorLocation());
 				}
 			}
 #endif
@@ -178,7 +178,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				{
 					if (!CheckOctree(Leaf))
 					{
-						ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
+						ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
 					}
 				}
 				return true;
@@ -190,7 +190,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 		if (!(DistancePlayer <= DistanceLODs / 2.f) && World->MinimumLOD < Octant->Depth + 1) 
 		{
 			/*Create old chunk*/
-			ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
+			ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Depth, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
 
 			/*Remove old chunks*/
 			for (auto& Leaf : GetLeavesChunk(Octant))

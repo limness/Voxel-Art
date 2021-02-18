@@ -32,8 +32,8 @@ private:
 	APlayerController* PlayerController;
 	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
-	FVector PlayerPositionToWorld;
-	FVector OldPlayerPositionToWorld;
+	FIntVector PlayerPositionToWorld;
+	FIntVector OldPlayerPositionToWorld;
 
 	uint8 DrawingRange = 5;
 	int MaximumLOD = 8;

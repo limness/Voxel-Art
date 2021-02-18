@@ -3,14 +3,17 @@
 
 #include "VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
+#include "Renders/VoxelLandscapeGenerator.h"
+#include "VoxelLandscape.h"
 #include "DrawDebugHelpers.h"
 
-FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, int _Depth, float _Radius, FVector _Position)
+FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Radius, FIntVector _Position)
 	: ParentChunk(_Parent)
 	, NodeID(_NodeID)
 	, Depth(_Depth)
 	, Size(_Radius)
 	, Position(_Position)
+	, Data(nullptr)
 {
 }
 
@@ -38,7 +41,7 @@ void FVoxelOctreeData::DestroyChildren()
 
 bool FVoxelOctreeData::HasChildren()
 {
-	return !!(ChildrenChunks.Num());
+	return ChildrenChunks.Num() == 8;
 }
 
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetParent()
@@ -63,61 +66,20 @@ void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> child
 
 void FVoxelOctreeData::AddChildren()
 {
-	float P = Size / 4.f;
+	int P = Size >> 2;
 
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 0, Depth + 1, Size / 2.f, Position + FVector(-P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 1, Depth + 1, Size / 2.f, Position + FVector(+P, -P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 2, Depth + 1, Size / 2.f, Position + FVector(-P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 3, Depth + 1, Size / 2.f, Position + FVector(+P, +P, -P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 4, Depth + 1, Size / 2.f, Position + FVector(-P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 5, Depth + 1, Size / 2.f, Position + FVector(+P, -P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 6, Depth + 1, Size / 2.f, Position + FVector(-P, +P, +P))));
-	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Depth + 1, Size / 2.f, Position + FVector(+P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 0, Depth + 1, Size >> 1, Position + FIntVector(-P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 1, Depth + 1, Size >> 1, Position + FIntVector(+P, -P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 2, Depth + 1, Size >> 1, Position + FIntVector(-P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 3, Depth + 1, Size >> 1, Position + FIntVector(+P, +P, -P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 4, Depth + 1, Size >> 1, Position + FIntVector(-P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 5, Depth + 1, Size >> 1, Position + FIntVector(+P, -P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 6, Depth + 1, Size >> 1, Position + FIntVector(-P, +P, +P))));
+	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Depth + 1, Size >> 1, Position + FIntVector(+P, +P, +P))));
 
-	//UE_LOG(VoxelArt, Error, TEXT("Size %f"), (radius / 2.f) / 16.f);
-	//UE_LOG(LogTemp, Log, TEXT("[ Voxel Art Plugin ] Added 8 children"));
-	//for (auto& Leaf : GetChildren())
-	//{
-	//	bool GetExistLeafFromHash = World->SavedChunks.RemoveAndCopyValue(Leaf->nodeID, Leaf);
-	//}
-}
-
-void FVoxelOctreeData::GetVoxelDensity(FVector Position, float& Value)
-{
-//	TransferToLocal(Position);
-
-	FIntVector PositionInt = FIntVector(Position.X, Position.Y, Position.Z);
-
-	//TransferToLocal(PositionInt);
-
-	Value = 0.f;
-
-//	if(LIKELY(chunk && chunk->DensityMap.Num() > 0))
-	{
-		//Value = chunk->DensityMap[PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
-/*
-		if (PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT) >= chunk->DensityMap.Num())
-		{
-			UE_LOG(VoxelArt, Error, TEXT("Level %d Value %s Our Num %d Num %d"), 
-				level,
-				*PositionInt.ToString(),
-				PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT),
-				chunk->DensityMap.Num());
-		}
-		else
-		{
-			UE_LOG(VoxelArt, Log, TEXT("Level %d Value %s Our Num %d Num %d"),
-				level,
-				*PositionInt.ToString(),
-				PositionInt.X + PositionInt.Y * (Voxels + 1 + NORMALS_SKIRT) + PositionInt.Z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT),
-				chunk->DensityMap.Num());
-		} */
-	}
-}
-
-void FVoxelOctreeData::TransferToLocal(FVector& Position)
-{
-	//Position = Position - position;
+	//check(DensityOctant != nullptr);
+	/*Create new branch for Density Map*/
+	//DensityOctant->AddChildren();
 }
 
 FORCEINLINE int FVoxelOctreeData::PositionToIndices(FVector position)
@@ -141,16 +103,6 @@ TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
 	return AsShared();
 }
 
-//0 1 0
-//1 1 0
-//0 0 0
-//1 0 0
-
-//0 1 1
-//1 1 1
-//0 0 1
-//1 0 1
-
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChildByPosition(FVector Position)
 {
 	check(HasChildren());
@@ -158,23 +110,144 @@ TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChildByPosition(FVector Position
 	return ChildrenChunks[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
-template<uint8 Direction>
-FORCEINLINE TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetNeighbor(int position)
+
+FVoxelOctreeDensity::FVoxelOctreeDensity(UVoxelLandscapeGenerator* _WorldGenerator, uint8 _Depth, int _Size, FIntVector _Position)
+	: WorldGenerator(_WorldGenerator)
+	, Depth(_Depth)
+	, Size(_Size)
+	, Position(_Position)
 {
-	TWeakPtr<FVoxelOctreeData> neighbor = nullptr;
 
-	if ((Direction >> 0) & 0x01) { neighbor = neighborFaceW[position]; }	//0x01
-	if ((Direction >> 1) & 0x01) { neighbor = neighborFaceE[position]; }	//0x02
-	if ((Direction >> 2) & 0x01) { neighbor = neighborFaceS[position]; }	//0x04
-	if ((Direction >> 3) & 0x01) { neighbor = neighborFaceN[position]; }	//0x08
-	if ((Direction >> 4) & 0x01) { neighbor = neighborFaceD[position]; }	//0x10
-	if ((Direction >> 5) & 0x01) { neighbor = neighborFaceU[position]; }	//0x20
-
-	return neighbor;
 }
 
-FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, FVector _Position, float _Size, int _Voxels, float _Priority)
+void FVoxelOctreeDensity::AddChildren()
+{
+	int P = Size >> 2;
+
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(-P, -P, -P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(+P, -P, -P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(-P, +P, -P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(+P, +P, -P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(-P, -P, +P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(+P, -P, +P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(-P, +P, +P)));
+	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Position + FIntVector(+P, +P, +P)));
+}
+
+FVoxelOctreeDensity* FVoxelOctreeDensity::GetLeaf(FIntVector Position)
+{
+	if (!HasChildren())
+	{
+		return this;
+	}
+	else
+	{
+		return GetChildByPosition(Position)->GetLeaf(Position);
+	}
+	return this;
+}
+
+FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position)
+{
+	check(HasChildren());
+
+	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
+}
+
+void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value)
+{
+	Value = 0.f;
+
+	//World->SpawnBoxTest(this->Position, Size / 2.f, 35.f, FColor::Green);
+
+	if (Depth != World->MaximumLOD)
+	{
+		check(!HasChildren());
+
+		AddChildren();
+		GetChildByPosition(Position)->SetVoxelDensity(World, Position, Value);
+	}
+	else
+	{
+		if (!HasOwnDensity())
+		{
+			SetDefaultDensityMap(World);
+			OwnDensity = true;
+		}
+		else
+		{
+			UE_LOG(VoxelArt, Warning, TEXT("This octant already has Density. Just change it"));
+		}
+		World->SpawnBoxTest(World->GetTransform().TransformPosition((FVector)this->Position), Size / 2.f * 128.f, 35.f, FColor::Green);
+	}
+}
+
+void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value)
+{
+	Value = 0.f;
+
+	if (HasOwnDensity())
+	{
+		auto GetIndex = [&](int X, int Y, int Z)
+		{
+			return X + Y * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) + Z * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT);
+		};
+
+		TransferToLocal(World, Position);
+
+		Value = DensityMap[GetIndex(Position.X, Position.Y, Position.Z)];
+
+		//UE_LOG(VoxelArt, Log, TEXT("It has Own Density // Value %f Position %s"), Value, *Position.ToString());
+	}
+	else
+	{
+		Value = WorldGenerator->GetDensityMap(Position);
+
+		//UE_LOG(VoxelArt, Log, TEXT("It has NOT Own Density // Value %f Position %s"), Value, *Position.ToString());
+		//UE_LOG(VoxelArt, Error, TEXT("Value %f Position %s"), Value, *Position.ToString());
+	}
+}
+
+
+
+void FVoxelOctreeDensity::SetDefaultDensityMap(AVoxelLandscape* World)
+{
+	auto GetIndex = [&](int X, int Y, int Z)
+	{
+		return X + Y * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) + Z * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT);
+	};
+
+	DensityMap.Init(-1.0, FMath::Pow((World->VoxelsPerChunk + 1 + NORMALS_SKIRT), 3));
+	 
+	for (int Z = 0; Z < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Z++)
+	{
+		for (int Y = 0; Y < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Y++)
+		{
+			for (int X = 0; X < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; X++)
+			{
+				FIntVector DensityPosition = Position + FIntVector(1, 1, 1) * (Size >> 2);//(FIntVector)World->GetTransform().InverseTransformPosition(Position + Size / 2.f);
+				DensityPosition = DensityPosition - FIntVector(X - NORMALS_SKIRT_HALF, Y - NORMALS_SKIRT_HALF, Z - NORMALS_SKIRT_HALF) * (1 << (World->MaximumLOD - Depth));
+
+				/*AsyncTask(ENamedThreads::GameThread, [=]()
+					{
+						DrawDebugPoint(World->GetWorld(), World->GetTransform().TransformPosition((FVector)DensityPosition), 5, FColor::Red, false, 25);
+
+					});*/
+				DensityMap[GetIndex(X, Y, Z)] = WorldGenerator->GetDensityMap(DensityPosition);
+			}
+		}
+	}
+}
+
+void FVoxelOctreeDensity::TransferToLocal(AVoxelLandscape* World, FIntVector& Position)
+{
+	//DrawDebugPoint(World->GetWorld(), Position, 5, FColor::Green, false, 15);
+	//Position = Position - (FIntVector)World->GetTransform().InverseTransformPosition(this->Position + Size / 2.f);
+}
+
+FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority)
 	: CurrentOctree(_CurrentOctree)
+	, Depth(_Depth)
 	, Position(_Position)
 	, Size(_Size)
 	, Voxels(_Voxels)

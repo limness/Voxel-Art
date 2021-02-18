@@ -13,7 +13,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define VOXELART_VoxelOctreeData_generated_h
 
-#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Octree_VoxelOctreeData_h_114_GENERATED_BODY \
+#define Voxel_Plugins_Voxel_Art_Source_VoxelArt_Public_Octree_VoxelOctreeData_h_147_GENERATED_BODY \
 	friend struct Z_Construct_UScriptStruct_FChunksRenderInfo_Statics; \
 	VOXELART_API static class UScriptStruct* StaticStruct();
 

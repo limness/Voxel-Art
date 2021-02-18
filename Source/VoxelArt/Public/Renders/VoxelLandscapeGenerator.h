@@ -22,6 +22,11 @@ public:
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings Density")
+	float Height = 0.f;
+
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	AVoxelLandscape* World;
 
@@ -52,7 +57,7 @@ private:
 
 public:
 
-	float GetDensityMap(const FVector& CellPosition);
+	float GetDensityMap(const FIntVector& CellPosition);
 	FColor GetColorMap(const FVector& CellPosition);
 
 private:

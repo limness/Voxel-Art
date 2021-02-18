@@ -67,51 +67,65 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Tr
 
 void FMesherAsyncTask::DoWork()
 {
+	auto GetIndex = [&](int X, int Y, int Z)
 	{
+		return X + Y * (Data->Voxels + 1 + NORMALS_SKIRT) + Z * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT);
+	};
+	Data->DensityMap.Init(-1.0, FMath::Pow((Data->Voxels + 1 + NORMALS_SKIRT), 3));
+
+	int VoxelSteps = (Data->Size / Data->Voxels);//(1 << (World->MaximumLOD - Data->Depth));
+
+	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS_SKIRT; Z++)
+	{
+		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS_SKIRT; Y++)
 		{
-			Data->DensityMap.Init(-1.0, (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT));
-
-			float radiusVoxel = Data->Size / (float)Data->Voxels;
-
-			for (int z = 0; z < Data->Voxels + 1 + NORMALS_SKIRT; z++)
+			for (int X = 0; X < Data->Voxels + 1 + NORMALS_SKIRT; X++)
 			{
-				for (int y = 0; y < Data->Voxels + 1 + NORMALS_SKIRT; y++)
-				{
-					for (int x = 0; x < Data->Voxels + 1 + NORMALS_SKIRT; x++)
+				FIntVector DensityLocation = Data->Position - FIntVector(1, 1, 1) * (Data->Size >> 1);
+				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMALS_SKIRT_HALF) * VoxelSteps;
+				/*FVector DensityLocation = (FVector(X, Y, Z) - NORMALS_SKIRT_HALF) * SizeVoxel;
+				DensityLocation = DensityLocation - (float)(Data->Size / 2.f);
+				DensityLocation = DensityLocation + Data->Position;*/
+				//FVector GlobalLocation = World->GetTransform().InverseTransformPosition(DensityLocation);
+					
+				//FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
+
+/*
+				AsyncTask(ENamedThreads::GameThread, [=]()
 					{
-						FVector positionNoise;
+						DrawDebugPoint(World->GetWorld(), ((FVector)DensityLocation), 30, FColor::Red, false, 25);
 
-						positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel;
-						positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel;
-						positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel;
-						positionNoise = positionNoise - (float)(Data->Size / 2.f);
+					});*/
+				float Value = -1.f;
+				World->GetVoxelValue(DensityLocation, Value);
 
-						Data->DensityMap[x + y * (Data->Voxels + 1 + NORMALS_SKIRT) + z * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT)] = World->GeneratorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + Data->Position);//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
-					}
-				}
+				//UE_LOG(VoxelArt, Error, TEXT("%s // %f"), *DensityLocation.ToString(), Value);
+
+				Data->DensityMap[GetIndex(X, Y, Z)] = Value;//World->GeneratorLandscape->GetDensityMap(P);
 			}
 		}
-		FVoxelMarchingCubesMesher* mesher = new FVoxelMarchingCubesMesher(World->GeneratorLandscape, Data);
-		mesher->GenerateMarchingCubesMesh();
-
-		TArray<FVector> Vertices = mesher->Vertices;
-		TArray<int32> Triangles = mesher->Triangles;
-		TArray<FVector> Normals = mesher->Normals;
-		TArray<FLinearColor> VertexColors = mesher->VertexColors;
-
-		AsyncTask(ENamedThreads::GameThread, [=]()
-			{
-				/*One more check active before we will create mesh*/
-				if (Data->Chunk->Active == true)
-				{
-					Data->Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
-				}
-			});
-
-
-		World->TaskWorkGlobalCounter.Decrement();
-
-		delete mesher;
-		mesher = nullptr;
 	}
+
+	FVoxelMarchingCubesMesher* mesher = new FVoxelMarchingCubesMesher(World, Data);
+	mesher->GenerateMarchingCubesMesh();
+
+	TArray<FVector> Vertices = mesher->Vertices;
+	TArray<int32> Triangles = mesher->Triangles;
+	TArray<FVector> Normals = mesher->Normals;
+	TArray<FLinearColor> VertexColors = mesher->VertexColors;
+
+	AsyncTask(ENamedThreads::GameThread, [=]()
+		{
+			/*One more check active before we will create mesh*/
+			if (Data->Chunk->Active == true)
+			{
+				Data->Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
+			}
+		});
+
+
+	World->TaskWorkGlobalCounter.Decrement();
+
+	delete mesher;
+	mesher = nullptr;
 }

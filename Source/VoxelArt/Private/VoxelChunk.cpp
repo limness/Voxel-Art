@@ -167,7 +167,7 @@ float AVoxelChunk::GetValueNoise(FVector positionGrid)
 	//	noise = (-1) * UKismetMathLibrary::FMin(-1.f, positionGrid.Z + 9000.f);
 	}
 
-	return  generatorLandscape->GetDensityMap(FVector(positionGrid.X, positionGrid.Y, positionGrid.Z));//-(positionGrid.Z + 5000.f);
+	return 0.f;// generatorLandscape->GetDensityMap(FVector(positionGrid.X, positionGrid.Y, positionGrid.Z));//-(positionGrid.Z + 5000.f);
 }
 
 void AVoxelChunk::GenerateDensityMap()
@@ -192,7 +192,7 @@ void AVoxelChunk::GenerateDensityMap()
 				positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
 				positionNoise = positionNoise - (float)(radius / 2.f);
 
-				Grid[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = generatorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + GetActorLocation());//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
+//				Grid[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = generatorLandscape->GetDensityMap(FVector(positionNoise.X, positionNoise.Y, positionNoise.Z) + GetActorLocation());//GetValueNoise(positionNoise);//-(positionNoise.Z - value);
 
 			}
 		}
@@ -458,18 +458,18 @@ void AVoxelChunk::MarchingCubes(int isolevel, int indexGrid, int x, int y, int z
 		Triangles.Add(Triangles.Num());
 		//VertexColors.Add(flatColor);
 		Normals.Add(-normList[triTable[cubeIndex][i + 0]].GetUnsafeNormal());
-		VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 0]] + GetActorLocation()));
+		//VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 0]] + GetActorLocation()));
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
 		//VertexColors.Add(flatColor);
 		Normals.Add(-normList[triTable[cubeIndex][i + 1]].GetUnsafeNormal());
-		VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + GetActorLocation()));// - (1 * radius) / 2.0f));
+		//VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + GetActorLocation()));// - (1 * radius) / 2.0f));
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
 		//VertexColors.Add(flatColor);
-		VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + GetActorLocation()));// - (1 * radius) / 2.0f));
+	//	VertexColors.Add(generatorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + GetActorLocation()));// - (1 * radius) / 2.0f));
 		Normals.Add(-normList[triTable[cubeIndex][i + 2]].GetUnsafeNormal());
 		
 		/*AsyncTask(ENamedThreads::GameThread, [=]()

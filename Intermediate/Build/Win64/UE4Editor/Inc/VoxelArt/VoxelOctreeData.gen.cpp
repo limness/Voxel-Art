@@ -46,7 +46,6 @@ static struct FScriptStruct_VoxelArt_StaticRegisterNativesFChunksRenderInfo
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UScriptStruct_FChunksRenderInfo_Statics::Struct_MetaDataParams[] = {
 		{ "BlueprintType", "true" },
 		{ "ModuleRelativePath", "Public/Octree/VoxelOctreeData.h" },
-		{ "ToolTip", "class VOXELART_API FVoxelChunkRenderData\n{\n\npublic:\n\n       float priority = 0.f;\n       FVector position = FVector(0.f, 0.f, 0.f);\n       TWeakPtr<FVoxelOctreeData> CurrentOctree;\n\npublic:\n       FVoxelChunkRenderData();\n       ~FVoxelChunkRenderData();\n\n};" },
 	};
 #endif
 	void* Z_Construct_UScriptStruct_FChunksRenderInfo_Statics::NewStructOps()
@@ -80,7 +79,7 @@ static struct FScriptStruct_VoxelArt_StaticRegisterNativesFChunksRenderInfo
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_FChunksRenderInfo_CRC() { return 1923805732U; }
+	uint32 Get_Z_Construct_UScriptStruct_FChunksRenderInfo_CRC() { return 1731919308U; }
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 #ifdef _MSC_VER
 #pragma warning (pop)

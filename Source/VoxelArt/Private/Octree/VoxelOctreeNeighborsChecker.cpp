@@ -81,6 +81,9 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 		}
 		else
 		{
+			//TODO: Remove this line (85). Its needed for test new Data system
+			FPlatformProcess::Sleep(5.0);
+
 			ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 			{
 				FScopeLock Lock(&World->OctreeMutex);
@@ -335,7 +338,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> Octan
 			{
 				if (IsValid(Octant->Data->Chunk) && Octant->Data->Chunk->IsActive())
 				{
-					//if ((int)chunk->nodeID == World->nodeID)
+					//if ((int)Octant->NodeID == 525)
 					if (true)
 					{
 						uint8 TransitionSides = 0x00;

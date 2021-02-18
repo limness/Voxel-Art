@@ -75,14 +75,26 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 	//FScopeLock Lock(&World->OctreeMutex);
 
 	float CurrentValue = 0.f;
+	//UVoxelChunkComponent* CurrentChunk = NULLPTR;
 
 	if (World)
 	{
-		World->OctreeMutex.Lock();
-		World->GetVoxelValue(HitPosition, CurrentValue);
-		World->OctreeMutex.Unlock();
+		//if (EditorRemovePressed)
+		{
+			UE_LOG(VoxelArt, Warning, TEXT("Setting Value"));
 
-		//UE_LOG(VoxelArt, Log, TEXT("Value %f"), CurrentValue);
+			World->OctreeMutex.Lock();
+			World->SetVoxelValue(World->TransferToVoxelWorld(HitPosition), CurrentValue);
+			World->OctreeMutex.Unlock();
+		}
+		/*else
+		{
+			UE_LOG(VoxelArt, Log, TEXT("Getting Value"));
+
+			World->OctreeMutex.Lock();
+			World->GetVoxelValue(World->TransferToWorld(HitPosition), CurrentValue);
+			World->OctreeMutex.Unlock();
+		}*/
 	}
 	else
 	{

@@ -10,6 +10,7 @@
 #define NORMALS_SKIRT 2
 #define NORMALS_SKIRT_HALF 1
 
+class AVoxelLandscape;
 class UVoxelLandscapeGenerator;
 
 /**
@@ -19,16 +20,16 @@ class UVoxelLandscapeGenerator;
 class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
-	FVoxelMarchingCubesMesher(UVoxelLandscapeGenerator* _GeneratorLandscape, FVoxelChunkData* _Data);
+	FVoxelMarchingCubesMesher(AVoxelLandscape* _World, FVoxelChunkData* _Data);
 	~FVoxelMarchingCubesMesher();
 
 private:
 
 	int Voxels;
 	int Depth;
-	float Size;
+	int Size;
 
-	FVector Position;
+	FIntVector Position;
 	uint8 TransitionSides;
 	TArray<float> DensityMap;
 
@@ -36,6 +37,8 @@ private:
 
 	FVector position[8];
 	float infoNoise[8];
+
+	float isolevel = 0.f;
 
 public:
 
@@ -53,7 +56,7 @@ public:
 
 	void GenerateMarchingCubesMesh();
 
-	void MarchingCubes(int isolevel, int indexGrid, int x, int y, int z, int normalIndex);
+	void MarchingCubes(int indexGrid, int x, int y, int z, int normalIndex);
 
 	FVector GetGradient(int x, int y, int z);
 	FVector GetGradient(FIntVector map);
@@ -68,15 +71,19 @@ public:
 	void GeometryTransitionCubes(float radius);
 
 	template<uint8 Direction>
-	FVector PositionToDirection(FVector directionPosition, float size);
+	FIntVector PositionToDirection(FIntVector DirectionPosition, float Size);
 
 	template<uint8 Direction>
-	float GetValue(float X, float Y, float size, bool CurrentDepth);
+	float GetValue(int X, int Y, int Size, int Steps, bool CurrentOctree);
 
-	FORCEINLINE int PositionToIndices(FVector position);
+	template<uint8 Direction>
+	FVector GetPosition(int X, int Y, int Size, int Steps);
+
+	FORCEINLINE int PositionToIndices(FIntVector position);
 
 	float VoxelValueMin(float a, float b, float k);
-
+	
+	AVoxelLandscape* World;
 	UVoxelLandscapeGenerator* GeneratorLandscape;
 
 	TArray<FVector> positionSide;
@@ -90,25 +97,10 @@ public:
 
 	FORCEINLINE float GetValueNoise(FVector positionGrid)
 	{
-		float noise = 0.f;
+		FVector GlobalLocation = FVector::OneVector;//World->GetTransform().InverseTransformPosition(positionGrid + Position);
 
-		positionGrid += Position;
+		FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
 
-		//if (GeneratorLandscape == nullptr)
-		//{
-		//	UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : GetheightmapData ] Error: 345435435"));
-		//}
-
-		return GeneratorLandscape->GetDensityMap(FVector(positionGrid.X, positionGrid.Y, positionGrid.Z));//-(positionGrid.Z + 5000.f);
+		return GeneratorLandscape->GetDensityMap(P);
 	}
-	/*FORCEINLINE float GetDensity(int x, int y, int z)
-	{
-		return Grid[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
-	}
-
-	FORCEINLINE float GetDensity(int Index)
-	{
-		//	FScopeLock Lock(&ChunkMutex);
-		return Grid[Index];
-	}*/
 };

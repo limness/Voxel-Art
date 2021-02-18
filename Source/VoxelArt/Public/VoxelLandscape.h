@@ -59,14 +59,16 @@ public:
 #endif
 
 public:
+
 	VoxelRender* RendererCheckPositionThreadHandle;
 	VoxelManager* ManagerCheckPositionThreadHandle;
-
 	VoxelOctreeNeighborsChecker* OctreeNeighborsChecker;
 
 public:
 
 	TSharedPtr<FVoxelOctreeData> MainOctree;
+	FVoxelOctreeDensity* OctreeDensity;
+
 	TQueue<TSharedPtr<FChunksRenderInfo>> ChangesOctree;
 	TMap<uint64, TSharedPtr<FVoxelOctreeData>> SavedChunks;
 
@@ -83,8 +85,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
 	bool EnabledWorldInGame = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "5000000.0", UIMin = "0.0", UIMax = "5000000.0"))
-	float WorldSize = 524288.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "524288", UIMin = "0.0", UIMax = "524288"))
+	int VoxelMin = 128;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "524288", UIMin = "0.0", UIMax = "524288"))
+	int WorldSize = 32768;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0", ClampMax = "32", UIMin = "0", UIMax = "32"))
 	int VoxelsPerChunk = 16;
@@ -173,8 +178,13 @@ private:
 
 public:
 
-	void GetVoxelValue(FVector Position, float& Value);
-	FORCEINLINE void SetVoxelValue(FVector Position, float& Value) const;
+	FIntVector TransferToVoxelWorld(FVector Position);
+	FVector TransferToGameWorld(FIntVector Position);
+
+public:
+
+	void GetVoxelValue(FIntVector Position, float& Value);
+	void SetVoxelValue(FIntVector Position, float& Value);
 
 	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
 
