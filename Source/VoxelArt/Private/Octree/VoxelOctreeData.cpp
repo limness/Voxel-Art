@@ -154,6 +154,8 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
+#include "Kismet/KismetMathLibrary.h"
+
 void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float Value)
 {
 	//Value = 0.f;
@@ -184,7 +186,7 @@ void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Pos
 		};
 		TransferToLocal(World, Position);
 
-		DensityMap[GetIndex(Position.X + NORMALS_SKIRT_HALF, Position.Y + NORMALS_SKIRT_HALF, Position.Z + NORMALS_SKIRT_HALF)] = Value;
+		DensityMap[GetIndex(Position.X + NORMALS_SKIRT_HALF, Position.Y + NORMALS_SKIRT_HALF, Position.Z + NORMALS_SKIRT_HALF)] = UKismetMathLibrary::FMax(DensityMap[GetIndex(Position.X + NORMALS_SKIRT_HALF, Position.Y + NORMALS_SKIRT_HALF, Position.Z + NORMALS_SKIRT_HALF)], Value);
 
 		//World->SpawnBoxTest(World->GetTransform().TransformPosition((FVector)this->Position), Size / 2.f * 128.f, 35.f, FColor::Green);
 	}
@@ -220,8 +222,6 @@ void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector Pos
 		//UE_LOG(VoxelArt, Error, TEXT("Value %f Position %s"), Value, *Position.ToString());
 	}
 }
-
-
 
 void FVoxelOctreeDensity::SetDefaultDensityMap(AVoxelLandscape* World)
 {

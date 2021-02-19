@@ -94,13 +94,13 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 				{
 					for (int X = -15; X <= 15; X++)
 					{
-						FIntVector PositionVoxel = FIntVector(X, Y, Z) + World->TransferToVoxelWorld(HitPosition);
-						float ValueSphere = -1.f;//12.f - PositionVoxel.Size();
-						World->SetVoxelValue(PositionVoxel, ValueSphere);
+						FVector PositionVoxel = FVector(X, Y, Z);
+						float ValueSphere = 13.5f - PositionVoxel.Size();
+						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
 
-						UE_LOG(VoxelArt, Log, TEXT("Value %f %d"), ValueSphere, PositionVoxel.Size());
+						//UE_LOG(VoxelArt, Log, TEXT("Value %f %f"), ValueSphere, PositionVoxel.Size());
 
-						DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
+						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
 					}
 				}
 			}
