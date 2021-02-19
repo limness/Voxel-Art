@@ -286,6 +286,48 @@ void AVoxelLandscape::UpdateOctree()
 	}
 }
 
+/*
+* UpdateWorld doesn't support the Priorities
+* because its not needed
+*/
+
+void AVoxelLandscape::UpdateWorld()
+{
+	if (!TerrainCreated)
+	{
+		UE_LOG(VoxelArt, Error, TEXT("World has not been created!"));
+		return;
+	}
+	OctreeMutex.Lock();
+	for (auto& Chunk : PoolChunks->PoolChunks)
+	{
+		Chunk->ClearAllMeshSections();
+	}
+	GetLeavesAndQueueToGeneration(MainOctree);
+	OctreeMutex.Unlock();
+}
+
+void AVoxelLandscape::GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant)
+{
+	if (!Octant->HasChildren())
+	{
+		if (Octant->Data != nullptr)
+		{
+			if (IsValid(Octant->Data->Chunk))
+			{
+				ChunksGeneration.Add(Octant->Data);
+			}
+		}
+	}
+	else
+	{
+		for (auto& ChildOctant : Octant->GetChildren())
+		{
+			GetLeavesAndQueueToGeneration(ChildOctant);
+		}
+	}
+}
+
 void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks)
 {
 	for (auto& Chunk : Chunks)
@@ -492,7 +534,7 @@ FVector AVoxelLandscape::TransferToGameWorld(FIntVector Position)
 	return GetTransform().TransformPosition((FVector)Position);
 }
 
-void AVoxelLandscape::SetVoxelValue(FIntVector Position, float& Value)
+void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Value)
 {
 	OctreeDensity->GetLeaf(Position)->SetVoxelDensity(this, Position, Value);
 }

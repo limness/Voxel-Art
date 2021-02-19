@@ -23,6 +23,14 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		P_NATIVE_END; \
 	} \
  \
+	DECLARE_FUNCTION(execUpdateWorld) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		P_THIS->UpdateWorld(); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execDestroyVoxelWorld) \
 	{ \
 		P_FINISH; \
@@ -47,6 +55,14 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		P_THIS->CreateTextureDensityMap(); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execUpdateWorld) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		P_THIS->UpdateWorld(); \
 		P_NATIVE_END; \
 	} \
  \

@@ -24,6 +24,7 @@ protected:
 
     FReply CreateWorldInEditor();
     FReply DestroyWorldInEditor();
+    FReply UpdateWorldInEditor();
 
 private:
 

@@ -120,7 +120,7 @@ public:
 
 	inline bool HasChildren() { return ChildrenOctants.Num() == 8; };
 
-	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value);
+	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float Value);
 
 	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value);
 

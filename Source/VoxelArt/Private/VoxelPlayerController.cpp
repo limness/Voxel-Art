@@ -66,6 +66,8 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
+#include "DrawDebugHelpers.h"
+
 void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius)
 {
 	int radius = FMath::CeilToInt(Radius);
@@ -81,10 +83,27 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 	{
 		//if (EditorRemovePressed)
 		{
-			UE_LOG(VoxelArt, Warning, TEXT("Setting Value"));
+			//UE_LOG(VoxelArt, Warning, TEXT("Setting Value"));
 
 			World->OctreeMutex.Lock();
-			World->SetVoxelValue(World->TransferToVoxelWorld(HitPosition), CurrentValue);
+			//World->SetVoxelValue(World->TransferToVoxelWorld(HitPosition), CurrentValue);
+
+			for (int Z = -15; Z <= 15; Z++)
+			{
+				for (int Y = -15; Y <= 15; Y++)
+				{
+					for (int X = -15; X <= 15; X++)
+					{
+						FIntVector PositionVoxel = FIntVector(X, Y, Z) + World->TransferToVoxelWorld(HitPosition);
+						float ValueSphere = -1.f;//12.f - PositionVoxel.Size();
+						World->SetVoxelValue(PositionVoxel, ValueSphere);
+
+						UE_LOG(VoxelArt, Log, TEXT("Value %f %d"), ValueSphere, PositionVoxel.Size());
+
+						DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
+					}
+				}
+			}
 			World->OctreeMutex.Unlock();
 		}
 		/*else

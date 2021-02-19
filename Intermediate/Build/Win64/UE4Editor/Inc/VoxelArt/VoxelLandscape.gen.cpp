@@ -21,6 +21,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld();
 	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld();
+	VOXELART_API UFunction* Z_Construct_UFunction_AVoxelLandscape_UpdateWorld();
 	ENGINE_API UClass* Z_Construct_UClass_USceneComponent_NoRegister();
 	VOXELART_API UClass* Z_Construct_UClass_UVoxelLandscapeGenerator_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_UStaticMesh_NoRegister();
@@ -81,6 +82,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 			{ "CreateTextureDensityMap", &AVoxelLandscape::execCreateTextureDensityMap },
 			{ "CreateVoxelWorld", &AVoxelLandscape::execCreateVoxelWorld },
 			{ "DestroyVoxelWorld", &AVoxelLandscape::execDestroyVoxelWorld },
+			{ "UpdateWorld", &AVoxelLandscape::execUpdateWorld },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, ARRAY_COUNT(Funcs));
 	}
@@ -150,6 +152,29 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		if (!ReturnFunction)
 		{
 			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
+	struct Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics
+	{
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics::Function_MetaDataParams[] = {
+		{ "Category", "Main" },
+		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_AVoxelLandscape, "UpdateWorld", RF_Public|RF_Transient|RF_MarkAsNative, nullptr, (EFunctionFlags)0x04020401, 0, nullptr, 0, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics::Function_MetaDataParams, ARRAY_COUNT(Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_AVoxelLandscape_UpdateWorld()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_AVoxelLandscape_UpdateWorld_Statics::FuncParams);
 		}
 		return ReturnFunction;
 	}
@@ -274,6 +299,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		{ &Z_Construct_UFunction_AVoxelLandscape_CreateTextureDensityMap, "CreateTextureDensityMap" }, // 2744335584
 		{ &Z_Construct_UFunction_AVoxelLandscape_CreateVoxelWorld, "CreateVoxelWorld" }, // 474152906
 		{ &Z_Construct_UFunction_AVoxelLandscape_DestroyVoxelWorld, "DestroyVoxelWorld" }, // 1493059625
+		{ &Z_Construct_UFunction_AVoxelLandscape_UpdateWorld, "UpdateWorld" }, // 985876392
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::Class_MetaDataParams[] = {
@@ -545,7 +571,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 1276626364);
+	IMPLEMENT_CLASS(AVoxelLandscape, 3404956196);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

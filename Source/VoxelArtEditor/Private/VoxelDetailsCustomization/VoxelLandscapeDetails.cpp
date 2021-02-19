@@ -1,7 +1,7 @@
 
 #include "VoxelLandscapeDetails.h"
 #include "VoxelModuleInterface.h"
-//#include "VoxelLandscape.h"
+#include "Helpers/VoxelTools.h"
 
 TSharedRef<IDetailCustomization> IVoxelLandscapeDetails::MakeInstance()
 {
@@ -67,6 +67,29 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
             .ContentPadding(2)
         .VAlign(VAlign_Center)
         .HAlign(HAlign_Center)
+        .OnClicked(this, &IVoxelLandscapeDetails::UpdateWorldInEditor)
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("Update World")))
+        ]
+        ];
+
+    OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
+        .NameContent()
+        [
+            SNew(STextBlock)
+            .Font(IDetailLayoutBuilder::GetDetailFont())
+        .Text(FText::FromString(TEXT("")))
+        ]
+    .ValueContent()
+        .MaxDesiredWidth(125.f)
+        .MinDesiredWidth(125.f)
+        [
+            SNew(SButton)
+            .ContentPadding(2)
+        .VAlign(VAlign_Center)
+        .HAlign(HAlign_Center)
         .OnClicked(this, &IVoxelLandscapeDetails::DestroyWorldInEditor)
         [
             SNew(STextBlock)
@@ -106,6 +129,10 @@ FReply IVoxelLandscapeDetails::CreateWorldInEditor()
     {
         World->CreateVoxelWorld();
     }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("World is NULL"));
+    }
     return FReply::Handled();
 }
 
@@ -114,6 +141,23 @@ FReply IVoxelLandscapeDetails::DestroyWorldInEditor()
     if (World.IsValid())
     {
         World->DestroyVoxelWorld();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("World is NULL"));
+    }
+    return FReply::Handled();
+}
+
+FReply IVoxelLandscapeDetails::UpdateWorldInEditor()
+{
+    if (World.IsValid())
+    {
+        World->UpdateWorld();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("World is NULL"));
     }
     return FReply::Handled();
 }

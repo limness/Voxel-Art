@@ -154,9 +154,9 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
-void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value)
+void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float Value)
 {
-	Value = 0.f;
+	//Value = 0.f;
 
 	//World->SpawnBoxTest(this->Position, Size / 2.f, 35.f, FColor::Green);
 
@@ -176,9 +176,17 @@ void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector Pos
 		}
 		else
 		{
-			UE_LOG(VoxelArt, Warning, TEXT("This octant already has Density. Just change it"));
+		//	UE_LOG(VoxelArt, Warning, TEXT("This octant already has Density. Just change it"));
 		}
-		World->SpawnBoxTest(World->GetTransform().TransformPosition((FVector)this->Position), Size / 2.f * 128.f, 35.f, FColor::Green);
+		auto GetIndex = [&](int X, int Y, int Z)
+		{
+			return X + Y * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) + Z * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT);
+		};
+		TransferToLocal(World, Position);
+
+		DensityMap[GetIndex(Position.X + NORMALS_SKIRT_HALF, Position.Y + NORMALS_SKIRT_HALF, Position.Z + NORMALS_SKIRT_HALF)] = Value;
+
+		//World->SpawnBoxTest(World->GetTransform().TransformPosition((FVector)this->Position), Size / 2.f * 128.f, 35.f, FColor::Green);
 	}
 }
 
@@ -195,7 +203,12 @@ void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector Pos
 
 		TransferToLocal(World, Position);
 
-		Value = DensityMap[GetIndex(Position.X, Position.Y, Position.Z)];
+		Value = DensityMap[GetIndex(Position.X + NORMALS_SKIRT_HALF, Position.Y + NORMALS_SKIRT_HALF, Position.Z + NORMALS_SKIRT_HALF)];
+		/*AsyncTask(ENamedThreads::GameThread, [=]()
+			{
+				DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(Position + this->Position - FIntVector(1, 1, 1) * Size / 2), 10, FColor::Red, false, 25);
+
+			});*/
 
 		//UE_LOG(VoxelArt, Log, TEXT("It has Own Density // Value %f Position %s"), Value, *Position.ToString());
 	}
@@ -212,28 +225,72 @@ void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector Pos
 
 void FVoxelOctreeDensity::SetDefaultDensityMap(AVoxelLandscape* World)
 {
-	auto GetIndex = [&](int X, int Y, int Z)
+	/*auto GetIndex = [&](int X, int Y, int Z)
 	{
 		return X + Y * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) + Z * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT);
 	};
 
 	DensityMap.Init(-1.0, FMath::Pow((World->VoxelsPerChunk + 1 + NORMALS_SKIRT), 3));
-	 
+
+	int VoxelSteps = (Size / World->VoxelsPerChunk);
+
 	for (int Z = 0; Z < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Z++)
 	{
 		for (int Y = 0; Y < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Y++)
 		{
 			for (int X = 0; X < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; X++)
 			{
-				FIntVector DensityPosition = Position + FIntVector(1, 1, 1) * (Size >> 2);//(FIntVector)World->GetTransform().InverseTransformPosition(Position + Size / 2.f);
-				DensityPosition = DensityPosition - FIntVector(X - NORMALS_SKIRT_HALF, Y - NORMALS_SKIRT_HALF, Z - NORMALS_SKIRT_HALF) * (1 << (World->MaximumLOD - Depth));
+				//FIntVector DensityPosition = Position + FIntVector(1, 1, 1) * (Size >> 1);//(FIntVector)World->GetTransform().InverseTransformPosition(Position + Size / 2.f);
+				//DensityPosition = DensityPosition - FIntVector(X - NORMALS_SKIRT_HALF, Y - NORMALS_SKIRT_HALF, Z - NORMALS_SKIRT_HALF) * VoxelSteps/*(1 << (World->MaximumLOD - Depth))*/;
+
+				//FIntVector DensityLocation = Position - FIntVector(1, 1, 1) * (Size >> 1);
+				//DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMALS_SKIRT_HALF) * VoxelSteps;
 
 				/*AsyncTask(ENamedThreads::GameThread, [=]()
 					{
-						DrawDebugPoint(World->GetWorld(), World->GetTransform().TransformPosition((FVector)DensityPosition), 5, FColor::Red, false, 25);
+						DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(DensityPosition), 10, FColor::Red, false, 25);
 
 					});*/
-				DensityMap[GetIndex(X, Y, Z)] = WorldGenerator->GetDensityMap(DensityPosition);
+				/*DensityMap[GetIndex(X, Y, Z)] = WorldGenerator->GetDensityMap(DensityLocation);
+			}
+		}
+	}*/
+
+	auto GetIndex = [&](int X, int Y, int Z)
+	{
+		return X + Y * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) + Z * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT) * (World->VoxelsPerChunk + 1 + NORMALS_SKIRT);
+	};
+	DensityMap.Init(-1.0, FMath::Pow((World->VoxelsPerChunk + 1 + NORMALS_SKIRT), 3));
+
+	int VoxelSteps = (Size / World->VoxelsPerChunk);//(1 << (World->MaximumLOD - Data->Depth));
+
+	for (int Z = 0; Z < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Z++)
+	{
+		for (int Y = 0; Y < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; Y++)
+		{
+			for (int X = 0; X < World->VoxelsPerChunk + 1 + NORMALS_SKIRT; X++)
+			{
+				FIntVector DensityLocation = Position - FIntVector(1, 1, 1) * (Size >> 1);
+				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMALS_SKIRT_HALF) * VoxelSteps;
+				/*FVector DensityLocation = (FVector(X, Y, Z) - NORMALS_SKIRT_HALF) * SizeVoxel;
+				DensityLocation = DensityLocation - (float)(Data->Size / 2.f);
+				DensityLocation = DensityLocation + Data->Position;*/
+				//FVector GlobalLocation = World->GetTransform().InverseTransformPosition(DensityLocation);
+
+				//FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
+
+/*
+				AsyncTask(ENamedThreads::GameThread, [=]()
+					{
+						DrawDebugPoint(World->GetWorld(), ((FVector)DensityLocation), 30, FColor::Red, false, 25);
+
+					});*/
+				float Value = -1.f;
+				World->GetVoxelValue(DensityLocation, Value);
+
+				//UE_LOG(VoxelArt, Error, TEXT("%s // %f"), *DensityLocation.ToString(), Value);
+
+				DensityMap[GetIndex(X, Y, Z)] = Value;//World->GeneratorLandscape->GetDensityMap(P);
 			}
 		}
 	}
@@ -242,7 +299,7 @@ void FVoxelOctreeDensity::SetDefaultDensityMap(AVoxelLandscape* World)
 void FVoxelOctreeDensity::TransferToLocal(AVoxelLandscape* World, FIntVector& Position)
 {
 	//DrawDebugPoint(World->GetWorld(), Position, 5, FColor::Green, false, 15);
-	//Position = Position - (FIntVector)World->GetTransform().InverseTransformPosition(this->Position + Size / 2.f);
+	Position = Position - this->Position + FIntVector(1, 1, 1) * Size / 2;
 }
 
 FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority)

@@ -109,6 +109,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Main")
 	void DestroyVoxelWorld();
 
+	UFUNCTION(BlueprintCallable, Category = "Main")
+	void UpdateWorld();
+
 public:	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -174,6 +177,7 @@ private:
 	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
 	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
+	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
 	void UpdateOctree();
 
 public:
@@ -184,7 +188,7 @@ public:
 public:
 
 	void GetVoxelValue(FIntVector Position, float& Value);
-	void SetVoxelValue(FIntVector Position, float& Value);
+	void SetVoxelValue(FIntVector Position, float Value);
 
 	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
 

@@ -19,8 +19,8 @@ void EmptyLinkFunctionForGeneratedCodeVoxelArt_init() {}
 			static const UE4CodeGen_Private::FPackageParams PackageParams = {
 				"/Script/VoxelArt",
 				PKG_CompiledIn | 0x00000000,
-				0x850D5322,
-				0xD91555E0,
+				0x94D7F0A6,
+				0xC6192D9A,
 				nullptr, 0,
 				METADATA_PARAMS(nullptr, 0)
 			};

@@ -440,7 +440,7 @@ float FVoxelMarchingCubesMesher::GetValue(int X, int Y, int Size, int Steps, boo
 	{
 		FIntVector GlobalPosition = PositionToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
 
-		World->GetVoxelValue(DensityLocation, Value);
+		World->GetVoxelValue(GlobalPosition, Value);
 	}
 	return Value;
 }
