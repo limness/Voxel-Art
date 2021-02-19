@@ -71,22 +71,13 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius)
 {
 	int radius = FMath::CeilToInt(Radius);
-
-	//World->SpawnBoxTest(HitPosition, 30.f, 25.f, FColor::Red);
-
-	//FScopeLock Lock(&World->OctreeMutex);
-
 	float CurrentValue = 0.f;
-	//UVoxelChunkComponent* CurrentChunk = NULLPTR;
 
 	if (World)
 	{
 		//if (EditorRemovePressed)
 		{
-			//UE_LOG(VoxelArt, Warning, TEXT("Setting Value"));
-
 			World->OctreeMutex.Lock();
-			//World->SetVoxelValue(World->TransferToVoxelWorld(HitPosition), CurrentValue);
 
 			for (int Z = -15; Z <= 15; Z++)
 			{
@@ -95,30 +86,14 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 					for (int X = -15; X <= 15; X++)
 					{
 						FVector PositionVoxel = FVector(X, Y, Z);
-						float ValueSphere = 13.5f - PositionVoxel.Size();
+						float ValueSphere = 15.5f - PositionVoxel.Size();
 						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
-
-						//UE_LOG(VoxelArt, Log, TEXT("Value %f %f"), ValueSphere, PositionVoxel.Size());
-
 						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
 					}
 				}
 			}
 			World->OctreeMutex.Unlock();
 		}
-		/*else
-		{
-			UE_LOG(VoxelArt, Log, TEXT("Getting Value"));
-
-			World->OctreeMutex.Lock();
-			World->GetVoxelValue(World->TransferToWorld(HitPosition), CurrentValue);
-			World->OctreeMutex.Unlock();
-		}*/
-	}
-	else
-	{
-		UE_LOG(VoxelArt, Error, TEXT("Controller ~ World is NULL"));
-
 	}
 /*
 	for (int z = -radius; z <= radius; z++)

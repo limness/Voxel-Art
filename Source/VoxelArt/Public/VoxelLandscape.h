@@ -180,10 +180,12 @@ private:
 	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
 	void UpdateOctree();
 
-public:
+public:	
 
-	FIntVector TransferToVoxelWorld(FVector Position);
-	FVector TransferToGameWorld(FIntVector Position);
+	FIntVector TransferToVoxelWorld(FVector P);
+	FVector TransferToGameWorld(FIntVector P);
+
+	FORCEINLINE int GetIndex(FIntVector P);
 
 public:
 

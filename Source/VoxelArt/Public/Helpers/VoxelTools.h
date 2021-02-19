@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#define NORMALS_SKIRT 2
-#define NORMALS_SKIRT_HALF 1
+#define NORMALS 2
+#define NORMAL 1
 
 
 DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);

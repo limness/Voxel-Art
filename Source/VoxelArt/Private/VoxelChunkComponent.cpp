@@ -69,39 +69,25 @@ void FMesherAsyncTask::DoWork()
 {
 	auto GetIndex = [&](int X, int Y, int Z)
 	{
-		return X + Y * (Data->Voxels + 1 + NORMALS_SKIRT) + Z * (Data->Voxels + 1 + NORMALS_SKIRT) * (Data->Voxels + 1 + NORMALS_SKIRT);
+		return X + Y * (Data->Voxels + 1 + NORMALS) + Z * (Data->Voxels + 1 + NORMALS) * (Data->Voxels + 1 + NORMALS);
 	};
-	Data->DensityMap.Init(-1.0, FMath::Pow((Data->Voxels + 1 + NORMALS_SKIRT), 3));
+	Data->DensityMap.Init(-1.0, FMath::Pow((Data->Voxels + 1 + NORMALS), 3));
 
-	int VoxelSteps = (Data->Size / Data->Voxels);//(1 << (World->MaximumLOD - Data->Depth));
+	int VoxelSteps = (Data->Size / Data->Voxels);
 
-	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS_SKIRT; Z++)
+	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
 	{
-		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS_SKIRT; Y++)
+		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS; Y++)
 		{
-			for (int X = 0; X < Data->Voxels + 1 + NORMALS_SKIRT; X++)
+			for (int X = 0; X < Data->Voxels + 1 + NORMALS; X++)
 			{
 				FIntVector DensityLocation = Data->Position - FIntVector(1, 1, 1) * (Data->Size >> 1);
-				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMALS_SKIRT_HALF) * VoxelSteps;
-				/*FVector DensityLocation = (FVector(X, Y, Z) - NORMALS_SKIRT_HALF) * SizeVoxel;
-				DensityLocation = DensityLocation - (float)(Data->Size / 2.f);
-				DensityLocation = DensityLocation + Data->Position;*/
-				//FVector GlobalLocation = World->GetTransform().InverseTransformPosition(DensityLocation);
-					
-				//FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
+				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMAL) * VoxelSteps;
 
-/*
-				AsyncTask(ENamedThreads::GameThread, [=]()
-					{
-						DrawDebugPoint(World->GetWorld(), ((FVector)DensityLocation), 30, FColor::Red, false, 25);
-
-					});*/
 				float Value = -1.f;
 				World->GetVoxelValue(DensityLocation, Value);
 
-				//UE_LOG(VoxelArt, Error, TEXT("%s // %f"), *DensityLocation.ToString(), Value);
-
-				Data->DensityMap[GetIndex(X, Y, Z)] = Value;//World->GeneratorLandscape->GetDensityMap(P);
+				Data->DensityMap[GetIndex(X, Y, Z)] = Value;
 			}
 		}
 	}

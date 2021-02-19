@@ -71,7 +71,7 @@ public:
 	void GeometryTransitionCubes(float radius);
 
 	template<uint8 Direction>
-	FIntVector PositionToDirection(FIntVector DirectionPosition, float Size);
+	FIntVector TransferToDirection(FIntVector DirectionPosition, float Size);
 
 	template<uint8 Direction>
 	float GetValue(int X, int Y, int Size, int Steps, bool CurrentOctree);

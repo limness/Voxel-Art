@@ -54,8 +54,6 @@ public:
 	inline TWeakPtr<FVoxelOctreeData> GetChildByPosition(FVector Position);
 
 	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
-
-	FORCEINLINE int PositionToIndices(FVector position);
 };
 
 class VOXELART_API FVoxelChunkData
@@ -120,9 +118,9 @@ public:
 
 	inline bool HasChildren() { return ChildrenOctants.Num() == 8; };
 
-	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float Value);
+	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector P, float Value);
 
-	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector Position, float& Value);
+	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value);
 
 	void TransferToLocal(AVoxelLandscape* World, FIntVector& Position);
 

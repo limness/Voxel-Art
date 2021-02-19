@@ -8,8 +8,8 @@
 #include "Helpers/Transvoxels.h"
 #include "DrawDebugHelpers.h"
 
-#define NORMALS_SKIRT 2 //2
-#define NORMALS_SKIRT_HALF 1 //1
+#define NORMALS 2 //2
+#define NORMAL 1 //1
 
 namespace EVoxelDirectionRender
 {
@@ -92,16 +92,16 @@ void AVoxelChunkTransvoxels::GenerateNoise()
 {
 	//positionSide.Init(FVector(0, 0, 0), (voxels + 1) * (voxels + 1) * (voxels + 1));
 	//Grid.Init(-1.f, (voxels + 1) * (voxels + 1) * (voxels + 1));
-	positionSide.Init(FVector(0, 0, 0), (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT));
-	Grid.Init(-1.0, (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT));
+	positionSide.Init(FVector(0, 0, 0), (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS));
+	Grid.Init(-1.0, (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS));
 
 	float radiusVoxel = GetVoxelSize();
 
-	for (int z = 0; z < voxels + 1 + NORMALS_SKIRT; z++)
+	for (int z = 0; z < voxels + 1 + NORMALS; z++)
 	{
-		for (int y = 0; y < voxels + 1 + NORMALS_SKIRT; y++)
+		for (int y = 0; y < voxels + 1 + NORMALS; y++)
 		{
-			for (int x = 0; x < voxels + 1 + NORMALS_SKIRT; x++)
+			for (int x = 0; x < voxels + 1 + NORMALS; x++)
 			{
 			/*	FVector positionNoise;
 
@@ -113,12 +113,12 @@ void AVoxelChunkTransvoxels::GenerateNoise()
 				Grid[x + y * (voxels + 1) + z * (voxels + 1) * (voxels + 1)] = GetValueNoise(positionNoise);*/
 				FVector positionNoise;
 
-				positionNoise.X = (x - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-				positionNoise.Y = (y - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
-				positionNoise.Z = (z - NORMALS_SKIRT_HALF) * radiusVoxel - 0;
+				positionNoise.X = (x - NORMAL) * radiusVoxel - 0;
+				positionNoise.Y = (y - NORMAL) * radiusVoxel - 0;
+				positionNoise.Z = (z - NORMAL) * radiusVoxel - 0;
 				positionNoise = positionNoise - (float)(radius / 2.f);
 
-				Grid[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = GetValueNoise(positionNoise); //shouldbeMIN
+				Grid[x + y * (voxels + 1 + NORMALS) + z * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)] = GetValueNoise(positionNoise); //shouldbeMIN
 			}
 		}
 	}
@@ -222,24 +222,24 @@ void AVoxelChunkTransvoxels::GenerateVertexCube(bool regenerate)
 					float transitionY = 1 * transitionSize * (Y == 1 ? -MaximumY : MinimumY);
 					float transitionZ = 1 * transitionSize * (Z == 1 ? -MaximumZ : MinimumZ);
 
-					infoNoise[i] = Grid[(x + X + NORMALS_SKIRT_HALF) + (y + Y + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) + (z + Z + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
-					position[i] = FVector((x + X + NORMALS_SKIRT_HALF + transitionX) * radiusVoxel, (y + Y + NORMALS_SKIRT_HALF + transitionY) * radiusVoxel, (z + Z + NORMALS_SKIRT_HALF + transitionZ) * radiusVoxel) - (float)(radius / 2.f);
+					infoNoise[i] = Grid[(x + X + NORMAL) + (y + Y + NORMAL) * (voxels + 1 + NORMALS) + (z + Z + NORMAL) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)];
+					position[i] = FVector((x + X + NORMAL + transitionX) * radiusVoxel, (y + Y + NORMAL + transitionY) * radiusVoxel, (z + Z + NORMAL + transitionZ) * radiusVoxel) - (float)(radius / 2.f);
 
-					positionSide[(x + X + NORMALS_SKIRT_HALF) + (y + Y + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) + (z + Z + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = position[i];
+					positionSide[(x + X + NORMAL) + (y + Y + NORMAL) * (voxels + 1 + NORMALS) + (z + Z + NORMAL) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)] = position[i];
 				}
 
-				MarchingCubes(isolevel, (x + NORMALS_SKIRT_HALF) + (y + NORMALS_SKIRT_HALF) * (voxels + 1 + NORMALS_SKIRT) + (z + NORMALS_SKIRT_HALF)* (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT), x + NORMALS_SKIRT_HALF, y + NORMALS_SKIRT_HALF, z + NORMALS_SKIRT_HALF, normalIndex);
+				MarchingCubes(isolevel, (x + NORMAL) + (y + NORMAL) * (voxels + 1 + NORMALS) + (z + NORMAL)* (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS), x + NORMAL, y + NORMAL, z + NORMAL, normalIndex);
 
 				normalIndex++;
 			}
 		}
 	}*/
 
-	for (int z = NORMALS_SKIRT_HALF; z < voxels + NORMALS_SKIRT_HALF; z++)
+	for (int z = NORMAL; z < voxels + NORMAL; z++)
 	{
-		for (int y = NORMALS_SKIRT_HALF; y < voxels + NORMALS_SKIRT_HALF; y++)
+		for (int y = NORMAL; y < voxels + NORMAL; y++)
 		{
-			for (int x = NORMALS_SKIRT_HALF; x < voxels + NORMALS_SKIRT_HALF; x++)
+			for (int x = NORMAL; x < voxels + NORMAL; x++)
 			{
 				for (int i = 0; i < 8; i++)
 				{
@@ -248,23 +248,23 @@ void AVoxelChunkTransvoxels::GenerateVertexCube(bool regenerate)
 					int Y = i % 4 / 2;
 					int Z = !(i / 4);
 
-					uint8 localMinimumX = (uint8)(((x + X - NORMALS_SKIRT_HALF == 0) ? 1 : 0) << 0);
-					uint8 localMaximumX = (uint8)(((x + X - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0) << 1);
+					uint8 localMinimumX = (uint8)(((x + X - NORMAL == 0) ? 1 : 0) << 0);
+					uint8 localMaximumX = (uint8)(((x + X - NORMAL == voxels - 0) ? 1 : 0) << 1);
 
-					uint8 localMinimumY = (uint8)(((y + Y - NORMALS_SKIRT_HALF == 0) ? 1 : 0) << 2);
-					uint8 localMaximumY = (uint8)(((y + Y - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0) << 3);
+					uint8 localMinimumY = (uint8)(((y + Y - NORMAL == 0) ? 1 : 0) << 2);
+					uint8 localMaximumY = (uint8)(((y + Y - NORMAL == voxels - 0) ? 1 : 0) << 3);
 
-					uint8 localMinimumZ = (uint8)(((z + Z - NORMALS_SKIRT_HALF == 0) ? 1 : 0) << 4);
-					uint8 localMaximumZ = (uint8)(((z + Z - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0) << 5);
+					uint8 localMinimumZ = (uint8)(((z + Z - NORMAL == 0) ? 1 : 0) << 4);
+					uint8 localMaximumZ = (uint8)(((z + Z - NORMAL == voxels - 0) ? 1 : 0) << 5);
 
-					int MinimumX = (((transvoxelDirection & EVoxelDirectionRender::MinimumX) == EVoxelDirectionRender::MinimumX) ? 1 : 0) * ((x + X - NORMALS_SKIRT_HALF == 0) ? 1 : 0);
-					int MaximumX = (((transvoxelDirection & EVoxelDirectionRender::MaximumX) == EVoxelDirectionRender::MaximumX) ? 1 : 0) * ((x + X - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0);
+					int MinimumX = (((transvoxelDirection & EVoxelDirectionRender::MinimumX) == EVoxelDirectionRender::MinimumX) ? 1 : 0) * ((x + X - NORMAL == 0) ? 1 : 0);
+					int MaximumX = (((transvoxelDirection & EVoxelDirectionRender::MaximumX) == EVoxelDirectionRender::MaximumX) ? 1 : 0) * ((x + X - NORMAL == voxels - 0) ? 1 : 0);
 
-					int MinimumY = (((transvoxelDirection & EVoxelDirectionRender::MinimumY) == EVoxelDirectionRender::MinimumY) ? 1 : 0) * ((y + Y - NORMALS_SKIRT_HALF == 0) ? 1 : 0);
-					int MaximumY = (((transvoxelDirection & EVoxelDirectionRender::MaximumY) == EVoxelDirectionRender::MaximumY) ? 1 : 0) * ((y + Y - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0);
+					int MinimumY = (((transvoxelDirection & EVoxelDirectionRender::MinimumY) == EVoxelDirectionRender::MinimumY) ? 1 : 0) * ((y + Y - NORMAL == 0) ? 1 : 0);
+					int MaximumY = (((transvoxelDirection & EVoxelDirectionRender::MaximumY) == EVoxelDirectionRender::MaximumY) ? 1 : 0) * ((y + Y - NORMAL == voxels - 0) ? 1 : 0);
 
-					int MinimumZ = (((transvoxelDirection & EVoxelDirectionRender::MinimumZ) == EVoxelDirectionRender::MinimumZ) ? 1 : 0) * ((z + Z - NORMALS_SKIRT_HALF == 0) ? 1 : 0);
-					int MaximumZ = (((transvoxelDirection & EVoxelDirectionRender::MaximumZ) == EVoxelDirectionRender::MaximumZ) ? 1 : 0) * ((z + Z - NORMALS_SKIRT_HALF == voxels - 0) ? 1 : 0);
+					int MinimumZ = (((transvoxelDirection & EVoxelDirectionRender::MinimumZ) == EVoxelDirectionRender::MinimumZ) ? 1 : 0) * ((z + Z - NORMAL == 0) ? 1 : 0);
+					int MaximumZ = (((transvoxelDirection & EVoxelDirectionRender::MaximumZ) == EVoxelDirectionRender::MaximumZ) ? 1 : 0) * ((z + Z - NORMAL == voxels - 0) ? 1 : 0);
 
 					if (((localMinimumX || localMaximumX) & (localMinimumY || localMaximumY)) |
 						((localMinimumY || localMaximumY) & (localMinimumZ || localMaximumZ)) |
@@ -292,15 +292,15 @@ void AVoxelChunkTransvoxels::GenerateVertexCube(bool regenerate)
 					float transitionY = transitionSize * (Y == 1 ? -MaximumY : MinimumY);
 					float transitionZ = transitionSize * (Z == 1 ? -MaximumZ : MinimumZ);
 
-					infoNoise[i] = Grid[(x + X) + (y + Y) * (voxels + 1 + NORMALS_SKIRT) + (z + Z) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
-					position[i] = FVector((x + X + transitionX - NORMALS_SKIRT_HALF) * radiusVoxel, (y + Y + transitionY - NORMALS_SKIRT_HALF) * radiusVoxel, (z + Z + transitionZ - NORMALS_SKIRT_HALF) * radiusVoxel) - (float)(radius / 2.f);
+					infoNoise[i] = Grid[(x + X) + (y + Y) * (voxels + 1 + NORMALS) + (z + Z) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)];
+					position[i] = FVector((x + X + transitionX - NORMAL) * radiusVoxel, (y + Y + transitionY - NORMAL) * radiusVoxel, (z + Z + transitionZ - NORMAL) * radiusVoxel) - (float)(radius / 2.f);
 
-					positionSide[(x + X) + (y + Y) * (voxels + 1 + NORMALS_SKIRT) + (z + Z) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)] = position[i];
+					positionSide[(x + X) + (y + Y) * (voxels + 1 + NORMALS) + (z + Z) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)] = position[i];
 
-					//UE_LOG(LogTemp, Warning, TEXT("1 cornerPosition %d"), (x + X) + (y + Y) * (voxels + 1 + NORMALS_SKIRT) + (z + Z) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT));
+					//UE_LOG(LogTemp, Warning, TEXT("1 cornerPosition %d"), (x + X) + (y + Y) * (voxels + 1 + NORMALS) + (z + Z) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS));
 				}
 
-				MarchingCubes(isolevel, x + (voxels + 1 + NORMALS_SKIRT) * y + (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT) * z, x, y, z, normalIndex);
+				MarchingCubes(isolevel, x + (voxels + 1 + NORMALS) * y + (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS) * z, x, y, z, normalIndex);
 
 				normalIndex++;
 			}
@@ -546,9 +546,9 @@ void AVoxelChunkTransvoxels::GeometryTransitionCubes()
 					int Y = (i - 1) % 4 / 2;
 
 					cornerPosition[i] = positionSide[
-						(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), voxels + valueSize).X) +
-						(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), voxels + valueSize).Y) * (voxels + 1 + NORMALS_SKIRT) +
-						(int)(PositionToDirection<Direction>(FVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), voxels + valueSize).Z) * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
+						(int)(PositionToDirection<Direction>(FVector(x + X + NORMAL, y + Y + NORMAL, NORMAL), voxels + valueSize).X) +
+						(int)(PositionToDirection<Direction>(FVector(x + X + NORMAL, y + Y + NORMAL, NORMAL), voxels + valueSize).Y) * (voxels + 1 + NORMALS) +
+						(int)(PositionToDirection<Direction>(FVector(x + X + NORMAL, y + Y + NORMAL, NORMAL), voxels + valueSize).Z) * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)];
 
 
 					//UE_LOG(LogTemp, Warning, TEXT("cornerPosition s %s"), *cornerPosition[i].ToString());
@@ -677,7 +677,7 @@ FVector AVoxelChunkTransvoxels::GetGradient(int x, int y, int z)
 
 float AVoxelChunkTransvoxels::GetDensity(int x, int y, int z)
 {
-	return Grid[x + y * (voxels + 1 + NORMALS_SKIRT) + z * (voxels + 1 + NORMALS_SKIRT) * (voxels + 1 + NORMALS_SKIRT)];
+	return Grid[x + y * (voxels + 1 + NORMALS) + z * (voxels + 1 + NORMALS) * (voxels + 1 + NORMALS)];
 }
 
 

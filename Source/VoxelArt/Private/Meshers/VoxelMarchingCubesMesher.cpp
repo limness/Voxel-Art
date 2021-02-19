@@ -33,7 +33,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 	TextureCoordinates.Empty();
 	VertexColors.Empty();
 
-	positionSide.Init(FVector(0, 0, 0), (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT));
+	positionSide.Init(FVector(0, 0, 0), (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS));
 
 	int normalIndex = 0;
 
@@ -42,11 +42,11 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 
 	FVector firstPoint, lastPoint;
 
-	for (int z = NORMALS_SKIRT_HALF; z < Voxels + NORMALS_SKIRT_HALF; z++)
+	for (int z = NORMAL; z < Voxels + NORMAL; z++)
 	{
-		for (int y = NORMALS_SKIRT_HALF; y < Voxels + NORMALS_SKIRT_HALF; y++)
+		for (int y = NORMAL; y < Voxels + NORMAL; y++)
 		{
-			for (int x = NORMALS_SKIRT_HALF; x < Voxels + NORMALS_SKIRT_HALF; x++)
+			for (int x = NORMAL; x < Voxels + NORMAL; x++)
 			{
 				for (int i = 0; i < 8; i++)
 				{
@@ -54,23 +54,23 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					int Y = i % 4 / 2;
 					int Z = (i / 4);
 
-					uint8 localMinimumX = (uint8)((x + X - NORMALS_SKIRT_HALF == 0) << 0);
-					uint8 localMaximumX = (uint8)((x + X - NORMALS_SKIRT_HALF == Voxels - 0) << 1);
+					uint8 localMinimumX = (uint8)((x + X - NORMAL == 0) << 0);
+					uint8 localMaximumX = (uint8)((x + X - NORMAL == Voxels - 0) << 1);
 
-					uint8 localMinimumY = (uint8)((y + Y - NORMALS_SKIRT_HALF == 0) << 2);
-					uint8 localMaximumY = (uint8)((y + Y - NORMALS_SKIRT_HALF == Voxels - 0) << 3);
+					uint8 localMinimumY = (uint8)((y + Y - NORMAL == 0) << 2);
+					uint8 localMaximumY = (uint8)((y + Y - NORMAL == Voxels - 0) << 3);
 
-					uint8 localMinimumZ = (uint8)((z + Z - NORMALS_SKIRT_HALF == 0) << 4);
-					uint8 localMaximumZ = (uint8)((z + Z - NORMALS_SKIRT_HALF == Voxels - 0) << 5);
+					uint8 localMinimumZ = (uint8)((z + Z - NORMAL == 0) << 4);
+					uint8 localMaximumZ = (uint8)((z + Z - NORMAL == Voxels - 0) << 5);
 
-					int MinimumX = ((TransitionSides & EVoxelDirection::MinimumX) == EVoxelDirection::MinimumX) * (x + X - NORMALS_SKIRT_HALF == 0);
-					int MaximumX = ((TransitionSides & EVoxelDirection::MaximumX) == EVoxelDirection::MaximumX) * (x + X - NORMALS_SKIRT_HALF == Voxels - 0);
+					int MinimumX = ((TransitionSides & EVoxelDirection::MinimumX) == EVoxelDirection::MinimumX) * (x + X - NORMAL == 0);
+					int MaximumX = ((TransitionSides & EVoxelDirection::MaximumX) == EVoxelDirection::MaximumX) * (x + X - NORMAL == Voxels - 0);
 
-					int MinimumY = ((TransitionSides & EVoxelDirection::MinimumY) == EVoxelDirection::MinimumY) * (y + Y - NORMALS_SKIRT_HALF == 0);
-					int MaximumY = ((TransitionSides & EVoxelDirection::MaximumY) == EVoxelDirection::MaximumY) * (y + Y - NORMALS_SKIRT_HALF == Voxels - 0);
+					int MinimumY = ((TransitionSides & EVoxelDirection::MinimumY) == EVoxelDirection::MinimumY) * (y + Y - NORMAL == 0);
+					int MaximumY = ((TransitionSides & EVoxelDirection::MaximumY) == EVoxelDirection::MaximumY) * (y + Y - NORMAL == Voxels - 0);
 
-					int MinimumZ = ((TransitionSides & EVoxelDirection::MinimumZ) == EVoxelDirection::MinimumZ) * (z + Z - NORMALS_SKIRT_HALF == 0);
-					int MaximumZ = ((TransitionSides & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) * (z + Z - NORMALS_SKIRT_HALF == Voxels - 0);
+					int MinimumZ = ((TransitionSides & EVoxelDirection::MinimumZ) == EVoxelDirection::MinimumZ) * (z + Z - NORMAL == 0);
+					int MaximumZ = ((TransitionSides & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) * (z + Z - NORMAL == Voxels - 0);
 
 					if (((localMinimumX || localMaximumX) & (localMinimumY || localMaximumY)) |
 						((localMinimumY || localMaximumY) & (localMinimumZ || localMaximumZ)) |
@@ -94,17 +94,17 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					float transitionY = 0.25f * (Y == 1 ? -MaximumY : MinimumY);
 					float transitionZ = 0.25f * (Z == 1 ? -MaximumZ : MinimumZ);
 					
-					FVector PositionGrid = FVector(x + X + transitionX, y + Y + transitionY, z + Z + transitionZ) - NORMALS_SKIRT_HALF;
+					FVector PositionGrid = FVector(x + X + transitionX, y + Y + transitionY, z + Z + transitionZ) - NORMAL;
 					PositionGrid = PositionGrid - World->VoxelsPerChunk / 2;
 					PositionGrid = PositionGrid * VoxelSize;
 
-					infoNoise[i] = DensityMap[(x + X) + (y + Y) * (Voxels + 1 + NORMALS_SKIRT) + (z + Z) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
+					infoNoise[i] = DensityMap[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
 					position[i] = PositionGrid;
 
-					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS_SKIRT) + (z + Z) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)] = position[i];
+					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)] = position[i];
 				}
 
-				MarchingCubes(x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT), x, y, z, normalIndex);
+				MarchingCubes(x + y * (Voxels + 1 + NORMALS) + z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS), x, y, z, normalIndex);
 
 				normalIndex++;
 			}
@@ -259,11 +259,11 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 1]].GetSafeNormal());
-		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + PositionGameWorld));// - (1 * radius) / 2.0f));
+		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + PositionGameWorld));
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
-		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + PositionGameWorld));// - (1 * radius) / 2.0f));
+		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + PositionGameWorld));
 		Normals.Add(normList[triTable[cubeIndex][i + 2]].GetSafeNormal());
 	}
 }
@@ -326,27 +326,24 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 				cornerPosition[7] = GetPosition<Direction>(x * 2 + 1, y * 2 + 2, Size, VoxelSteps >> 1);	// 7
 				cornerPosition[8] = GetPosition<Direction>(x * 2 + 2, y * 2 + 2, Size, VoxelSteps >> 1);	// 8 - C
 
-				normals[0] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 0 + NORMALS_SKIRT_HALF, y + 0 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[1] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 1 + NORMALS_SKIRT_HALF, y + 0 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[2] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 1 + NORMALS_SKIRT_HALF, y + 0 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[3] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 0 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[4] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 1 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[5] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 1 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[6] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 0 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[7] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 0 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
-				normals[8] = GetGradient(PositionToDirection<Direction>(FIntVector(x + 1 + NORMALS_SKIRT_HALF, y + 1 + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
+				normals[0] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 0 + NORMAL, y + 0 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[1] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 1 + NORMAL, y + 0 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[2] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 1 + NORMAL, y + 0 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[3] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 0 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[4] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 1 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[5] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 1 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[6] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 0 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[7] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 0 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
+				normals[8] = GetGradient(TransferToDirection<Direction>(FIntVector(x + 1 + NORMAL, y + 1 + NORMAL, 0 + NORMAL), Voxels + 2));
 
 				for (uint32 i = 9; i < 13; i++)
 				{
 					const int X = (i - 1) % 2;
 					const int Y = (i - 1) % 4 / 2;
 
-					cornerPosition[i] = positionSide[
-						(PositionToDirection<Direction>(FIntVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).X) +
-						(PositionToDirection<Direction>(FIntVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).Y) * (Voxels + 1 + NORMALS_SKIRT) +
-						(PositionToDirection<Direction>(FIntVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, NORMALS_SKIRT_HALF), Voxels + 2).Z) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
-
-					normals[i] = GetGradient(PositionToDirection<Direction>(FIntVector(x + X + NORMALS_SKIRT_HALF, y + Y + NORMALS_SKIRT_HALF, 0 + NORMALS_SKIRT_HALF), Voxels + 2));
+					FIntVector P = TransferToDirection<Direction>(FIntVector(x + X + NORMAL, y + Y + NORMAL, NORMAL), Voxels + 2);
+					cornerPosition[i] = positionSide[P.X + P.Y * (Voxels + 1 + NORMALS) + P.Z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
+					normals[i] = GetGradient(TransferToDirection<Direction>(FIntVector(x + X + NORMAL, y + Y + NORMAL, 0 + NORMAL), Voxels + 2));
 				}
 
 				const uint8 cellClass = Transvoxels::transitionCellClass[caseValue];
@@ -400,24 +397,22 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 						_TrianglesTransition.Add(Triangles.Num() + cellData.vertexIndex[i * 3 + 2]);
 					}
 				}
-				// Add our transition cells to global variable of data
+
+				/*Add our transition cells to global variable of data*/
 
 				for (int a = 0; a < _VerticesTransition.Num(); a++)
 				{
 					Vertices.Add(_VerticesTransition[a]);
 					VertexColors.Add(GeneratorLandscape->GetColorMap(_VerticesTransition[a] + PositionGameWorld));
 				}
-
 				for (int j = 0; j < _NormalsTransition.Num(); j++)
 				{
 					Normals.Add(_NormalsTransition[j]);
 				}
-
 				for (int b = 0; b < _TrianglesTransition.Num(); b++)
 				{
 					Triangles.Add(_TrianglesTransition[b]);
 				}
-
 				VerticesTransition.Empty();
 				TrianglesTransition.Empty();
 			}
@@ -432,13 +427,13 @@ float FVoxelMarchingCubesMesher::GetValue(int X, int Y, int Size, int Steps, boo
 
 	if(CurrentOctree)
 	{
-		FIntVector LocalPosition = PositionToDirection<Direction>(FIntVector(X, Y, 0), Size);
+		FIntVector LocalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0), Size);
 
 		Value = DensityMap[PositionToIndices(LocalPosition)];
 	}
 	else
 	{
-		FIntVector GlobalPosition = PositionToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
+		FIntVector GlobalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
 
 		World->GetVoxelValue(GlobalPosition, Value);
 	}
@@ -448,7 +443,7 @@ float FVoxelMarchingCubesMesher::GetValue(int X, int Y, int Size, int Steps, boo
 template<uint8 Direction>
 FVector FVoxelMarchingCubesMesher::GetPosition(int X, int Y, int Size, int Steps)
 {
-	FIntVector GlobalPosition = PositionToDirection<Direction>(FIntVector(X * Steps, Y * Steps, 0), Size) - FIntVector(1, 1, 1) * (Size >> 1);
+	FIntVector GlobalPosition = TransferToDirection<Direction>(FIntVector(X * Steps, Y * Steps, 0), Size) - FIntVector(1, 1, 1) * (Size >> 1);
 
 	return World->TransferToGameWorld(GlobalPosition);
 }
@@ -456,13 +451,13 @@ FVector FVoxelMarchingCubesMesher::GetPosition(int X, int Y, int Size, int Steps
 FORCEINLINE int FVoxelMarchingCubesMesher::PositionToIndices(FIntVector Position)
 {
 	return 
-		(Position.X + NORMALS_SKIRT_HALF) +
-		(Position.Y + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) +
-		(Position.Z + NORMALS_SKIRT_HALF) * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT);
+		(Position.X + NORMAL) +
+		(Position.Y + NORMAL) * (Voxels + 1 + NORMALS) +
+		(Position.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
 }
 
 template<uint8 Direction>
-FIntVector FVoxelMarchingCubesMesher::PositionToDirection(FIntVector DirectionPosition, float Size)
+FIntVector FVoxelMarchingCubesMesher::TransferToDirection(FIntVector DirectionPosition, float Size)
 {
 	if ((Direction >> 0) & 0x01) { DirectionPosition = FIntVector(DirectionPosition.Z, DirectionPosition.X, DirectionPosition.Y); }			//0x01
 	if ((Direction >> 1) & 0x01) { DirectionPosition = FIntVector(Size - DirectionPosition.Z, DirectionPosition.Y, DirectionPosition.X); }	//0x02

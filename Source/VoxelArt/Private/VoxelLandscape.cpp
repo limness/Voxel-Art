@@ -524,19 +524,24 @@ void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value)
 	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value);
 }
 
-FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector Position)
+FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector P)
 {
-	return (FIntVector)GetTransform().InverseTransformPosition(Position);
+	return (FIntVector)GetTransform().InverseTransformPosition(P);
 }
 
-FVector AVoxelLandscape::TransferToGameWorld(FIntVector Position)
+FVector AVoxelLandscape::TransferToGameWorld(FIntVector P)
 {
-	return GetTransform().TransformPosition((FVector)Position);
+	return GetTransform().TransformPosition((FVector)P);
 }
 
 void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Value)
 {
 	OctreeDensity->GetLeaf(Position)->SetVoxelDensity(this, Position, Value);
+}
+
+FORCEINLINE int AVoxelLandscape::GetIndex(FIntVector P)
+{
+	return P.X + P.Y * (VoxelsPerChunk + 1 + NORMALS) + P.Z * (VoxelsPerChunk + 1 + NORMALS) * (VoxelsPerChunk + 1 + NORMALS);
 }
 
 #if WITH_EDITOR
