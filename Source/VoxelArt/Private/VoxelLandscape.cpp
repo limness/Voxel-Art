@@ -473,21 +473,13 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 		Chunk->AttachToComponent(WorldComponent, FAttachmentTransformRules::KeepWorldTransform);
 		Chunk->SetWorldLocation(TransferToGameWorld(ChunkData->Position));
 		Chunk->SetActive(true);
-
-//		DrawDebugPoint(GetWorld(), TransferToGameWorld(ChunkData->Position), 30, FColor::Blue, false, 25);
-
-//		SpawnBoxTest(Chunk->GetComponentLocation(), (ChunkData->Size * VoxelMin) / 2.f, 900.f, FColor::Red);
 	}
 }
 
 void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value)
 {
-	//FVoxelOctreeDensity* CurrentOctantTest = OctreeDensity->GetLeaf((FVector)Position);
 	//SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Size / 2.f, 30.f, FColor::Red);
 	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value);
-	//FVector PositionToWorld = GetTransform().InverseTransformPosition((FVector)Position);
-
-	//CurrentOctantTest->GetVoxelDensity(this, PositionToWorld, Value);
 }
 
 FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector Position)
