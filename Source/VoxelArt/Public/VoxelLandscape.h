@@ -36,6 +36,8 @@ enum RenderTexture
 	RedGreenBlue	UMETA(DisplayName = "RGB")
 };
 
+class FVoxelCollisionBox;
+
 UCLASS()
 class VOXELART_API AVoxelLandscape : public AActor
 {
@@ -186,6 +188,10 @@ public:
 	FVector TransferToGameWorld(FIntVector P);
 
 	FORCEINLINE int GetIndex(FIntVector P);
+
+public:
+
+	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
 
 public:
 

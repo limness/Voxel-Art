@@ -46,6 +46,9 @@ public:
 
 	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
 
+	inline FIntVector GetMinimumCorner();
+
+	inline FIntVector GetMaximumCorner();
 
 	inline TWeakPtr<FVoxelOctreeData> GetParent();
 

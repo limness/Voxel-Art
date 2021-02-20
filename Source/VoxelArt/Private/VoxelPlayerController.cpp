@@ -2,6 +2,7 @@
 
 #include "VoxelPlayerController.h"
 #include "Helpers/VoxelTools.h"
+#include "Helpers/VoxelCollisionBox.h"
 
 void AVoxelPlayerController::BeginPlay()
 {
@@ -86,12 +87,16 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 					for (int X = -15; X <= 15; X++)
 					{
 						FVector PositionVoxel = FVector(X, Y, Z);
-						float ValueSphere = 15.5f - PositionVoxel.Size();
-						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
+						float ValueSphere = 14.5f - PositionVoxel.Size();
+						//World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
 						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
 					}
 				}
 			}
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), 25);
+			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
+
+			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
 			World->OctreeMutex.Unlock();
 		}
 	}

@@ -142,8 +142,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 1);
-		normalTwo = GetGradient(x + 1, y + 0, z + 1);
+		normalOne = GetGradient(x + 0, y + 0, z + 0);
+		normalTwo = GetGradient(x + 1, y + 0, z + 0);
 
 		vertList[0] = VertexInterp(position[0], position[1], normalOne, normalTwo, infoNoise[0], infoNoise[1], 0, normList[0]);
 	}
@@ -151,8 +151,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 1);
-		normalTwo = GetGradient(x + 1, y + 1, z + 1);
+		normalOne = GetGradient(x + 1, y + 0, z + 0);
+		normalTwo = GetGradient(x + 1, y + 1, z + 0);
 
 		vertList[1] = VertexInterp(position[1], position[2], normalOne, normalTwo, infoNoise[1], infoNoise[2], 0, normList[1]);
 	}
@@ -160,8 +160,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 1);
-		normalTwo = GetGradient(x + 0, y + 1, z + 1);
+		normalOne = GetGradient(x + 1, y + 1, z + 0);
+		normalTwo = GetGradient(x + 0, y + 1, z + 0);
 
 		vertList[2] = VertexInterp(position[2], position[3], normalOne, normalTwo, infoNoise[2], infoNoise[3], 0, normList[2]);
 	}
@@ -169,8 +169,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 1);
-		normalTwo = GetGradient(x + 0, y + 0, z + 1);
+		normalOne = GetGradient(x + 0, y + 1, z + 0);
+		normalTwo = GetGradient(x + 0, y + 0, z + 0);
 
 		vertList[3] = VertexInterp(position[3], position[0], normalOne, normalTwo, infoNoise[3], infoNoise[0], 0, normList[3]);
 	}
@@ -178,8 +178,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 0);
-		normalTwo = GetGradient(x + 1, y + 0, z + 0);
+		normalOne = GetGradient(x + 0, y + 0, z + 1);
+		normalTwo = GetGradient(x + 1, y + 0, z + 1);
 
 		vertList[4] = VertexInterp(position[4], position[5], normalOne, normalTwo, infoNoise[4], infoNoise[5], 0, normList[4]);
 	}
@@ -187,8 +187,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 0);
-		normalTwo = GetGradient(x + 1, y + 1, z + 0);
+		normalOne = GetGradient(x + 1, y + 0, z + 1);
+		normalTwo = GetGradient(x + 1, y + 1, z + 1);
 
 		vertList[5] = VertexInterp(position[5], position[6], normalOne, normalTwo, infoNoise[5], infoNoise[6], 0, normList[5]);
 	}
@@ -196,8 +196,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 0);
-		normalTwo = GetGradient(x + 0, y + 1, z + 0);
+		normalOne = GetGradient(x + 1, y + 1, z + 1);
+		normalTwo = GetGradient(x + 0, y + 1, z + 1);
 
 		vertList[6] = VertexInterp(position[6], position[7], normalOne, normalTwo, infoNoise[6], infoNoise[7], 0, normList[6]);
 	}
@@ -205,8 +205,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 0);
-		normalTwo = GetGradient(x + 0, y + 0, z + 0);
+		normalOne = GetGradient(x + 0, y + 1, z + 1);
+		normalTwo = GetGradient(x + 0, y + 0, z + 1);
 
 		vertList[7] = VertexInterp(position[7], position[4], normalOne, normalTwo, infoNoise[7], infoNoise[4], 0, normList[7]);
 	}
@@ -214,8 +214,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 1);
-		normalTwo = GetGradient(x + 0, y + 0, z + 0);
+		normalOne = GetGradient(x + 0, y + 0, z + 0);
+		normalTwo = GetGradient(x + 0, y + 0, z + 1);
 
 		vertList[8] = VertexInterp(position[0], position[4], normalOne, normalTwo, infoNoise[0], infoNoise[4], 0, normList[8]);
 	}
@@ -223,8 +223,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 1);
-		normalTwo = GetGradient(x + 1, y + 0, z + 0);
+		normalOne = GetGradient(x + 1, y + 0, z + 0);
+		normalTwo = GetGradient(x + 1, y + 0, z + 1);
 
 		vertList[9] = VertexInterp(position[1], position[5], normalOne, normalTwo, infoNoise[1], infoNoise[5], 0, normList[9]);
 	}
@@ -232,8 +232,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 1);
-		normalTwo = GetGradient(x + 1, y + 1, z + 0);
+		normalOne = GetGradient(x + 1, y + 1, z + 0);
+		normalTwo = GetGradient(x + 1, y + 1, z + 1);
 
 		vertList[10] = VertexInterp(position[2], position[6], normalOne, normalTwo, infoNoise[2], infoNoise[6], 0, normList[10]);
 	}
@@ -241,8 +241,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 1);
-		normalTwo = GetGradient(x + 0, y + 1, z + 0);
+		normalOne = GetGradient(x + 0, y + 1, z + 0);
+		normalTwo = GetGradient(x + 0, y + 1, z + 1);
 
 		vertList[11] = VertexInterp(position[3], position[7], normalOne, normalTwo, infoNoise[3], infoNoise[7], 0, normList[11]);
 	}

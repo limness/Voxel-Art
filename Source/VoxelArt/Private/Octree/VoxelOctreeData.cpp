@@ -58,6 +58,16 @@ void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> child
 	}
 }
 
+FIntVector FVoxelOctreeData::GetMinimumCorner()
+{
+	return this->Position - FIntVector(1, 1, 1) * this->Size / 2;
+}
+
+FIntVector FVoxelOctreeData::GetMaximumCorner()
+{
+	return this->Position + FIntVector(1, 1, 1) * this->Size / 2;
+}
+
 void FVoxelOctreeData::AddChildren()
 {
 	int P = Size >> 2;
