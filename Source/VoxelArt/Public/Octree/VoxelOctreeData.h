@@ -127,7 +127,7 @@ public:
 
 	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
 
-	void TransferToLocal(AVoxelLandscape* World, FIntVector& Position);
+	FIntVector TransferToLocal(AVoxelLandscape* World, FIntVector Position);
 
 	inline bool HasOwnDensity() { return OwnDensity; }
 	inline bool HasOwnColor() { return OwnColor; }

@@ -138,7 +138,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
 		normalTwo = GetGradient(X + 1, Y + 0, Z + 0);
 
-		vertList[0] = VertexInterp(position[0], position[1], normalOne, normalTwo, infoNoise[0], infoNoise[1], 0, normList[0]);
+		vertList[0] = VertexInterp(position[0], position[1], normalOne, normalTwo, infoNoise[0], infoNoise[1], normList[0]);
 	}
 	if (edgeTable[cubeIndex] & 2)
 	{
@@ -147,7 +147,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
 		normalTwo = GetGradient(X + 1, Y + 1, Z + 0);
 
-		vertList[1] = VertexInterp(position[1], position[2], normalOne, normalTwo, infoNoise[1], infoNoise[2], 0, normList[1]);
+		vertList[1] = VertexInterp(position[1], position[2], normalOne, normalTwo, infoNoise[1], infoNoise[2], normList[1]);
 	}
 	if (edgeTable[cubeIndex] & 4)
 	{
@@ -156,7 +156,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
 		normalTwo = GetGradient(X + 0, Y + 1, Z + 0);
 
-		vertList[2] = VertexInterp(position[2], position[3], normalOne, normalTwo, infoNoise[2], infoNoise[3], 0, normList[2]);
+		vertList[2] = VertexInterp(position[2], position[3], normalOne, normalTwo, infoNoise[2], infoNoise[3], normList[2]);
 	}
 	if (edgeTable[cubeIndex] & 8)
 	{
@@ -165,7 +165,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
 		normalTwo = GetGradient(X + 0, Y + 0, Z + 0);
 
-		vertList[3] = VertexInterp(position[3], position[0], normalOne, normalTwo, infoNoise[3], infoNoise[0], 0, normList[3]);
+		vertList[3] = VertexInterp(position[3], position[0], normalOne, normalTwo, infoNoise[3], infoNoise[0], normList[3]);
 	}
 	if (edgeTable[cubeIndex] & 16)
 	{
@@ -174,7 +174,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 0, Z + 1);
 		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
 
-		vertList[4] = VertexInterp(position[4], position[5], normalOne, normalTwo, infoNoise[4], infoNoise[5], 0, normList[4]);
+		vertList[4] = VertexInterp(position[4], position[5], normalOne, normalTwo, infoNoise[4], infoNoise[5], normList[4]);
 	}
 	if (edgeTable[cubeIndex] & 32)
 	{
@@ -183,7 +183,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 0, Z + 1);
 		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
 
-		vertList[5] = VertexInterp(position[5], position[6], normalOne, normalTwo, infoNoise[5], infoNoise[6], 0, normList[5]);
+		vertList[5] = VertexInterp(position[5], position[6], normalOne, normalTwo, infoNoise[5], infoNoise[6], normList[5]);
 	}
 	if (edgeTable[cubeIndex] & 64)
 	{
@@ -192,7 +192,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 1, Z + 1);
 		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
 
-		vertList[6] = VertexInterp(position[6], position[7], normalOne, normalTwo, infoNoise[6], infoNoise[7], 0, normList[6]);
+		vertList[6] = VertexInterp(position[6], position[7], normalOne, normalTwo, infoNoise[6], infoNoise[7], normList[6]);
 	}
 	if (edgeTable[cubeIndex] & 128)
 	{
@@ -201,7 +201,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 1, Z + 1);
 		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
 
-		vertList[7] = VertexInterp(position[7], position[4], normalOne, normalTwo, infoNoise[7], infoNoise[4], 0, normList[7]);
+		vertList[7] = VertexInterp(position[7], position[4], normalOne, normalTwo, infoNoise[7], infoNoise[4], normList[7]);
 	}
 	if (edgeTable[cubeIndex] & 256)
 	{
@@ -210,7 +210,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
 		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
 
-		vertList[8] = VertexInterp(position[0], position[4], normalOne, normalTwo, infoNoise[0], infoNoise[4], 0, normList[8]);
+		vertList[8] = VertexInterp(position[0], position[4], normalOne, normalTwo, infoNoise[0], infoNoise[4], normList[8]);
 	}
 	if (edgeTable[cubeIndex] & 512)
 	{
@@ -219,7 +219,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
 		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
 
-		vertList[9] = VertexInterp(position[1], position[5], normalOne, normalTwo, infoNoise[1], infoNoise[5], 0, normList[9]);
+		vertList[9] = VertexInterp(position[1], position[5], normalOne, normalTwo, infoNoise[1], infoNoise[5], normList[9]);
 	}
 	if (edgeTable[cubeIndex] & 1024)
 	{
@@ -228,7 +228,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
 		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
 
-		vertList[10] = VertexInterp(position[2], position[6], normalOne, normalTwo, infoNoise[2], infoNoise[6], 0, normList[10]);
+		vertList[10] = VertexInterp(position[2], position[6], normalOne, normalTwo, infoNoise[2], infoNoise[6], normList[10]);
 	}
 	if (edgeTable[cubeIndex] & 2048)
 	{
@@ -237,7 +237,7 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
 		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
 
-		vertList[11] = VertexInterp(position[3], position[7], normalOne, normalTwo, infoNoise[3], infoNoise[7], 0, normList[11]);
+		vertList[11] = VertexInterp(position[3], position[7], normalOne, normalTwo, infoNoise[3], infoNoise[7], normList[11]);
 	}
 	//
 	FVector PositionGameWorld = World->TransferToGameWorld(Position);
@@ -495,10 +495,13 @@ float FVoxelMarchingCubesMesher::VoxelValueMin(float a, float b, float k)
 	return a * h + b * (1 - h) - k * h * (1.0 - h);
 }
 
-FVector FVoxelMarchingCubesMesher::VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, float Value, FVector& normalInst)
+FVector FVoxelMarchingCubesMesher::VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FVector& normalInst)
 {
 	float mu;
 	FVector P;
+
+	FColor d;
+	FColor s;
 
 	if (FMath::Abs(isolevel - P1Val) < 0.00001)
 		return P1;
@@ -511,13 +514,9 @@ FVector FVoxelMarchingCubesMesher::VertexInterp(FVector P1, FVector P2, FVector 
 
 	mu = (isolevel - P1Val) / (P2Val - P1Val);
 
-	P.X = P1.X + mu * (P2.X - P1.X);
-	P.Y = P1.Y + mu * (P2.Y - P1.Y);
-	P.Z = P1.Z + mu * (P2.Z - P1.Z);
+	P = P1 + mu * (P2 - P1);
 
-	normalInst.X = N1.X + mu * (N2.X - N1.X);
-	normalInst.Y = N1.Y + mu * (N2.Y - N1.Y);
-	normalInst.Z = N1.Z + mu * (N2.Z - N1.Z);
+	normalInst = N1 + mu * (N2 - N1);
 
 	return P;
 }

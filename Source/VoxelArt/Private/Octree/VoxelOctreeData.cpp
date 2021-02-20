@@ -158,9 +158,9 @@ void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector P, 
 			OwnDensity = true;
 			OwnColor = true;
 		}
-		TransferToLocal(World, P);
+		FIntVector LP = TransferToLocal(World, P);
 
-		DensityMap[World->GetIndex(P + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(P + FIntVector(1, 1, 1) * NORMAL)], Value);
+		DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Value);
 	}
 	else
 	{
@@ -178,9 +178,7 @@ void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector P, 
 
 	if (HasOwnDensity())
 	{
-		TransferToLocal(World, P);
-
-		Value = DensityMap[World->GetIndex(P + FIntVector(1, 1, 1) * NORMAL)];
+		Value = DensityMap[World->GetIndex(TransferToLocal(World, P) + FIntVector(1, 1, 1) * NORMAL)];
 	}
 	else
 	{
@@ -188,9 +186,7 @@ void FVoxelOctreeDensity::GetVoxelDensity(AVoxelLandscape* World, FIntVector P, 
 	}
 	if (HasOwnColor())
 	{
-		TransferToLocal(World, P);
-
-		Color = ColorMap[World->GetIndex(P + FIntVector(1, 1, 1) * NORMAL)];
+		Color = ColorMap[World->GetIndex(TransferToLocal(World, P) + FIntVector(1, 1, 1) * NORMAL)];
 	}
 	else
 	{
@@ -226,9 +222,9 @@ void FVoxelOctreeDensity::SetDefaultMap(AVoxelLandscape* World)
 	}
 }
 
-void FVoxelOctreeDensity::TransferToLocal(AVoxelLandscape* World, FIntVector& Position)
+FIntVector FVoxelOctreeDensity::TransferToLocal(AVoxelLandscape* World, FIntVector Position)
 {
-	Position = Position - this->Position + FIntVector(1, 1, 1) * Size / 2;
+	return Position - this->Position + FIntVector(1, 1, 1) * Size / 2;
 }
 
 FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority)

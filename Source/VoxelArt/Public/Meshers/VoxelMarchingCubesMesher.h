@@ -65,7 +65,7 @@ public:
 	float GetVoxelSize();
 	float GetVoxelSizeHalf();
 
-	FVector VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, float Value, FVector& normalInst);
+	FVector VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FVector& normalInst);
 
 	template<uint8 Direction>
 	void GeometryTransitionCubes(float radius);
