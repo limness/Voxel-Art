@@ -36,8 +36,10 @@ private:
 
 private:
 
-	FVector position[8];
-	float infoNoise[8];
+	FVector NormalsInfo[8];
+	FVector PositionInfo[8];
+	float DensityInfo[8];
+	FColor ColorInfo[8];
 
 	float isolevel = 0.f;
 
@@ -65,7 +67,7 @@ public:
 	float GetVoxelSize();
 	float GetVoxelSizeHalf();
 
-	FVector VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FVector& normalInst);
+	void ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color);
 
 	template<uint8 Direction>
 	void GeometryTransitionCubes(float radius);
@@ -74,7 +76,7 @@ public:
 	FIntVector TransferToDirection(FIntVector DirectionPosition, float Size);
 
 	template<uint8 Direction>
-	float GetValue(FColor& ColorMap, int X, int Y, int Size, int Steps, bool CurrentOctree);
+	float GetValue(FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree);
 
 	template<uint8 Direction>
 	FVector GetPosition(int X, int Y, int Size, int Steps);

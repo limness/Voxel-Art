@@ -93,10 +93,12 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					PositionGrid = PositionGrid - World->VoxelsPerChunk / 2;
 					PositionGrid = PositionGrid * VoxelSize;
 
-					infoNoise[i] = DensityMap[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
-					position[i] = PositionGrid;
+					PositionInfo[i] = PositionGrid;
+					NormalsInfo[i] = GetGradient(x + X, y + Y, z + Z);
+					DensityInfo[i] = DensityMap[World->GetIndex(FIntVector(x + X, y + Y, z + Z))];
+					ColorInfo[i] = ColorMap[World->GetIndex(FIntVector(x + X, y + Y, z + Z))];
 
-					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)] = position[i];
+					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)] = PositionInfo[i];
 				}
 
 				MarchingCubes(x, y, z);
@@ -119,125 +121,66 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 
 	FVector vertList[12];
 	FVector normList[12];
+	FColor colList[12];
 
-	if (infoNoise[0] < isolevel) cubeIndex |= 1;
-	if (infoNoise[1] < isolevel) cubeIndex |= 2;
-	if (infoNoise[2] < isolevel) cubeIndex |= 4;
-	if (infoNoise[3] < isolevel) cubeIndex |= 8;
-	if (infoNoise[4] < isolevel) cubeIndex |= 16;
-	if (infoNoise[5] < isolevel) cubeIndex |= 32;
-	if (infoNoise[6] < isolevel) cubeIndex |= 64;
-	if (infoNoise[7] < isolevel) cubeIndex |= 128;
+	if (DensityInfo[0] < isolevel) cubeIndex |= 1;
+	if (DensityInfo[1] < isolevel) cubeIndex |= 2;
+	if (DensityInfo[2] < isolevel) cubeIndex |= 4;
+	if (DensityInfo[3] < isolevel) cubeIndex |= 8;
+	if (DensityInfo[4] < isolevel) cubeIndex |= 16;
+	if (DensityInfo[5] < isolevel) cubeIndex |= 32;
+	if (DensityInfo[6] < isolevel) cubeIndex |= 64;
+	if (DensityInfo[7] < isolevel) cubeIndex |= 128;
 
 	if (edgeTable[cubeIndex] == 0) return;
 
 	if (edgeTable[cubeIndex] & 1)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
-		normalTwo = GetGradient(X + 1, Y + 0, Z + 0);
-
-		vertList[0] = VertexInterp(position[0], position[1], normalOne, normalTwo, infoNoise[0], infoNoise[1], normList[0]);
+		ValueInterp(PositionInfo[0], PositionInfo[1], NormalsInfo[0], NormalsInfo[1], DensityInfo[0], DensityInfo[1], ColorInfo[0], ColorInfo[1], vertList[0], normList[0], colList[0]);
 	}
 	if (edgeTable[cubeIndex] & 2)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
-		normalTwo = GetGradient(X + 1, Y + 1, Z + 0);
-
-		vertList[1] = VertexInterp(position[1], position[2], normalOne, normalTwo, infoNoise[1], infoNoise[2], normList[1]);
+		ValueInterp(PositionInfo[1], PositionInfo[2], NormalsInfo[1], NormalsInfo[2], DensityInfo[1], DensityInfo[2], ColorInfo[1], ColorInfo[2], vertList[1], normList[1], colList[1]);
 	}
 	if (edgeTable[cubeIndex] & 4)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
-		normalTwo = GetGradient(X + 0, Y + 1, Z + 0);
-
-		vertList[2] = VertexInterp(position[2], position[3], normalOne, normalTwo, infoNoise[2], infoNoise[3], normList[2]);
+		ValueInterp(PositionInfo[2], PositionInfo[3], NormalsInfo[2], NormalsInfo[3], DensityInfo[2], DensityInfo[3], ColorInfo[2], ColorInfo[3], vertList[2], normList[2], colList[2]);
 	}
 	if (edgeTable[cubeIndex] & 8)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
-		normalTwo = GetGradient(X + 0, Y + 0, Z + 0);
-
-		vertList[3] = VertexInterp(position[3], position[0], normalOne, normalTwo, infoNoise[3], infoNoise[0], normList[3]);
+		ValueInterp(PositionInfo[3], PositionInfo[0], NormalsInfo[3], NormalsInfo[0], DensityInfo[3], DensityInfo[0], ColorInfo[3], ColorInfo[0], vertList[3], normList[3], colList[3]);
 	}
 	if (edgeTable[cubeIndex] & 16)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 0, Z + 1);
-		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
-
-		vertList[4] = VertexInterp(position[4], position[5], normalOne, normalTwo, infoNoise[4], infoNoise[5], normList[4]);
+		ValueInterp(PositionInfo[4], PositionInfo[5], NormalsInfo[4], NormalsInfo[5], DensityInfo[4], DensityInfo[5], ColorInfo[4], ColorInfo[5], vertList[4], normList[4], colList[4]);
 	}
 	if (edgeTable[cubeIndex] & 32)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 0, Z + 1);
-		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
-
-		vertList[5] = VertexInterp(position[5], position[6], normalOne, normalTwo, infoNoise[5], infoNoise[6], normList[5]);
+		ValueInterp(PositionInfo[5], PositionInfo[6], NormalsInfo[5], NormalsInfo[6], DensityInfo[5], DensityInfo[6], ColorInfo[5], ColorInfo[6], vertList[5], normList[5], colList[5]);
 	}
 	if (edgeTable[cubeIndex] & 64)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 1, Z + 1);
-		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
-
-		vertList[6] = VertexInterp(position[6], position[7], normalOne, normalTwo, infoNoise[6], infoNoise[7], normList[6]);
+		ValueInterp(PositionInfo[6], PositionInfo[7], NormalsInfo[6], NormalsInfo[7], DensityInfo[6], DensityInfo[7], ColorInfo[6], ColorInfo[7], vertList[6], normList[6], colList[6]);
 	}
 	if (edgeTable[cubeIndex] & 128)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 1, Z + 1);
-		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
-
-		vertList[7] = VertexInterp(position[7], position[4], normalOne, normalTwo, infoNoise[7], infoNoise[4], normList[7]);
+		ValueInterp(PositionInfo[7], PositionInfo[4], NormalsInfo[7], NormalsInfo[4], DensityInfo[7], DensityInfo[4], ColorInfo[7], ColorInfo[4], vertList[7], normList[7], colList[7]);
 	}
 	if (edgeTable[cubeIndex] & 256)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
-		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
-
-		vertList[8] = VertexInterp(position[0], position[4], normalOne, normalTwo, infoNoise[0], infoNoise[4], normList[8]);
+		ValueInterp(PositionInfo[0], PositionInfo[4], NormalsInfo[0], NormalsInfo[4], DensityInfo[0], DensityInfo[4], ColorInfo[0], ColorInfo[4], vertList[8], normList[8], colList[8]);
 	}
 	if (edgeTable[cubeIndex] & 512)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
-		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
-
-		vertList[9] = VertexInterp(position[1], position[5], normalOne, normalTwo, infoNoise[1], infoNoise[5], normList[9]);
+		ValueInterp(PositionInfo[1], PositionInfo[5], NormalsInfo[1], NormalsInfo[5], DensityInfo[1], DensityInfo[5], ColorInfo[1], ColorInfo[5], vertList[9], normList[9], colList[9]);
 	}
 	if (edgeTable[cubeIndex] & 1024)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
-		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
-
-		vertList[10] = VertexInterp(position[2], position[6], normalOne, normalTwo, infoNoise[2], infoNoise[6], normList[10]);
+		ValueInterp(PositionInfo[2], PositionInfo[6], NormalsInfo[2], NormalsInfo[6], DensityInfo[2], DensityInfo[6], ColorInfo[2], ColorInfo[6], vertList[10], normList[10], colList[10]);
 	}
 	if (edgeTable[cubeIndex] & 2048)
 	{
-		FVector normalOne, normalTwo;
-
-		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
-		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
-
-		vertList[11] = VertexInterp(position[3], position[7], normalOne, normalTwo, infoNoise[3], infoNoise[7], normList[11]);
+		ValueInterp(PositionInfo[3], PositionInfo[7], NormalsInfo[3], NormalsInfo[7], DensityInfo[3], DensityInfo[7], ColorInfo[3], ColorInfo[7], vertList[11], normList[11], colList[11]);
 	}
 	//
 	FVector PositionGameWorld = World->TransferToGameWorld(Position);
@@ -247,17 +190,17 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		Vertices.Add(vertList[triTable[cubeIndex][i]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 0]].GetSafeNormal());
-		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
+		VertexColors.Add(colList[triTable[cubeIndex][i + 0]]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 1]].GetSafeNormal());
-		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
+		VertexColors.Add(colList[triTable[cubeIndex][i + 1]]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 2]].GetSafeNormal());
-		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
+		VertexColors.Add(colList[triTable[cubeIndex][i + 2]]);
 	}
 }
 
@@ -349,6 +292,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 				TArray<FVector> _VerticesTransition;
 				TArray<FVector> _NormalsTransition;
 				TArray<int32> _TrianglesTransition;
+				TArray<FColor> _ColorsTransition;
 
 				for (int i = 0; i < cellData.GetTriangleCount() * 3; i++)
 				{
@@ -366,11 +310,18 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 					FVector normalOne = normals[indexPointA];
 					FVector normalTwo = normals[indexPointB];
 
+					FColor colorOne = CornerColor[indexPointA];
+					FColor colorTwo = CornerColor[indexPointB];
+
 					FVector N = FVector(0.f, 0.f, 0.f);
-					FVector P = VertexInterp(positionA, positionB, normalOne, normalTwo, valueA, valueB, 0, N);
+					FVector P = FVector(0.f, 0.f, 0.f);
+					FColor C = FColor(77.f, 77.f, 77.f);
+					
+					ValueInterp(positionA, positionB, normalOne, normalTwo, valueA, valueB, colorOne, colorTwo, P, N, C);
 
 					_NormalsTransition.Add(N.GetSafeNormal());
 					_VerticesTransition.Add(P);
+					_ColorsTransition.Add(C);
 				}
 
 				if (convertTriangles)
@@ -397,7 +348,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 				for (int a = 0; a < _VerticesTransition.Num(); a++)
 				{
 					Vertices.Add(_VerticesTransition[a]);
-					VertexColors.Add(CornerColor[0]);
+					VertexColors.Add(_ColorsTransition[a]);
 				}
 				for (int j = 0; j < _NormalsTransition.Num(); j++)
 				{
@@ -415,7 +366,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 }
 
 template<uint8 Direction>
-float FVoxelMarchingCubesMesher::GetValue(FColor& ColorMap, int X, int Y, int Size, int Steps, bool CurrentOctree)
+float FVoxelMarchingCubesMesher::GetValue(FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree)
 {
 	float Value = 0.f;
 
@@ -424,12 +375,13 @@ float FVoxelMarchingCubesMesher::GetValue(FColor& ColorMap, int X, int Y, int Si
 		FIntVector LocalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0), Size);
 
 		Value = DensityMap[PositionToIndices(LocalPosition)];
+		Color = ColorMap[PositionToIndices(LocalPosition)];
 	}
 	else
 	{
 		FIntVector GlobalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
 
-		World->GetVoxelValue(GlobalPosition, Value, ColorMap);
+		World->GetVoxelValue(GlobalPosition, Value, Color);
 	}
 	return Value;
 }
@@ -495,30 +447,33 @@ float FVoxelMarchingCubesMesher::VoxelValueMin(float a, float b, float k)
 	return a * h + b * (1 - h) - k * h * (1.0 - h);
 }
 
-FVector FVoxelMarchingCubesMesher::VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FVector& normalInst)
+void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color)
 {
-	float mu;
-	FVector P;
-
-	FColor d;
-	FColor s;
-
 	if (FMath::Abs(isolevel - P1Val) < 0.00001)
-		return P1;
-
+	{
+		Vertex = P1;
+		return;
+	}
 	if (FMath::Abs(isolevel - P2Val) < 0.00001)
-		return P2;
-
+	{
+		Vertex = P2;
+		return;
+	}
 	if (FMath::Abs(P1Val - P2Val) < 0.00001)
-		return P1;
+	{
+		Vertex = P1;
+		return;
+	}
 
-	mu = (isolevel - P1Val) / (P2Val - P1Val);
+	float mu = (isolevel - P1Val) / (P2Val - P1Val);
 
-	P = P1 + mu * (P2 - P1);
+	Vertex = P1 + mu * (P2 - P1);
+	Normal = N1 + mu * (N2 - N1);
 
-	normalInst = N1 + mu * (N2 - N1);
-
-	return P;
+	Color.A = C1.A + mu * (C2.A - C1.A);
+	Color.B = C1.B + mu * (C2.B - C1.B);
+	Color.R = C1.R + mu * (C2.R - C1.R);
+	Color.G = C1.G + mu * (C2.G - C1.G);
 }
 
 float FVoxelMarchingCubesMesher::GetVoxelSize()

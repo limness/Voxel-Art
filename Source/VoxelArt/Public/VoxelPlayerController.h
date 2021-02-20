@@ -33,44 +33,34 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly)
 	bool EditorRemovePressed = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly)
 	bool EditorCreatePressed = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int positionVoxelX = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	float Radius = 20.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int positionVoxelY = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	bool Smooth = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int positionVoxelZ = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	float Strength = 0.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float rangeEditMax = 1200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	float MaxDictance = 5000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float rangeEdit = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	float SmoothInsert = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float editorSpeed = -1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
+	bool ColorEditor = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool smooth = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float strength = 0.5f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float dictance = 5000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float smoothInsert = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
+	FColor Color = FColor(77.f, 77.f, 77.f);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius);
-	//void ChangeChunk(AVoxelLandscape* terrain, AVoxelChunk* chunkCenter, FVector hitPosition, float range, float volume, bool sphereMinus);
+	void ChangeWorld(AVoxelLandscape* World, FVector HitPosition, float Radius);
 
 };

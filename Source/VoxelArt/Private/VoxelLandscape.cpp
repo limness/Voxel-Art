@@ -521,7 +521,6 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 
 void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value, FColor& Color)
 {
-	//SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Size / 2.f, 30.f, FColor::Red);
 	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value, Color);
 }
 

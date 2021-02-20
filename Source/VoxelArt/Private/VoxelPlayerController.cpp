@@ -56,11 +56,11 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					ChangeChunk(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location, rangeEdit);
+					ChangeWorld(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location, Radius);
 				}
 			}
 		}
-		if (!smooth)
+		if (!Smooth)
 		{
 			EditorRemovePressed ? EditorRemovePressed = false : EditorCreatePressed = false;
 		}
@@ -69,9 +69,9 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 
 #include "DrawDebugHelpers.h"
 
-void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosition, float Radius)
+void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosition, float Radius)
 {
-	int radius = FMath::CeilToInt(Radius);
+	int VoxelsRadius = FMath::CeilToInt(Radius);
 	float CurrentValue = 0.f;
 
 	if (World)
@@ -80,20 +80,20 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 		{
 			World->OctreeMutex.Lock();
 
-			for (int Z = -15; Z <= 15; Z++)
+			for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 			{
-				for (int Y = -15; Y <= 15; Y++)
+				for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
 				{
-					for (int X = -15; X <= 15; X++)
+					for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 					{
 						FVector PositionVoxel = FVector(X, Y, Z);
-						float ValueSphere = 14.5f - PositionVoxel.Size();
+						float offset = 0.001f;
+						float ValueSphere = Radius - offset - PositionVoxel.Size();
 						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
-						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
 					}
 				}
 			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), 35);
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius);
 			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
 
 			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
@@ -105,7 +105,6 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 					if (IsValid(Octant->Data->Chunk))
 					{
 						World->PutChunkOnGeneration(Octant->Data);
-						//World->ChunksGeneration.Add(Octant->Data);
 					}
 				}
 			}
