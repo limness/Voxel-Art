@@ -88,15 +88,28 @@ void AVoxelPlayerController::ChangeChunk(AVoxelLandscape* World, FVector HitPosi
 					{
 						FVector PositionVoxel = FVector(X, Y, Z);
 						float ValueSphere = 14.5f - PositionVoxel.Size();
-						//World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
+						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
 						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(PositionVoxel), 10, FColor::Red, false, 25);
 					}
 				}
 			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), 25);
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), 35);
 			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
 
 			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
+
+			for (auto& Octant : OverlapOctants)
+			{
+				if (Octant->Data != nullptr)
+				{
+					if (IsValid(Octant->Data->Chunk))
+					{
+						World->PutChunkOnGeneration(Octant->Data);
+						//World->ChunksGeneration.Add(Octant->Data);
+					}
+				}
+			}
+
 			World->OctreeMutex.Unlock();
 		}
 	}

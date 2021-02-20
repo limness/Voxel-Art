@@ -14,7 +14,7 @@ FVoxelCollisionBox::FVoxelCollisionBox(AVoxelLandscape* _World, FIntVector _Posi
 	, Size(_Size)
 	, World(_World)
 {
-	World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Red);
+	//World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Red);
 }
 
 FVoxelCollisionBox::~FVoxelCollisionBox()
@@ -53,17 +53,21 @@ bool FVoxelCollisionBox::BoxOverlapOctree(TSharedPtr<FVoxelOctreeData> CurrentOc
 	int CorenerY = 0;
 	int CorenerZ = 0;
 
-	if (GetMinimumCorner().X > CurrentOctant->GetMaximumCorner().X || GetMaximumCorner().X > CurrentOctant->GetMinimumCorner().X)
+	if ((GetMinimumCorner().X > CurrentOctant->GetMaximumCorner().X) ^ (GetMaximumCorner().X > CurrentOctant->GetMinimumCorner().X))
 	{
 		CorenerX = 1;
 	}
-	if (GetMinimumCorner().Y > CurrentOctant->GetMaximumCorner().Y || GetMaximumCorner().Y > CurrentOctant->GetMinimumCorner().Y)
+	if ((GetMinimumCorner().Y > CurrentOctant->GetMaximumCorner().Y) ^ (GetMaximumCorner().Y > CurrentOctant->GetMinimumCorner().Y))
 	{
 		CorenerY = 1; 
+	}
+	if ((GetMinimumCorner().Z > CurrentOctant->GetMaximumCorner().Z) ^ (GetMaximumCorner().Z > CurrentOctant->GetMinimumCorner().Z))
+	{
+		CorenerZ = 1;
 	}
 	/*if (CurrentOctant->GetMinimumCorner().Z > GetMaximumCorner().Z || CurrentOctant->GetMaximumCorner().Z > GetMinimumCorner().Z)
 	{
 		CorenerZ = true;
 	}*/
-	return CorenerX + CorenerY == 2;
+	return CorenerX + CorenerY + CorenerZ == 3;
 }

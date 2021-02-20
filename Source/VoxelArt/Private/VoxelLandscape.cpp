@@ -542,8 +542,8 @@ void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Value)
 
 void AVoxelLandscape::GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree)
 {
-	DrawDebugPoint(GetWorld(), TransferToGameWorld(CurrentOctree->GetMinimumCorner()), 80, FColor::Green, false, 25);
-	DrawDebugPoint(GetWorld(), TransferToGameWorld(CurrentOctree->GetMaximumCorner()), 80, FColor::Green, false, 25);
+	//DrawDebugPoint(GetWorld(), TransferToGameWorld(CurrentOctree->GetMinimumCorner()), 80, FColor::Green, false, 25);
+	//DrawDebugPoint(GetWorld(), TransferToGameWorld(CurrentOctree->GetMaximumCorner()), 80, FColor::Green, false, 25);
 
 	if (Box.BoxOverlapOctree(CurrentOctree))
 	{
@@ -556,7 +556,8 @@ void AVoxelLandscape::GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVo
 		}
 		else
 		{
-			SpawnBoxTest(TransferToGameWorld(CurrentOctree->Position), CurrentOctree->Size / 2.f * VoxelMin, 400.f, FColor::Green);
+			OverlapingOctree.Add(CurrentOctree);
+		//	SpawnBoxTest(TransferToGameWorld(CurrentOctree->Position), CurrentOctree->Size / 2.f * VoxelMin, 80.f, FColor::Green);
 
 			//UE_LOG(VoxelArt, Warning, TEXT("No children"));
 		}
