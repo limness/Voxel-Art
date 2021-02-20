@@ -139,24 +139,13 @@ float UVoxelLandscapeGenerator::GetDensityMap(const FIntVector& CellPosition)
 	return TextureHeightMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : ((CellPosition.Z + Height) + offset);
 }
 
-FColor UVoxelLandscapeGenerator::GetColorMap(const FVector& CellPosition)
+FColor UVoxelLandscapeGenerator::GetColorMap(const FIntVector& CellPosition)
 {
-	FColor color = FColor(121.f, 121.f, 121.f);
+	FColor color = FColor(77.f, 77.f, 77.f);
 
 	if (TextureColorMap.Num() > 0)
 	{
 		color = GetColormapData(CellPosition.X, CellPosition.Y, CellPosition.Z);
-	}
-	else
-	{
-		if (VectorDistanceAB(FVector(CellPosition.X, CellPosition.Y, CellPosition.Z), FVector(0, 0, 0)) > 60000.0f)
-		{
-			color = FColor(255, 18, 10);
-		}
-		else
-		{
-			color = FColor(128, 223, 255);
-		}
 	}
 	return color;
 }

@@ -377,7 +377,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 					if (PixelColorWB == 191)
 					{
-						FColor PixelColorRGB = GeneratorDensity->GetColorMap(FVector(
+						/*FColor PixelColorRGB = GeneratorDensity->GetColorMap(FVector(
 							static_cast<float>((x - width * 0.5f) * StepTexture),
 							static_cast<float>((y - height * 0.5f) * StepTexture),
 							0
@@ -386,7 +386,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 						pixels[y * 4 * width + x * 4 + 0] = PixelColorRGB.R; // R
 						pixels[y * 4 * width + x * 4 + 1] = PixelColorRGB.G; // G
 						pixels[y * 4 * width + x * 4 + 2] = PixelColorRGB.B; // B
-						pixels[y * 4 * width + x * 4 + 3] = PixelColorRGB.A; // A
+						pixels[y * 4 * width + x * 4 + 3] = PixelColorRGB.A; // A*/
 					}
 					else
 					{
@@ -519,10 +519,10 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 	}
 }
 
-void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value)
+void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value, FColor& Color)
 {
 	//SpawnBoxTest(CurrentOctantTest->Position, CurrentOctantTest->Size / 2.f, 30.f, FColor::Red);
-	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value);
+	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value, Color);
 }
 
 FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector P)

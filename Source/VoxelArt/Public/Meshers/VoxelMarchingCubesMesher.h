@@ -32,6 +32,7 @@ private:
 	FIntVector Position;
 	uint8 TransitionSides;
 	TArray<float> DensityMap;
+	TArray<FColor> ColorMap;
 
 private:
 
@@ -56,7 +57,7 @@ public:
 
 	void GenerateMarchingCubesMesh();
 
-	void MarchingCubes(int indexGrid, int x, int y, int z, int normalIndex);
+	void MarchingCubes(int x, int y, int z);
 
 	FVector GetGradient(int x, int y, int z);
 	FVector GetGradient(FIntVector map);
@@ -65,7 +66,6 @@ public:
 	float GetVoxelSizeHalf();
 
 	FVector VertexInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, float Value, FVector& normalInst);
-	FVector VertexInterpTransition(FVector P1, FVector P2, float P1Val, float P2Val, float Value);
 
 	template<uint8 Direction>
 	void GeometryTransitionCubes(float radius);
@@ -74,7 +74,7 @@ public:
 	FIntVector TransferToDirection(FIntVector DirectionPosition, float Size);
 
 	template<uint8 Direction>
-	float GetValue(int X, int Y, int Size, int Steps, bool CurrentOctree);
+	float GetValue(FColor& ColorMap, int X, int Y, int Size, int Steps, bool CurrentOctree);
 
 	template<uint8 Direction>
 	FVector GetPosition(int X, int Y, int Size, int Steps);

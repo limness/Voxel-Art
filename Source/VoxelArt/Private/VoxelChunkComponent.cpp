@@ -72,6 +72,7 @@ void FMesherAsyncTask::DoWork()
 		return X + Y * (Data->Voxels + 1 + NORMALS) + Z * (Data->Voxels + 1 + NORMALS) * (Data->Voxels + 1 + NORMALS);
 	};
 	Data->DensityMap.Init(-1.0, FMath::Pow((Data->Voxels + 1 + NORMALS), 3));
+	Data->ColorMap.Init(FColor(77.f, 77.f, 77.f), FMath::Pow((Data->Voxels + 1 + NORMALS), 3));
 
 	int VoxelSteps = (Data->Size / Data->Voxels);
 
@@ -85,9 +86,12 @@ void FMesherAsyncTask::DoWork()
 				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMAL) * VoxelSteps;
 
 				float Value = -1.f;
-				World->GetVoxelValue(DensityLocation, Value);
+				FColor Color = FColor(77.f, 77.f, 77.f);
+
+				World->GetVoxelValue(DensityLocation, Value, Color);
 
 				Data->DensityMap[GetIndex(X, Y, Z)] = Value;
+				Data->ColorMap[GetIndex(X, Y, Z)] = Color;
 			}
 		}
 	}

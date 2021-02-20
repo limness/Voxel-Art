@@ -24,7 +24,7 @@
 /wd4838
 /we4668
 /I .
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Private"
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Private
 /I ..\Intermediate\Build\Win64\UE4Editor\Inc\CoreUObject
 /I Runtime
 /I Runtime\CoreUObject\Public
@@ -413,31 +413,31 @@
 /I ThirdParty
 /I ThirdParty\libSampleRate\Public
 /I ThirdParty\libSampleRate
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Editor"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Helpers"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Importers"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Meshers"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Octree"
-/I "D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Source\VoxelArt\Public\Renders"
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Inc\VoxelArt
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Editor
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Helpers
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Importers
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Meshers
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Octree
+/I E:\Projects\TestPlugin\Plugins\VoxelArt\Source\VoxelArt\Public\Renders
 /I ..\Plugins\Runtime\ProceduralMeshComponent\Intermediate\Build\Win64\UE4Editor\Inc\ProceduralMeshComponent
 /I ..\Plugins\Runtime\ProceduralMeshComponent\Source
 /I ..\Plugins\Runtime\ProceduralMeshComponent\Source\ProceduralMeshComponent\Public
 /I ..\Plugins\Runtime\ProceduralMeshComponent\Source\ProceduralMeshComponent
-/I "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\INCLUDE"
+/I "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\INCLUDE"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt"
-/FI"D:\Unreal Projects\Voxel\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h"
-/Yu"D:\Unreal Projects\Voxel\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h"
-/Fp"D:\Unreal Projects\Voxel\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h.pch"
-"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp"
-/FI"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Definitions.VoxelArt.h"
-/Fo"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp.obj"
+/FI"E:\Projects\TestPlugin\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h"
+/Yu"E:\Projects\TestPlugin\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h"
+/Fp"E:\Projects\TestPlugin\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h.pch"
+"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp"
+/FI"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Definitions.VoxelArt.h"
+/Fo"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp.obj"
 /TP
 /GR-
 /W4

@@ -75,8 +75,8 @@ public:
 
 public:
 
-	TArray<float> DensityMap = TArray <float>();
-	//FVoxelOctreeDensity* DensityOctant = nullptr;
+	TArray<float> DensityMap;
+	TArray<FColor> ColorMap;
 
 public:
 
@@ -103,12 +103,14 @@ public:
 	uint8 Depth = 0;
 
 	int Size = 0;
-	FIntVector Position = FIntVector(0, 0, 0);
-	TArray<float> DensityMap = TArray <float>();
+	FIntVector Position;
+	TArray<float> DensityMap;
+	TArray<FColor> ColorMap;
 
 private:
 
 	bool OwnDensity = false;
+	bool OwnColor = false;
 
 public:
 
@@ -123,17 +125,18 @@ public:
 
 	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector P, float Value);
 
-	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value);
+	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
 
 	void TransferToLocal(AVoxelLandscape* World, FIntVector& Position);
 
 	inline bool HasOwnDensity() { return OwnDensity; }
+	inline bool HasOwnColor() { return OwnColor; }
 
 	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
 
 	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
 
-	void SetDefaultDensityMap(AVoxelLandscape* World);
+	void SetDefaultMap(AVoxelLandscape* World);
 
 public:
 	FVoxelOctreeDensity(UVoxelLandscapeGenerator* _WorldGenerator, uint8 _Depth, int _Size, FIntVector _Position);

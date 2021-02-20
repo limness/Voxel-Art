@@ -13,15 +13,13 @@ FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelLandscape* _World, FV
 	, Position(_Data->Position)
 	, TransitionSides(_Data->TransitionSides)
 	, DensityMap(_Data->DensityMap)
+	, ColorMap(_Data->ColorMap)
 {
 }
 
 FVoxelMarchingCubesMesher::~FVoxelMarchingCubesMesher()
 {
 }
-
-
-//Voxels << Depth = Size World
 
 #include "DrawDebugHelpers.h"
 
@@ -35,10 +33,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 
 	positionSide.Init(FVector(0, 0, 0), (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS));
 
-	int normalIndex = 0;
-
-	int VoxelSize = (Size / Voxels) * World->VoxelMin;//World->VoxelMin * (1 << (World->MaximumLOD - Depth));//GetVoxelSize();
-	//int SizeVoxel = (1 << (World->MaximumLOD - Depth));
+	int VoxelSize = (Size / Voxels) * World->VoxelMin;
 
 	FVector firstPoint, lastPoint;
 
@@ -50,7 +45,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					int X = (i + 1) % 4 / 2; //inverse tri
+					int X = (i + 1) % 4 / 2;
 					int Y = i % 4 / 2;
 					int Z = (i / 4);
 
@@ -104,9 +99,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)] = position[i];
 				}
 
-				MarchingCubes(x + y * (Voxels + 1 + NORMALS) + z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS), x, y, z, normalIndex);
-
-				normalIndex++;
+				MarchingCubes(x, y, z);
 			}
 		}
 	}
@@ -120,7 +113,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 	positionSide.Empty();
 }
 
-void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z, int normalIndex)
+void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 {
 	int cubeIndex = 0;
 
@@ -142,8 +135,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 0);
-		normalTwo = GetGradient(x + 1, y + 0, z + 0);
+		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
+		normalTwo = GetGradient(X + 1, Y + 0, Z + 0);
 
 		vertList[0] = VertexInterp(position[0], position[1], normalOne, normalTwo, infoNoise[0], infoNoise[1], 0, normList[0]);
 	}
@@ -151,8 +144,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 0);
-		normalTwo = GetGradient(x + 1, y + 1, z + 0);
+		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
+		normalTwo = GetGradient(X + 1, Y + 1, Z + 0);
 
 		vertList[1] = VertexInterp(position[1], position[2], normalOne, normalTwo, infoNoise[1], infoNoise[2], 0, normList[1]);
 	}
@@ -160,8 +153,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 0);
-		normalTwo = GetGradient(x + 0, y + 1, z + 0);
+		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
+		normalTwo = GetGradient(X + 0, Y + 1, Z + 0);
 
 		vertList[2] = VertexInterp(position[2], position[3], normalOne, normalTwo, infoNoise[2], infoNoise[3], 0, normList[2]);
 	}
@@ -169,8 +162,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 0);
-		normalTwo = GetGradient(x + 0, y + 0, z + 0);
+		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
+		normalTwo = GetGradient(X + 0, Y + 0, Z + 0);
 
 		vertList[3] = VertexInterp(position[3], position[0], normalOne, normalTwo, infoNoise[3], infoNoise[0], 0, normList[3]);
 	}
@@ -178,8 +171,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 1);
-		normalTwo = GetGradient(x + 1, y + 0, z + 1);
+		normalOne = GetGradient(X + 0, Y + 0, Z + 1);
+		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
 
 		vertList[4] = VertexInterp(position[4], position[5], normalOne, normalTwo, infoNoise[4], infoNoise[5], 0, normList[4]);
 	}
@@ -187,8 +180,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 1);
-		normalTwo = GetGradient(x + 1, y + 1, z + 1);
+		normalOne = GetGradient(X + 1, Y + 0, Z + 1);
+		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
 
 		vertList[5] = VertexInterp(position[5], position[6], normalOne, normalTwo, infoNoise[5], infoNoise[6], 0, normList[5]);
 	}
@@ -196,8 +189,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 1);
-		normalTwo = GetGradient(x + 0, y + 1, z + 1);
+		normalOne = GetGradient(X + 1, Y + 1, Z + 1);
+		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
 
 		vertList[6] = VertexInterp(position[6], position[7], normalOne, normalTwo, infoNoise[6], infoNoise[7], 0, normList[6]);
 	}
@@ -205,8 +198,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 1);
-		normalTwo = GetGradient(x + 0, y + 0, z + 1);
+		normalOne = GetGradient(X + 0, Y + 1, Z + 1);
+		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
 
 		vertList[7] = VertexInterp(position[7], position[4], normalOne, normalTwo, infoNoise[7], infoNoise[4], 0, normList[7]);
 	}
@@ -214,8 +207,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 0, z + 0);
-		normalTwo = GetGradient(x + 0, y + 0, z + 1);
+		normalOne = GetGradient(X + 0, Y + 0, Z + 0);
+		normalTwo = GetGradient(X + 0, Y + 0, Z + 1);
 
 		vertList[8] = VertexInterp(position[0], position[4], normalOne, normalTwo, infoNoise[0], infoNoise[4], 0, normList[8]);
 	}
@@ -223,8 +216,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 0, z + 0);
-		normalTwo = GetGradient(x + 1, y + 0, z + 1);
+		normalOne = GetGradient(X + 1, Y + 0, Z + 0);
+		normalTwo = GetGradient(X + 1, Y + 0, Z + 1);
 
 		vertList[9] = VertexInterp(position[1], position[5], normalOne, normalTwo, infoNoise[1], infoNoise[5], 0, normList[9]);
 	}
@@ -232,8 +225,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 1, y + 1, z + 0);
-		normalTwo = GetGradient(x + 1, y + 1, z + 1);
+		normalOne = GetGradient(X + 1, Y + 1, Z + 0);
+		normalTwo = GetGradient(X + 1, Y + 1, Z + 1);
 
 		vertList[10] = VertexInterp(position[2], position[6], normalOne, normalTwo, infoNoise[2], infoNoise[6], 0, normList[10]);
 	}
@@ -241,8 +234,8 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 	{
 		FVector normalOne, normalTwo;
 
-		normalOne = GetGradient(x + 0, y + 1, z + 0);
-		normalTwo = GetGradient(x + 0, y + 1, z + 1);
+		normalOne = GetGradient(X + 0, Y + 1, Z + 0);
+		normalTwo = GetGradient(X + 0, Y + 1, Z + 1);
 
 		vertList[11] = VertexInterp(position[3], position[7], normalOne, normalTwo, infoNoise[3], infoNoise[7], 0, normList[11]);
 	}
@@ -254,17 +247,17 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int indexGrid, int x, int y, int z
 		Vertices.Add(vertList[triTable[cubeIndex][i]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 0]].GetSafeNormal());
-		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 0]] + PositionGameWorld));
+		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
 		Normals.Add(normList[triTable[cubeIndex][i + 1]].GetSafeNormal());
-		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 1]] + PositionGameWorld));
+		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
-		VertexColors.Add(GeneratorLandscape->GetColorMap(vertList[triTable[cubeIndex][i + 2]] + PositionGameWorld));
 		Normals.Add(normList[triTable[cubeIndex][i + 2]].GetSafeNormal());
+		VertexColors.Add(ColorMap[World->GetIndex(FIntVector(X, Y, Z))]);
 	}
 }
 
@@ -277,7 +270,8 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 
 	FVector PositionGameWorld = World->TransferToGameWorld(Position);
 
-	float cornerNoise[13];
+	FColor CornerColor[13];
+	float CornerNoise[13];
 
 	int VoxelSteps = (Size / Voxels);
 
@@ -285,31 +279,31 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 	{
 		for (int y = 0; y < Voxels; y++)
 		{
-			cornerNoise[0] = GetValue<Direction>(x * 2 + 0, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 0 - 9
-			cornerNoise[1] = GetValue<Direction>(x * 2 + 1, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 1
-			cornerNoise[2] = GetValue<Direction>(x * 2 + 2, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 2 - A
-			cornerNoise[3] = GetValue<Direction>(x * 2 + 0, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 3
-			cornerNoise[4] = GetValue<Direction>(x * 2 + 1, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 4
-			cornerNoise[5] = GetValue<Direction>(x * 2 + 2, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 5
-			cornerNoise[6] = GetValue<Direction>(x * 2 + 0, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 6 - B
-			cornerNoise[7] = GetValue<Direction>(x * 2 + 1, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 7
-			cornerNoise[8] = GetValue<Direction>(x * 2 + 2, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 8 - C
+			CornerNoise[0] = GetValue<Direction>(CornerColor[0], x * 2 + 0, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 0 - 9
+			CornerNoise[1] = GetValue<Direction>(CornerColor[1], x * 2 + 1, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 1
+			CornerNoise[2] = GetValue<Direction>(CornerColor[2], x * 2 + 2, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 2 - A
+			CornerNoise[3] = GetValue<Direction>(CornerColor[3], x * 2 + 0, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 3
+			CornerNoise[4] = GetValue<Direction>(CornerColor[4], x * 2 + 1, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 4
+			CornerNoise[5] = GetValue<Direction>(CornerColor[5], x * 2 + 2, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 5
+			CornerNoise[6] = GetValue<Direction>(CornerColor[6], x * 2 + 0, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 6 - B
+			CornerNoise[7] = GetValue<Direction>(CornerColor[7], x * 2 + 1, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 7
+			CornerNoise[8] = GetValue<Direction>(CornerColor[8], x * 2 + 2, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 8 - C
 
-			cornerNoise[9] =  GetValue<Direction>(x + 0, y + 0, Voxels + 0, VoxelSteps, true);	// 9
-			cornerNoise[10] = GetValue<Direction>(x + 1, y + 0, Voxels + 0, VoxelSteps, true);	// A
-			cornerNoise[11] = GetValue<Direction>(x + 0, y + 1, Voxels + 0, VoxelSteps, true);	// B
-			cornerNoise[12] = GetValue<Direction>(x + 1, y + 1, Voxels + 0, VoxelSteps, true);	// C
+			CornerNoise[9] =  GetValue<Direction>(CornerColor[9], x + 0, y + 0, Voxels + 0, VoxelSteps, true);	// 9
+			CornerNoise[10] = GetValue<Direction>(CornerColor[10], x + 1, y + 0, Voxels + 0, VoxelSteps, true);	// A
+			CornerNoise[11] = GetValue<Direction>(CornerColor[11], x + 0, y + 1, Voxels + 0, VoxelSteps, true);	// B
+			CornerNoise[12] = GetValue<Direction>(CornerColor[12], x + 1, y + 1, Voxels + 0, VoxelSteps, true);	// C
 
 			uint32 caseValue =
-				((cornerNoise[0] < 0.f) << 0)
-				| ((cornerNoise[1] < 0.f) << 1)
-				| ((cornerNoise[2] < 0.f) << 2)
-				| ((cornerNoise[5] < 0.f) << 3)
-				| ((cornerNoise[8] < 0.f) << 4)
-				| ((cornerNoise[7] < 0.f) << 5)
-				| ((cornerNoise[6] < 0.f) << 6)
-				| ((cornerNoise[3] < 0.f) << 7)
-				| ((cornerNoise[4] < 0.f) << 8);
+				((CornerNoise[0] < 0.f) << 0)
+				| ((CornerNoise[1] < 0.f) << 1)
+				| ((CornerNoise[2] < 0.f) << 2)
+				| ((CornerNoise[5] < 0.f) << 3)
+				| ((CornerNoise[8] < 0.f) << 4)
+				| ((CornerNoise[7] < 0.f) << 5)
+				| ((CornerNoise[6] < 0.f) << 6)
+				| ((CornerNoise[3] < 0.f) << 7)
+				| ((CornerNoise[4] < 0.f) << 8);
 
 			if (caseValue != 0 && caseValue != 511)
 			{
@@ -366,8 +360,8 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 					FVector positionA = cornerPosition[indexPointA];
 					FVector positionB = cornerPosition[indexPointB];
 
-					float valueA = cornerNoise[indexPointA];
-					float valueB = cornerNoise[indexPointB];
+					float valueA = CornerNoise[indexPointA];
+					float valueB = CornerNoise[indexPointB];
 
 					FVector normalOne = normals[indexPointA];
 					FVector normalTwo = normals[indexPointB];
@@ -403,7 +397,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 				for (int a = 0; a < _VerticesTransition.Num(); a++)
 				{
 					Vertices.Add(_VerticesTransition[a]);
-					VertexColors.Add(GeneratorLandscape->GetColorMap(_VerticesTransition[a] + PositionGameWorld));
+					VertexColors.Add(CornerColor[0]);
 				}
 				for (int j = 0; j < _NormalsTransition.Num(); j++)
 				{
@@ -421,7 +415,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 }
 
 template<uint8 Direction>
-float FVoxelMarchingCubesMesher::GetValue(int X, int Y, int Size, int Steps, bool CurrentOctree)
+float FVoxelMarchingCubesMesher::GetValue(FColor& ColorMap, int X, int Y, int Size, int Steps, bool CurrentOctree)
 {
 	float Value = 0.f;
 
@@ -435,7 +429,7 @@ float FVoxelMarchingCubesMesher::GetValue(int X, int Y, int Size, int Steps, boo
 	{
 		FIntVector GlobalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
 
-		World->GetVoxelValue(GlobalPosition, Value);
+		World->GetVoxelValue(GlobalPosition, Value, ColorMap);
 	}
 	return Value;
 }
@@ -450,10 +444,7 @@ FVector FVoxelMarchingCubesMesher::GetPosition(int X, int Y, int Size, int Steps
 
 FORCEINLINE int FVoxelMarchingCubesMesher::PositionToIndices(FIntVector Position)
 {
-	return 
-		(Position.X + NORMAL) +
-		(Position.Y + NORMAL) * (Voxels + 1 + NORMALS) +
-		(Position.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
+	return (Position.X + NORMAL) + (Position.Y + NORMAL) * (Voxels + 1 + NORMALS) + (Position.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
 }
 
 template<uint8 Direction>
@@ -527,27 +518,6 @@ FVector FVoxelMarchingCubesMesher::VertexInterp(FVector P1, FVector P2, FVector 
 	normalInst.X = N1.X + mu * (N2.X - N1.X);
 	normalInst.Y = N1.Y + mu * (N2.Y - N1.Y);
 	normalInst.Z = N1.Z + mu * (N2.Z - N1.Z);
-
-	return P;
-}
-
-FVector FVoxelMarchingCubesMesher::VertexInterpTransition(FVector P1, FVector P2, float P1Val, float P2Val, float Value)
-{
-	float mu;
-	FVector P;
-
-	if (FMath::Abs(Value - P1Val) < 0.00001)
-		return P1;
-
-	if (FMath::Abs(Value - P2Val) < 0.00001)
-		return P2;
-
-	if (FMath::Abs(P1Val - P2Val) < 0.00001)
-		return P1;
-
-	mu = (Value - P1Val) / (P2Val - P1Val);
-
-	P = P1 + mu * (P2 - P1);
 
 	return P;
 }

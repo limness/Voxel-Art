@@ -58,7 +58,7 @@ private:
 public:
 
 	float GetDensityMap(const FIntVector& CellPosition);
-	FColor GetColorMap(const FVector& CellPosition);
+	FColor GetColorMap(const FIntVector& CellPosition);
 
 private:
 
