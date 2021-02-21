@@ -76,7 +76,7 @@ void FMesherAsyncTask::DoWork()
 
 	int VoxelSteps = (Data->Size / Data->Voxels);
 
-	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
+	/*for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
 	{
 		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS; Y++)
 		{
@@ -94,7 +94,7 @@ void FMesherAsyncTask::DoWork()
 				Data->ColorMap[GetIndex(X, Y, Z)] = Color;
 			}
 		}
-	}
+	}*/
 
 	FVoxelMarchingCubesMesher* mesher = new FVoxelMarchingCubesMesher(World, Data);
 	mesher->GenerateMarchingCubesMesh();

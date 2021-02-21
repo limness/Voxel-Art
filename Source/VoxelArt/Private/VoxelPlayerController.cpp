@@ -152,7 +152,7 @@ void AVoxelPlayerController::ChangeWorldColor(AVoxelLandscape* World, FVector Hi
 					}
 				}
 			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius + 1);
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
 			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
 
 			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);

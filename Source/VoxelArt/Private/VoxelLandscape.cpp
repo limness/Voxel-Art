@@ -61,20 +61,15 @@ void AVoxelLandscape::CreateVoxelWorld()
 		}
 		else
 		{
-			ThreadPool->Create(4, 64 * 1024);
-
 			if (TerrainCreated)
 			{
 				DestroyVoxelWorld();
 			}
-			/*float RadiusHeighestVoxel = WorldSize / (float)VoxelsPerChunk * 2.f;
-
-			for (int i = 0; i < MaximumLOD; i++)
-			{
-				RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
-			}*/
-			SetActorScale3D(FVector(128.f, 128.f, 128.f));
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
+
+			ThreadPool->Create(3, 64 * 1024);
+			SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
+
 			GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
 
@@ -304,6 +299,7 @@ void AVoxelLandscape::UpdateWorld()
 	{
 		Chunk->ClearAllMeshSections();
 	}
+	GeneratorLandscape->GeneratorInit();
 	GetLeavesAndQueueToGeneration(MainOctree);
 	OctreeMutex.Unlock();
 }

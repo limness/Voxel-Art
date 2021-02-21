@@ -49,7 +49,7 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					int Y = i % 4 / 2;
 					int Z = (i / 4);
 
-					uint8 localMinimumX = (uint8)((x + X - NORMAL == 0) << 0);
+					/*uint8 localMinimumX = (uint8)((x + X - NORMAL == 0) << 0);
 					uint8 localMaximumX = (uint8)((x + X - NORMAL == Voxels - 0) << 1);
 
 					uint8 localMinimumY = (uint8)((y + Y - NORMAL == 0) << 2);
@@ -91,12 +91,12 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 					
 					FVector PositionGrid = FVector(x + X + transitionX, y + Y + transitionY, z + Z + transitionZ) - NORMAL;
 					PositionGrid = PositionGrid - World->VoxelsPerChunk / 2;
-					PositionGrid = PositionGrid * VoxelSize;
+					PositionGrid = PositionGrid * VoxelSize;*/
 
-					PositionInfo[i] = PositionGrid;
+					PositionInfo[i] = FVector(0, 0, 0);//PositionGrid;
 					NormalsInfo[i] = GetGradient(x + X, y + Y, z + Z);
 					DensityInfo[i] = DensityMap[World->GetIndex(FIntVector(x + X, y + Y, z + Z))];
-					ColorInfo[i] = ColorMap[World->GetIndex(FIntVector(x + X, y + Y, z + Z))];
+					//ColorInfo[i] = ColorMap[World->GetIndex(FIntVector(x + X, y + Y, z + Z))];
 
 					positionSide[(x + X) + (y + Y) * (Voxels + 1 + NORMALS) + (z + Z) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)] = PositionInfo[i];
 				}
@@ -105,12 +105,12 @@ void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
 			}
 		}
 	}
-	if ((TransitionSides & EVoxelDirection::MinimumX) == EVoxelDirection::MinimumX) GeometryTransitionCubes<EVoxelDirection::MinimumX>(Size);
+	/*if ((TransitionSides & EVoxelDirection::MinimumX) == EVoxelDirection::MinimumX) GeometryTransitionCubes<EVoxelDirection::MinimumX>(Size);
 	if ((TransitionSides & EVoxelDirection::MaximumX) == EVoxelDirection::MaximumX) GeometryTransitionCubes<EVoxelDirection::MaximumX>(Size);
 	if ((TransitionSides & EVoxelDirection::MinimumY) == EVoxelDirection::MinimumY) GeometryTransitionCubes<EVoxelDirection::MinimumY>(Size);
 	if ((TransitionSides & EVoxelDirection::MaximumY) == EVoxelDirection::MaximumY) GeometryTransitionCubes<EVoxelDirection::MaximumY>(Size);
 	if ((TransitionSides & EVoxelDirection::MinimumZ) == EVoxelDirection::MinimumZ) GeometryTransitionCubes<EVoxelDirection::MinimumZ>(Size);
-	if ((TransitionSides & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) GeometryTransitionCubes<EVoxelDirection::MaximumZ>(Size);
+	if ((TransitionSides & EVoxelDirection::MaximumZ) == EVoxelDirection::MaximumZ) GeometryTransitionCubes<EVoxelDirection::MaximumZ>(Size);*/
 
 	positionSide.Empty();
 }
@@ -449,7 +449,7 @@ float FVoxelMarchingCubesMesher::VoxelValueMin(float a, float b, float k)
 
 void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color)
 {
-	if (FMath::Abs(isolevel - P1Val) < 0.00001)
+	/*if (FMath::Abs(isolevel - P1Val) < 0.00001)
 	{
 		Vertex = P1;
 		return;
@@ -463,17 +463,18 @@ void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, 
 	{
 		Vertex = P1;
 		return;
-	}
+	}*/
 
-	float mu = (isolevel - P1Val) / (P2Val - P1Val);
-
-	Vertex = P1 + mu * (P2 - P1);
-	Normal = N1 + mu * (N2 - N1);
+	//float mu = (isolevel - P1Val) / (P2Val - P1Val);
+	Vertex = FVector(0.f, 0.f, 0.f);
+	Normal = FVector(0.f, 0.f, 0.f);
+	//Vertex = P1 + mu * (P2 - P1);
+	/*Normal = N1 + mu * (N2 - N1);
 
 	Color.A = C1.A + mu * (C2.A - C1.A);
 	Color.B = C1.B + mu * (C2.B - C1.B);
 	Color.R = C1.R + mu * (C2.R - C1.R);
-	Color.G = C1.G + mu * (C2.G - C1.G);
+	Color.G = C1.G + mu * (C2.G - C1.G);*/
 }
 
 float FVoxelMarchingCubesMesher::GetVoxelSize()
