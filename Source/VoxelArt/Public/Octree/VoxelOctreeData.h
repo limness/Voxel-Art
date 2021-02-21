@@ -123,7 +123,7 @@ public:
 
 	inline bool HasChildren() { return ChildrenOctants.Num() == 8; };
 
-	inline void SetVoxelDensity(AVoxelLandscape* World, FIntVector P, float Value);
+	inline void SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
 

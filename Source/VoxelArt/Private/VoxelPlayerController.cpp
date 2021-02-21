@@ -56,7 +56,14 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					ChangeWorld(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location, Radius);
+					if (RenderType == EditorType::Color)
+					{
+						ChangeWorldColor(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
+					}
+					else if (RenderType == EditorType::Terrain)
+					{
+						ChangeWorldTerrain(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
+					}
 				}
 			}
 		}
@@ -69,7 +76,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 
 #include "DrawDebugHelpers.h"
 
-void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosition, float Radius)
+void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector HitPosition)
 {
 	int VoxelsRadius = FMath::CeilToInt(Radius);
 	float CurrentValue = 0.f;
@@ -89,11 +96,63 @@ void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosi
 						FVector PositionVoxel = FVector(X, Y, Z);
 						float offset = 0.001f;
 						float ValueSphere = Radius - offset - PositionVoxel.Size();
-						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere);
+						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere, FColor(77.f, 77.f, 77.f), true, false);
+
+						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition)), 30, FColor::Red, false, 25);
 					}
 				}
 			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius);
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
+			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
+			
+			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
+
+			for (auto& Octant : OverlapOctants)
+			{
+				if (Octant->Data != nullptr)
+				{
+					if (IsValid(Octant->Data->Chunk))
+					{
+						World->PutChunkOnGeneration(Octant->Data);
+					}
+				}
+			}
+
+			World->OctreeMutex.Unlock();
+		}
+	}
+}
+
+void AVoxelPlayerController::ChangeWorldColor(AVoxelLandscape* World, FVector HitPosition)
+{
+	int VoxelsRadius = FMath::CeilToInt(Radius);
+	float CurrentValue = 0.f;
+
+	if (World)
+	{
+		//if (EditorRemovePressed)
+		{
+			World->OctreeMutex.Lock();
+
+			for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
+			{
+				for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
+				{
+					for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
+					{
+						FVector PositionVoxel = FVector(X, Y, Z);
+						float offset = 0.001f;
+						float ValueSphere = Radius - offset - PositionVoxel.Size();
+						//float ValueSphere = Radius - offset - PositionVoxel.Size();
+
+						if (ValueSphere >= 0)
+						{
+							World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), 0, Color, false, true);
+						}
+					}
+				}
+			}
+			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius + 1);
 			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
 
 			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
@@ -112,54 +171,6 @@ void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosi
 			World->OctreeMutex.Unlock();
 		}
 	}
-/*
-	for (int z = -radius; z <= radius; z++)
-	{
-		for (int y = -radius; y <= radius; y++)
-		{
-			for (int x = -radius; x <= radius; x++)
-			{
-				FVector Position = HitPosition + FVector(x, y, z);
-				float SphereRadius = Radius - Position.Size();
-
-				float CurrentValue = 0.f;
-				World->GetVoxelValue(Position, CurrentValue);
-			}
-		}
-	}*/
-
-/*	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	TArray<AActor*> OverlapActors;
-
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
-
-	if (UKismetSystemLibrary::SphereOverlapActors(this, position, rangeEditMax, ObjectTypes, AVoxelChunk::StaticClass(), TArray<AActor*>(), OverlapActors))
-	{
-		for (AActor* OverlapActor : OverlapActors)
-		{
-			AVoxelChunk* chunk = Cast<AVoxelChunk>(OverlapActor);
-
-			if (chunk->Grid.Num() > 0)
-			{
-				chunk->ChangeVoxel(nullptr, position, range, strength, smooth, EditorRemovePressed, smoothInsert);
-			}
-		}*/
-
-		/*
-		We must first generate noise on all the chunks asynchronously
-		So that when we update the transition mesh we have fresh data
-		*/
-/*		for (AActor* OverlapActor : OverlapActors)
-		{
-			AVoxelChunk* chunk = Cast<AVoxelChunk>(OverlapActor);
-
-			if (chunk->Grid.Num() > 0)
-			{
-				chunk->GenerateVertexCube(true);
-			}
-		}
-	}*/
 }
 
 void AVoxelPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -148,7 +148,7 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 
 #include "Kismet/KismetMathLibrary.h"
 
-void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector P, float Value)
+void FVoxelOctreeDensity::SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor)
 {
 	if (Depth == World->MaximumLOD)
 	{
@@ -160,14 +160,21 @@ void FVoxelOctreeDensity::SetVoxelDensity(AVoxelLandscape* World, FIntVector P, 
 		}
 		FIntVector LP = TransferToLocal(World, P);
 
-		DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Value);
+		if (bSetDensity)
+		{
+			DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Density);
+		}
+		if (bSetColor)
+		{
+			ColorMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = Color;
+		}
 	}
 	else
 	{
 		check(!HasChildren());
 
 		AddChildren();
-		GetChildByPosition(P)->SetVoxelDensity(World, P, Value);
+		GetChildByPosition(P)->SetVoxelValue(World, P, Density, Color, bSetDensity, bSetColor);
 	}
 }
 

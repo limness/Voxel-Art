@@ -195,7 +195,7 @@ public:
 public:
 
 	void GetVoxelValue(FIntVector Position, float& Value, FColor& Color);
-	void SetVoxelValue(FIntVector Position, float Value);
+	void SetVoxelValue(FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
 

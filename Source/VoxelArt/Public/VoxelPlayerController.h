@@ -12,6 +12,13 @@
 #include "GameFramework/PlayerController.h"
 #include "VoxelPlayerController.generated.h"
 
+UENUM()
+enum EditorType
+{
+	Terrain	UMETA(DisplayName = "Terrain"),
+	Color	UMETA(DisplayName = "Color")
+};
+
 /**
  * 
  */
@@ -55,12 +62,14 @@ public:
 	float SmoothInsert = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	bool ColorEditor = false;
+	TEnumAsByte<EditorType> RenderType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
 	FColor Color = FColor(77.f, 77.f, 77.f);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeWorld(AVoxelLandscape* World, FVector HitPosition, float Radius);
+	void ChangeWorldTerrain(AVoxelLandscape* World, FVector HitPosition);
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeWorldColor(AVoxelLandscape* World, FVector HitPosition);
 };

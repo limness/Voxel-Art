@@ -534,9 +534,9 @@ FVector AVoxelLandscape::TransferToGameWorld(FIntVector P)
 	return GetTransform().TransformPosition((FVector)P);
 }
 
-void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Value)
+void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor)
 {
-	OctreeDensity->GetLeaf(Position)->SetVoxelDensity(this, Position, Value);
+	OctreeDensity->GetLeaf(Position)->SetVoxelValue(this, Position, Density, Color, bSetDensity, bSetColor);
 }
 
 void AVoxelLandscape::GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree)

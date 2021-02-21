@@ -14,7 +14,7 @@ FVoxelCollisionBox::FVoxelCollisionBox(AVoxelLandscape* _World, FIntVector _Posi
 	, Size(_Size)
 	, World(_World)
 {
-	//World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Red);
+//	World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Green);
 }
 
 FVoxelCollisionBox::~FVoxelCollisionBox()

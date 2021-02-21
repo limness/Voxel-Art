@@ -36,11 +36,11 @@ void UVoxelChunkComponent::SetActive(bool activeStatus)
 	if (!activeStatus)
 	{
 		ClearMeshSection(0);
-		SetCollisionEnabled(ECollisionEnabled::NoCollision); //QueryAndPhysics
+		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else
 	{
-		SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
+		SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 	ToggleVisibility(!activeStatus);
 }
