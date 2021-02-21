@@ -383,10 +383,10 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AVoxelLandscape_Statics::NewProp_ChunksPerFrame_MetaData[] = {
 		{ "Category", "Rendering" },
-		{ "ClampMax", "2048" },
+		{ "ClampMax", "4096" },
 		{ "ClampMin", "1" },
 		{ "ModuleRelativePath", "Public/VoxelLandscape.h" },
-		{ "UIMax", "2048" },
+		{ "UIMax", "4096" },
 		{ "UIMin", "1" },
 	};
 #endif
@@ -571,7 +571,7 @@ void EmptyLinkFunctionForGeneratedCodeVoxelLandscape() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(AVoxelLandscape, 3404956196);
+	IMPLEMENT_CLASS(AVoxelLandscape, 3915432424);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AVoxelLandscape(Z_Construct_UClass_AVoxelLandscape, &AVoxelLandscape::StaticClass, TEXT("/Script/VoxelArt"), TEXT("AVoxelLandscape"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AVoxelLandscape);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

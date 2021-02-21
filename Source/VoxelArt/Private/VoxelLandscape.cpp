@@ -36,7 +36,10 @@ void AVoxelLandscape::BeginPlay()
 
 	if (EnabledWorldInGame)
 	{
+		int TimeBeforeDestroy = FDateTime::Now().GetTicks();
 		CreateVoxelWorld();
+		int TimeAfterDestroy = FDateTime::Now().GetTicks();
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World in %f s."), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f);
 	}
 }
 
@@ -65,11 +68,11 @@ void AVoxelLandscape::CreateVoxelWorld()
 			{
 				DestroyVoxelWorld();
 			}
+
 			TimeForWorldGenerate = FDateTime::Now().GetTicks();
+			ThreadPool->Create(4, 64 * 1024);
 
-			ThreadPool->Create(3, 64 * 1024);
 			SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
-
 			GeneratorLandscape->GeneratorInit();
 			GenerateLandscape();
 
@@ -299,7 +302,6 @@ void AVoxelLandscape::UpdateWorld()
 	{
 		Chunk->ClearAllMeshSections();
 	}
-	GeneratorLandscape->GeneratorInit();
 	GetLeavesAndQueueToGeneration(MainOctree);
 	OctreeMutex.Unlock();
 }

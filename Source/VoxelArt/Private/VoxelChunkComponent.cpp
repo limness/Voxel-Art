@@ -76,7 +76,7 @@ void FMesherAsyncTask::DoWork()
 
 	int VoxelSteps = (Data->Size / Data->Voxels);
 
-	/*for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
+	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
 	{
 		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS; Y++)
 		{
@@ -86,7 +86,7 @@ void FMesherAsyncTask::DoWork()
 				DensityLocation = DensityLocation + (FIntVector(X, Y, Z) - FIntVector(1, 1, 1) * NORMAL) * VoxelSteps;
 
 				float Value = -1.f;
-				FColor Color = FColor(77.f, 77.f, 77.f);
+				FColor Color = FColor(77.f, 7.f, 77.f);
 
 				World->GetVoxelValue(DensityLocation, Value, Color);
 
@@ -94,7 +94,7 @@ void FMesherAsyncTask::DoWork()
 				Data->ColorMap[GetIndex(X, Y, Z)] = Color;
 			}
 		}
-	}*/
+	}
 
 	FVoxelMarchingCubesMesher* mesher = new FVoxelMarchingCubesMesher(World, Data);
 	mesher->GenerateMarchingCubesMesh();
