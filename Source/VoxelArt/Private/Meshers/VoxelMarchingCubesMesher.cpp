@@ -183,23 +183,21 @@ void FVoxelMarchingCubesMesher::MarchingCubes(int X, int Y, int Z)
 		ValueInterp(PositionInfo[3], PositionInfo[7], NormalsInfo[3], NormalsInfo[7], DensityInfo[3], DensityInfo[7], ColorInfo[3], ColorInfo[7], vertList[11], normList[11], colList[11]);
 	}
 	//
-	FVector PositionGameWorld = World->TransferToGameWorld(Position);
-
 	for (int i = 0; triTable[cubeIndex][i] != -1; i += 3)
 	{
 		Vertices.Add(vertList[triTable[cubeIndex][i]]);
 		Triangles.Add(Triangles.Num());
-		Normals.Add(normList[triTable[cubeIndex][i + 0]].GetSafeNormal());
+		Normals.Add(normList[triTable[cubeIndex][i + 0]].GetUnsafeNormal());
 		VertexColors.Add(colList[triTable[cubeIndex][i + 0]]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 1]]);
 		Triangles.Add(Triangles.Num());
-		Normals.Add(normList[triTable[cubeIndex][i + 1]].GetSafeNormal());
+		Normals.Add(normList[triTable[cubeIndex][i + 1]].GetUnsafeNormal());
 		VertexColors.Add(colList[triTable[cubeIndex][i + 1]]);
 
 		Vertices.Add(vertList[triTable[cubeIndex][i + 2]]);
 		Triangles.Add(Triangles.Num());
-		Normals.Add(normList[triTable[cubeIndex][i + 2]].GetSafeNormal());
+		Normals.Add(normList[triTable[cubeIndex][i + 2]].GetUnsafeNormal());
 		VertexColors.Add(colList[triTable[cubeIndex][i + 2]]);
 	}
 }
@@ -466,10 +464,14 @@ void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, 
 	}
 
 	float mu = (isolevel - P1Val) / (P2Val - P1Val);
-	//Vertex = FVector(0.f, 0.f, 0.f);
-	//Normal = FVector(0.f, 0.f, 0.f);
-	Vertex = P1 + mu * (P2 - P1);
-	Normal = N1 + mu * (N2 - N1);
+
+	Vertex.X = P1.X + mu * (P2.X - P1.X);
+	Vertex.Y = P1.Y + mu * (P2.Y - P1.Y);
+	Vertex.Z = P1.Z + mu * (P2.Z - P1.Z);
+
+	Normal.X = N1.X + mu * (N2.X - N1.X);
+	Normal.Y = N1.Y + mu * (N2.Y - N1.Y);
+	Normal.Z = N1.Z + mu * (N2.Z - N1.Z);
 
 	Color.A = C1.A + mu * (C2.A - C1.A);
 	Color.B = C1.B + mu * (C2.B - C1.B);

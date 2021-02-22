@@ -101,13 +101,14 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 
 FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, float Z) const
 {
+	float offset = 0.001f;
 	float MapX = X + WidthHeightmap / 2.f;
 	float MapY = Y + HeightHeightmap / 2.f;
 
 	if (MapX > WidthHeightmap - 1 || MapX < 0) return 1.f;
 	if (MapY > HeightHeightmap - 1 || MapY < 0) return 1.f;
 
-	return Z - (TextureHeightMap[round(MapY) * WidthHeightmap + round(MapX)].R - 128.f) / 63.f * Multiply;
+	return Z - (TextureHeightMap[round(MapY) * WidthHeightmap + round(MapX)].R - 128.f) / 63.f * Multiply + offset;
 }
 
 FORCEINLINE FColor UVoxelLandscapeGenerator::GetColormapData(float X, float Y, float Z) const

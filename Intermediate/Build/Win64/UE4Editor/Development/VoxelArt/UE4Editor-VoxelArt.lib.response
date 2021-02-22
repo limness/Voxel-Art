@@ -6,8 +6,8 @@
 /NAME:"UE4Editor-VoxelArt.dll"
 /IGNORE:4221
 /NODEFAULTLIB
-"D:\Unreal Projects\Voxel\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h.obj"
-"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.cpp.obj"
-"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp.obj"
-"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\PCLaunch.rc.res"
-/OUT:"D:\Unreal Projects\Voxel\Plugins\Voxel-Art\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\UE4Editor-VoxelArt.lib"
+"E:\Projects\TestPlugin\Intermediate\Build\Win64\TestPluginEditor\Development\UnrealEd\SharedPCH.UnrealEd.h.obj"
+"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.cpp.obj"
+"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\Module.VoxelArt.gen.cpp.obj"
+"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\PCLaunch.rc.res"
+/OUT:"E:\Projects\TestPlugin\Plugins\VoxelArt\Intermediate\Build\Win64\UE4Editor\Development\VoxelArt\UE4Editor-VoxelArt.lib"
