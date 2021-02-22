@@ -66,7 +66,7 @@ public:
 	int Voxels = 16;
 
 	int Size = 0;
-	float Priority = 0.f;
+	int Priority = 0;
 
 	uint8 Depth = 0;
 	uint8 TransitionSides = 0x00;
@@ -84,7 +84,7 @@ public:
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 
 public:
-	FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority);
+	FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, int _Priority);
 	~FVoxelChunkData();
 
 };

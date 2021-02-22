@@ -12,7 +12,7 @@
 
 UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bUseAsyncCooking = true;
+	//bUseAsyncCooking = true;
 }
 
 UVoxelChunkComponent::~UVoxelChunkComponent()
@@ -60,7 +60,9 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Tr
 
 	if (Vertices.Num() > 0)
 	{
+	//	bUseComplexAsSimpleCollision = false;
 		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), Colors, TArray<FProcMeshTangent>(), true);
+	//	SetCollisionConvexMeshes({ Vertices });
 		SetMaterial(0, Material);
 	}
 }
