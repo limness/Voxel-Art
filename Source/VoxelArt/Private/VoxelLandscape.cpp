@@ -231,63 +231,71 @@ void AVoxelLandscape::UpdateOctree()
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
 
 		int32 Index = 0;
-		while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
+		while (Index < ChunksPerFrame)
 		{
-			FVoxelChunkData* ChunkData = ChunksCreation.Pop();
-			OctreeMutex.Lock();
-			TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
-			OctreeMutex.Unlock();
-
-			if (Octant.IsValid())
+			if (ChunksCreation.Num() > 0)
 			{
-				if (!Octant->HasChildren())
+				FVoxelChunkData* ChunkData = ChunksCreation.Pop();
+				OctreeMutex.Lock();
+				TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
+				OctreeMutex.Unlock();
+
+				if (Octant.IsValid())
 				{
-					if (Octant->Data != nullptr)
+					if (!Octant->HasChildren())
 					{
-						//if (chunk->chunk->Active == true)
+						if (Octant->Data != nullptr)
 						{
-							ChunksRemoving.Add(Octant->Data);
+							//if (chunk->chunk->Active == true)
+							{
+								ChunksRemoving.Add(Octant->Data);
+							}
 						}
+
+						OctreeMutex.Lock();
+						Octant->Data = ChunkData;
+						OctreeMutex.Unlock();
+
+						SpawnChunk(ChunkData);
+						Index++;
 					}
-
-					OctreeMutex.Lock();
-					Octant->Data = ChunkData;
-					OctreeMutex.Unlock();
-
-					SpawnChunk(ChunkData);
-					Index++;
 				}
 			}
+			else { Index = ChunksPerFrame; }
 		}
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
 
-		int32 Index = 0;
-		while (Index < ChunksPerFrame && ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
+		if (TaskWorkGlobalCounter.GetValue() == 0)
 		{
-			if (TaskWorkGlobalCounter.GetValue() == 0)
+			int32 Index = 0;
+			while (Index < ChunksPerFrame)
 			{
-				if (!StatsShowed)
+				if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
 				{
-					int32 timeAfter = FDateTime::Now().GetMillisecond();
-					UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 1000.f, PoolChunks->PoolChunks.Num());
-					StatsShowed = true;
-				}
-				while (ChunksRemoving.Num() > 0)
-				{
-					FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
-
-					if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
+					if (!StatsShowed)
 					{
-						ChunkData->Chunk->SetActive(false);
-
-						delete ChunkData;
-						ChunkData = nullptr;
-
-						Index++;
+						int32 timeAfter = FDateTime::Now().GetMillisecond();
+						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 1000.f, PoolChunks->PoolChunks.Num());
+						StatsShowed = true;
 					}
-				}
+					//while (ChunksRemoving.Num() > 0)
+					{
+						FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
+
+						if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
+						{
+							ChunkData->Chunk->SetActive(false);
+
+							delete ChunkData;
+							ChunkData = nullptr;
+
+							Index++;
+						}
+					}
+				} 
+				else { Index = ChunksPerFrame; }
 			}
 		}
 	}
