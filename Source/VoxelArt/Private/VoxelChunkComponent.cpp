@@ -12,7 +12,7 @@
 
 UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bUseAsyncCooking = true;
+//	bUseAsyncCooking = true;
 }
 
 UVoxelChunkComponent::~UVoxelChunkComponent()
@@ -35,7 +35,9 @@ void UVoxelChunkComponent::SetActive(bool activeStatus)
 	Active = activeStatus;
 	if (!activeStatus)
 	{
-		ClearMeshSection(0);
+		//ClearMeshSection(0);
+		ClearAllMeshSections();
+	//	ClearCollisionConvexMeshes();
 		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else
@@ -96,13 +98,13 @@ void FMesherAsyncTask::DoWork()
 		}
 	}
 
-	FVoxelMarchingCubesMesher* mesher = new FVoxelMarchingCubesMesher(World, Data);
-	mesher->GenerateMarchingCubesMesh();
+	FVoxelMarchingCubesMesher mesher = FVoxelMarchingCubesMesher(World, Data);
+	mesher.GenerateMarchingCubesMesh();
 
-	TArray<FVector> Vertices = mesher->Vertices;
-	TArray<int32> Triangles = mesher->Triangles;
-	TArray<FVector> Normals = mesher->Normals;
-	TArray<FLinearColor> VertexColors = mesher->VertexColors;
+	TArray<FVector> Vertices = mesher.Vertices;
+	TArray<int32> Triangles = mesher.Triangles;
+	TArray<FVector> Normals = mesher.Normals;
+	TArray<FLinearColor> VertexColors = mesher.VertexColors;
 
 	AsyncTask(ENamedThreads::GameThread, [=]()
 		{
@@ -115,7 +117,4 @@ void FMesherAsyncTask::DoWork()
 
 
 	World->TaskWorkGlobalCounter.Decrement();
-
-	delete mesher;
-	mesher = nullptr;
 }

@@ -163,7 +163,7 @@ public:
 
 private:
 
-	int TimeForWorldGenerate = 0;
+	int32 TimeForWorldGenerate = 0;
 	bool StatsShowed = false;
 
 public:

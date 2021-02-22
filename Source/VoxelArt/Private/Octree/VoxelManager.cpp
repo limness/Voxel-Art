@@ -88,6 +88,11 @@ uint32 VoxelManager::Run()
 					SCOPE_CYCLE_COUNTER(STAT_Run);
 
 					ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
+
+					//for (int i = 0; i < 5500; i++)
+					{
+						//ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(World->MainOctree, World->MainOctree->Depth, World->MainOctree->Position, 4096, 16, 1000));
+					}
 					{
 						FScopeLock Lock(&World->OctreeMutex);
 						CheckOctree(World->MainOctree);
@@ -175,10 +180,14 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				}
 				/*Create new chunks*/
 				for (auto& Leaf : Octant->GetChildren())
+				//for(int i = 0; i < 8; i++)
 				{
+					//if (!CheckOctree(Octant->ChildrenChunks[i]))
 					if (!CheckOctree(Leaf))
 					{
 						ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
+						//ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(nullptr, 8, FIntVector(0,0,0), 10, 10, DistancePlayer));
+						//UE_LOG(VoxelArt, Log, TEXT("size %d"), sizeof(ChangesOctree->ChunksCreation.Last()));
 					}
 				}
 				return true;
@@ -191,6 +200,8 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 		{
 			/*Create old chunk*/
 			ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Depth, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
+
+			//UE_LOG(VoxelArt, Log, TEXT("size %d"), sizeof(ChangesOctree->ChunksCreation.Last()));
 
 			/*Remove old chunks*/
 			for (auto& Leaf : GetLeavesChunk(Octant))

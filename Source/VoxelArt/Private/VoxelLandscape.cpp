@@ -13,6 +13,11 @@
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Create Voxel World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroying Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Enqueue octants"), STAT_EnqueueOctree, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Updating Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Creation chunks"), STAT_CreateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Removing chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Updatings chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
 
 DEFINE_LOG_CATEGORY(VoxelArt);
 
@@ -69,8 +74,8 @@ void AVoxelLandscape::CreateVoxelWorld()
 				DestroyVoxelWorld();
 			}
 
-			TimeForWorldGenerate = FDateTime::Now().GetTicks();
-			ThreadPool->Create(4, 64 * 1024);
+			TimeForWorldGenerate = FDateTime::Now().GetMillisecond();
+			ThreadPool->Create(4, 128 * 1024);
 
 			SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 			GeneratorLandscape->GeneratorInit();
@@ -100,7 +105,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 	if (TerrainCreated)
 	{
-		int TimeBeforeDestroy = FDateTime::Now().GetTicks();
+		int TimeBeforeDestroy = FDateTime::Now().GetMillisecond();
 
 		if (ManagerCheckPositionThreadHandle)
 		{
@@ -124,13 +129,13 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		{
 			it->Cancel();
 		}		
-		int TotalChunks = PoolChunks->PoolChunks.Num();
+		int32 TotalChunks = PoolChunks->PoolChunks.Num();
 		for (auto& Chunk : PoolChunks->PoolChunks)
 		{
 			Chunk->DestroyComponent();
 		}
-		int TimeAfterDestroy = FDateTime::Now().GetTicks();
-		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f, TotalChunks);
+		int32 TimeAfterDestroy = FDateTime::Now().GetMillisecond();
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 1000.f, TotalChunks);
 		GEngine->ForceGarbageCollection(true);
 		ThreadPool->Destroy();
 		TerrainCreated = false;
@@ -171,29 +176,33 @@ void AVoxelLandscape::Tick(float DeltaTime)
 void AVoxelLandscape::UpdateOctree()
 {
 	SCOPE_CYCLE_COUNTER(STAT_UpdateOctree);
-
-	TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
-	while (ChangesOctree.Peek(ChunksChangesArray))
 	{
-		ChangesOctree.Dequeue(ChunksChangesArray);
+		SCOPE_CYCLE_COUNTER(STAT_EnqueueOctree);
 
-		for (auto& Chunk : ChunksChangesArray->ChunksCreation)
+		TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
+		while (ChangesOctree.Peek(ChunksChangesArray))
 		{
-			ChunksCreation.Add(Chunk);
+			ChangesOctree.Dequeue(ChunksChangesArray);
+
+			for (auto& Chunk : ChunksChangesArray->ChunksCreation)
+			{
+				ChunksCreation.Add(Chunk);
+			}
+			for (auto& Chunk : ChunksChangesArray->ChunksRemoving)
+			{
+				ChunksRemoving.Add(Chunk);
+			}
+			for (auto& Chunk : ChunksChangesArray->ChunksGeneration)
+			{
+				ChunksGeneration.Add(Chunk);
+			}
+			ChunksChangesArray->ChunksCreation.Empty();
+			ChunksChangesArray->ChunksRemoving.Empty();
+			ChunksChangesArray->ChunksGeneration.Empty();
 		}
-		for (auto& Chunk : ChunksChangesArray->ChunksRemoving)
-		{
-			ChunksRemoving.Add(Chunk);
-		}
-		for (auto& Chunk : ChunksChangesArray->ChunksGeneration)
-		{
-			ChunksGeneration.Add(Chunk);
-		}
-		ChunksChangesArray->ChunksCreation.Empty();
-		ChunksChangesArray->ChunksRemoving.Empty();
-		ChunksChangesArray->ChunksGeneration.Empty();
 	}
 	{
+		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
 		FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
@@ -208,7 +217,6 @@ void AVoxelLandscape::UpdateOctree()
 			PlayerPositionToWorld = TransferToVoxelWorld(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation());
 		}
 #endif
-		//FIntVector PlayerPositionToWorld = TransferToWorld(PlayerPositionToWorld);
 
 		for (auto& ChunkData : ChunksCreation)
 		{
@@ -219,68 +227,81 @@ void AVoxelLandscape::UpdateOctree()
 				return A.Priority > B.Priority;
 			});
 	}
-
-	int32 Index = 0;
-	while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
 	{
-		FVoxelChunkData* ChunkData = ChunksCreation.Pop();
-		OctreeMutex.Lock();
-		TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
-		OctreeMutex.Unlock();
+		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
 
-		if (Octant.IsValid())
+		int32 Index = 0;
+		while (Index < ChunksPerFrame && ChunksCreation.Num() > 0)
 		{
-			if (!Octant->HasChildren())
+			FVoxelChunkData* ChunkData = ChunksCreation.Pop();
+			OctreeMutex.Lock();
+			TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
+			OctreeMutex.Unlock();
+
+			if (Octant.IsValid())
 			{
-				if(Octant->Data != nullptr)
+				if (!Octant->HasChildren())
 				{
-					//if (chunk->chunk->Active == true)
+					if (Octant->Data != nullptr)
 					{
-						ChunksRemoving.Add(Octant->Data);
+						//if (chunk->chunk->Active == true)
+						{
+							ChunksRemoving.Add(Octant->Data);
+						}
 					}
-				}
 
-				OctreeMutex.Lock();
-				Octant->Data = ChunkData;
-				OctreeMutex.Unlock();
+					OctreeMutex.Lock();
+					Octant->Data = ChunkData;
+					OctreeMutex.Unlock();
 
-				SpawnChunk(ChunkData);
-				Index++;
-			}
-		} 
-	}
-
-	if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
-	{
-		if(TaskWorkGlobalCounter.GetValue() == 0)
-		{
-			if (!StatsShowed)
-			{
-				int timeAfter = FDateTime::Now().GetTicks();
-				UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 10000.f / 1000.f, PoolChunks->PoolChunks.Num());
-				StatsShowed = true;
-			}
-			while (ChunksRemoving.Num() > 0)
-			{
-				FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
-
-				if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
-				{
-					ChunkData->Chunk->SetActive(false);
-
-					delete ChunkData;
-					ChunkData = nullptr;
+					SpawnChunk(ChunkData);
+					Index++;
 				}
 			}
 		}
 	}
-	while (ChunksGeneration.Num() > 0)
 	{
-		FVoxelChunkData* ChunkData = ChunksGeneration.Pop();
+		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
 
-		if (ChunkData != nullptr)
+		int32 Index = 0;
+		while (Index < ChunksPerFrame && ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
 		{
-			PutChunkOnGeneration(ChunkData);
+			if (TaskWorkGlobalCounter.GetValue() == 0)
+			{
+				if (!StatsShowed)
+				{
+					int32 timeAfter = FDateTime::Now().GetMillisecond();
+					UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 1000.f, PoolChunks->PoolChunks.Num());
+					StatsShowed = true;
+				}
+				while (ChunksRemoving.Num() > 0)
+				{
+					FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
+
+					if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
+					{
+						ChunkData->Chunk->SetActive(false);
+
+						delete ChunkData;
+						ChunkData = nullptr;
+
+						Index++;
+					}
+				}
+			}
+		}
+	}
+	{
+		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
+
+		while (ChunksGeneration.Num() > 0)
+		{
+			FVoxelChunkData* ChunkData = ChunksGeneration.Pop();
+
+			if (ChunkData != nullptr)
+			{
+				PutChunkOnGeneration(ChunkData);
+			}
 		}
 	}
 }
