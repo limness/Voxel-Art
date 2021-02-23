@@ -4,20 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "VoxelLandscape.h"
+#include "Editor/VoxelEditorData.h"
 
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "GameFramework/PlayerController.h"
 #include "VoxelPlayerController.generated.h"
-
-
-UENUM()
-enum EditorType
-{
-	Terrain	UMETA(DisplayName = "Terrain"),
-	Color	UMETA(DisplayName = "Color")
-};
 
 /**
  * 
@@ -47,29 +40,32 @@ public:
 	bool EditorCreatePressed = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	TEnumAsByte<BrushSoftness> BrushSoftness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	TEnumAsByte<EditorType> EditorType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	bool Dig = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
 	float Radius = 20.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	bool Smooth = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	float Strength = 0.5f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	float MaxDictance = 5000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	float SmoothInsert = 10.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	TEnumAsByte<EditorType> RenderType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
 	FColor Color = FColor(77.f, 77.f, 77.f);
 
-	UFUNCTION(BlueprintCallable)
-	void ChangeWorldTerrain(AVoxelLandscape* World, FVector HitPosition);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
+	float Strength = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
+	float MaxDictance = 5000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
+	float SmoothInsert = 10.f;
+
+	UPROPERTY(BlueprintCallable)
+	FVoxelEditorData EditorData;
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeWorldColor(AVoxelLandscape* World, FVector HitPosition);
+	void ChangeWorld(AVoxelLandscape* World, FVector HitPosition);
 };

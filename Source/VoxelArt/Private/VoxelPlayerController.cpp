@@ -9,6 +9,13 @@
 void AVoxelPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EditorData.EditorType =		EditorType;
+	EditorData.BrushSoftness =	BrushSoftness;
+	EditorData.Dig =			Dig;
+	EditorData.Strength =		Strength;
+	EditorData.Radius =			Radius;
+	EditorData.Color =			Color;
 }
 
 bool AVoxelPlayerController::InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)
@@ -58,14 +65,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					if (RenderType == EditorType::Color)
-					{
-						ChangeWorldColor(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
-					}
-					else if (RenderType == EditorType::Terrain)
-					{
-						ChangeWorldTerrain(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
-					}
+					ChangeWorld(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
 				}
 			}
 		}
@@ -76,91 +76,13 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector HitPosition)
+void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosition)
 {
-	//int VoxelsRadius = FMath::CeilToInt(Radius);
-	//float CurrentValue = 0.f;
-
-
 	if (World)
 	{
 		FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
-		//if (EditorRemovePressed)
-		{
-			UVoxelModificationLandscape::SpherePainter(World, WorldPosition, Radius);
-			/*World->OctreeMutex.Lock();
 
-			float FlatValue = 0.f;
-			FColor Color = FColor(7.f, 77.f, 777.f);
-
-			World->GetVoxelValue(World->TransferToVoxelWorld(HitPosition), FlatValue, Color);
-
-			for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
-			{
-				for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
-				{
-					for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
-					{
-						FVector PositionVoxel = FVector(X, Y, Z);
-						float offset = 0.001f;
-						float ValueSphere = Radius - offset - PositionVoxel.Size();
-						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), FlatValue, FColor(77.f, 77.f, 77.f), true, false);
-
-						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition)), 30, FColor::Red, false, 25);
-					}
-				}
-			}*/
-		}
-	}
-}
-
-void AVoxelPlayerController::ChangeWorldColor(AVoxelLandscape* World, FVector HitPosition)
-{
-	int VoxelsRadius = FMath::CeilToInt(Radius);
-	float CurrentValue = 0.f;
-
-	if (World)
-	{
-		//if (EditorRemovePressed)
-		{
-			World->OctreeMutex.Lock();
-
-			for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
-			{
-				for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
-				{
-					for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
-					{
-						FVector PositionVoxel = FVector(X, Y, Z);
-						float offset = 0.001f;
-						float ValueSphere = Radius - offset - PositionVoxel.Size();
-						//float ValueSphere = Radius - offset - PositionVoxel.Size();
-
-						if (ValueSphere >= 0)
-						{
-							World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), 0, Color, false, true);
-						}
-					}
-				}
-			}
-			/*FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
-			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
-
-			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
-
-			for (auto& Octant : OverlapOctants)
-			{
-				if (Octant->Data != nullptr)
-				{
-					if (IsValid(Octant->Data->Chunk))
-					{
-						World->PutChunkOnGeneration(Octant->Data);
-					}
-				}
-			}*/
-
-			World->OctreeMutex.Unlock();
-		}
+		UVoxelModificationLandscape::SpherePainter(World, WorldPosition, Radius);
 	}
 }
 

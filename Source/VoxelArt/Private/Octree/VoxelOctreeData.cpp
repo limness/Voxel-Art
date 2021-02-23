@@ -160,14 +160,9 @@ void FVoxelOctreeDensity::SetVoxelValue(AVoxelLandscape* World, FIntVector P, fl
 		}
 		FIntVector LP = TransferToLocal(World, P);
 
-
 		if (bSetDensity)
 		{
-		//	UE_LOG(VoxelArt, Log, TEXT("Inside true changed %s before %f now %f"), *LP.ToString(), DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Density);
-
 			DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Density);
-
-		//	UE_LOG(VoxelArt, Log, TEXT("Final %f"), DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)]);
 		}
 		if (bSetColor)
 		{
