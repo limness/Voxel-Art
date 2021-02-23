@@ -12,11 +12,7 @@
 
 UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-<<<<<<< HEAD
-//	bUseAsyncCooking = true;
-=======
 	//bUseAsyncCooking = true;
->>>>>>> 4b42aed4e6353b3732f75307c5ebc78d2d1cc483
 }
 
 UVoxelChunkComponent::~UVoxelChunkComponent()

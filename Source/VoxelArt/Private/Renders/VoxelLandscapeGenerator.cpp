@@ -51,13 +51,6 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 		HeightmapTexture->MipGenSettings = OldMipGenSettings;
 		HeightmapTexture->SRGB = OldSRGB;
 		HeightmapTexture->UpdateResource();
-
-	/*	RadiusHeighestVoxel = World->WorldSize / (float)World->VoxelsPerChunk;
-
-		for (int i = 0; i < World->MaximumLOD; i++)
-		{
-			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
-		} */
 	}
 	if (ColormapTexture && World)
 	{
@@ -96,13 +89,6 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 		ColormapTexture->MipGenSettings = OldMipGenSettings;
 		ColormapTexture->SRGB = OldSRGB;
 		ColormapTexture->UpdateResource();
-/*
-		RadiusHeighestVoxel = World->WorldSize / (float)World->VoxelsPerChunk;
-
-		for (int i = 0; i < World->MaximumLOD; i++)
-		{
-			RadiusHeighestVoxel = (float)(RadiusHeighestVoxel / 2.f);
-		}*/
 	}
 }
 

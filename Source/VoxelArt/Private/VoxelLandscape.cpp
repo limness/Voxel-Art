@@ -11,20 +11,20 @@
 
 
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Create Voxel World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroying Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroy Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Enqueue octants"), STAT_EnqueueOctree, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Updating Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Creation chunks"), STAT_CreateChunks, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Removing chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Updatings chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Update Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Create chunks"), STAT_CreateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
 
 DEFINE_LOG_CATEGORY(VoxelArt);
 
 AVoxelLandscape::AVoxelLandscape()
 {
-	PrimaryActorTick.bCanEverTick = true; 
-//	PrimaryActorTick.bHighPriority = true;
+	PrimaryActorTick.bCanEverTick = true;
+	//	PrimaryActorTick.bHighPriority = true;
 
 	WorldComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RootComponent = WorldComponent;
@@ -128,7 +128,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		for (auto& it : PoolThreads)
 		{
 			it->Cancel();
-		}		
+		}
 		int32 TotalChunks = PoolChunks->PoolChunks.Num();
 		for (auto& Chunk : PoolChunks->PoolChunks)
 		{
@@ -154,7 +154,7 @@ void AVoxelLandscape::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AVoxelLandscape::Tick(float DeltaTime)	
+void AVoxelLandscape::Tick(float DeltaTime)
 {
 	if (GetWorld() != nullptr && GetWorld()->WorldType == EWorldType::Editor)
 	{
@@ -202,11 +202,7 @@ void AVoxelLandscape::UpdateOctree()
 		}
 	}
 	{
-<<<<<<< HEAD
 		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
-=======
-		int timeRecalculateBefore = FDateTime::Now().GetTicks();
->>>>>>> 4b42aed4e6353b3732f75307c5ebc78d2d1cc483
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
 		FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
@@ -230,21 +226,9 @@ void AVoxelLandscape::UpdateOctree()
 			{
 				return A.Priority > B.Priority;
 			});
-
-		int timeRecalculateAfter = FDateTime::Now().GetTicks();
 	}
 	{
-<<<<<<< HEAD
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
-=======
-		FVoxelChunkData* ChunkData = ChunksCreation.Pop();
-
-		//UE_LOG(VoxelArt, Log, TEXT("Creation priority %d"), ChunkData->Priority);
-
-		OctreeMutex.Lock();
-		TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
-		OctreeMutex.Unlock();
->>>>>>> 4b42aed4e6353b3732f75307c5ebc78d2d1cc483
 
 		int32 Index = 0;
 		while (Index < ChunksPerFrame)
@@ -310,7 +294,7 @@ void AVoxelLandscape::UpdateOctree()
 							Index++;
 						}
 					}
-				} 
+				}
 				else { Index = ChunksPerFrame; }
 			}
 		}
@@ -380,7 +364,7 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 		{
 			//if (Chunk->Chunk->hasOwnGrid)
 			{
-			//	Chunk->Grid = Chunk->chunk->DensityMap;
+				//	Chunk->Grid = Chunk->chunk->DensityMap;
 				SavedChunks.Add(Chunk->NodeID, Chunk);
 			}
 		}
@@ -447,16 +431,16 @@ void AVoxelLandscape::CreateTextureDensityMap()
 			{
 				for (int x = 0; x < width; x++)
 				{
-				/*	uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
-						static_cast<float>((x - width * 0.5f) * StepTexture),
-						static_cast<float>((y - height * 0.5f) * StepTexture),
-						0)
-					), -1.f, 1.0f) * 63.f + 128);
+					/*	uint8 PixelColorWB = (uint8)(FMath::Clamp(GeneratorDensity->GetDensityMap(FVector(
+							static_cast<float>((x - width * 0.5f) * StepTexture),
+							static_cast<float>((y - height * 0.5f) * StepTexture),
+							0)
+						), -1.f, 1.0f) * 63.f + 128);
 
-					pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
-					pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
-					pixels[y * 4 * width + x * 4 + 2] = PixelColorWB; // B
-					pixels[y * 4 * width + x * 4 + 3] = 255;*/
+						pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
+						pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
+						pixels[y * 4 * width + x * 4 + 2] = PixelColorWB; // B
+						pixels[y * 4 * width + x * 4 + 3] = 255;*/
 				}
 			}
 		}
@@ -549,9 +533,9 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 	{
 		ChunkData->Chunk = Chunk;
 
-		Chunk->CurrentOctree =			ChunkData->CurrentOctree;
-		Chunk->Material =				Material;
-		Chunk->GeneratorLandscape =		GeneratorLandscape;
+		Chunk->CurrentOctree = ChunkData->CurrentOctree;
+		Chunk->Material = Material;
+		Chunk->GeneratorLandscape = GeneratorLandscape;
 
 		Chunk->SetMaterial(0, Material);
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics

@@ -87,6 +87,11 @@ void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector 
 		{
 			World->OctreeMutex.Lock();
 
+			float FlatValue = 0.f;
+			FColor Color = FColor(7.f, 77.f, 777.f);
+
+			World->GetVoxelValue(World->TransferToVoxelWorld(HitPosition), FlatValue, Color);
+
 			for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 			{
 				for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
@@ -96,7 +101,7 @@ void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector 
 						FVector PositionVoxel = FVector(X, Y, Z);
 						float offset = 0.001f;
 						float ValueSphere = Radius - offset - PositionVoxel.Size();
-						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), ValueSphere, FColor(77.f, 77.f, 77.f), true, false);
+						World->SetVoxelValue((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition), FlatValue, FColor(77.f, 77.f, 77.f), true, false);
 
 						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition)), 30, FColor::Red, false, 25);
 					}
