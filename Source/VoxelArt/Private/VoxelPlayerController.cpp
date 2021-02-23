@@ -81,10 +81,10 @@ void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector 
 	//int VoxelsRadius = FMath::CeilToInt(Radius);
 	//float CurrentValue = 0.f;
 
-	FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
 
 	if (World)
 	{
+		FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
 		//if (EditorRemovePressed)
 		{
 			UVoxelModificationLandscape::SpherePainter(World, WorldPosition, Radius);

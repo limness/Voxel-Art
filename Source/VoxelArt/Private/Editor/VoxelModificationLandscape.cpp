@@ -21,7 +21,10 @@ void UVoxelModificationLandscape::SpherePainter(AVoxelLandscape* World, FIntVect
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
 				FVector PositionVoxel = FVector(X, Y, Z);
-				float Value = Radius - Offset - FVector(Position.X, Position.Y, Position.Z).Size();
+				float Value = Radius - Offset - PositionVoxel.Size();
+
+				//UE_LOG(VoxelArt, Log, TEXT("changed %s"), *((FIntVector)PositionVoxel + Position).ToString());
+
 				World->SetVoxelValue((FIntVector)PositionVoxel + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
 			}
 		}
