@@ -6,6 +6,9 @@
 #include "UObject/NoExportTypes.h"
 #include "VoxelModificationLandscape.generated.h"
 
+
+class AVoxelLandscape;
+
 /**
  * 
  */
@@ -22,9 +25,15 @@ public:
 public:
 
 	UFUNCTION(BlueprintCallable)
-	float SpherePainter(float X, float Y, float Z, float radius);
+	static void SpherePainter(AVoxelLandscape* World, FIntVector Position, float Radius);
 
 	UFUNCTION(BlueprintCallable)
-	float BangPainter(float X, float Y, float Z, float radius, int octaves, float amplitude, float frequency);
+	static void CubePainter(AVoxelLandscape* World, FIntVector Position, float Radius);
 
+	UFUNCTION(BlueprintCallable)
+	float BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency);
+
+private:
+
+	static void UpdateOverlapOctants(AVoxelLandscape* World, FIntVector Position, int Size);
 };

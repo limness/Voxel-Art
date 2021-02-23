@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelChunk.h"
 #include "VoxelLandscape.h"
 
 #include "EngineUtils.h"
@@ -11,6 +10,7 @@
 
 #include "GameFramework/PlayerController.h"
 #include "VoxelPlayerController.generated.h"
+
 
 UENUM()
 enum EditorType

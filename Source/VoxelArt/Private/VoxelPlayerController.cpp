@@ -2,7 +2,9 @@
 
 #include "VoxelPlayerController.h"
 #include "Helpers/VoxelTools.h"
-#include "Helpers/VoxelCollisionBox.h"
+#include "Editor/VoxelModificationLandscape.h"
+
+#include "DrawDebugHelpers.h"
 
 void AVoxelPlayerController::BeginPlay()
 {
@@ -74,18 +76,19 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
-#include "DrawDebugHelpers.h"
-
 void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector HitPosition)
 {
-	int VoxelsRadius = FMath::CeilToInt(Radius);
-	float CurrentValue = 0.f;
+	//int VoxelsRadius = FMath::CeilToInt(Radius);
+	//float CurrentValue = 0.f;
+
+	FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
 
 	if (World)
 	{
 		//if (EditorRemovePressed)
 		{
-			World->OctreeMutex.Lock();
+			UVoxelModificationLandscape::SpherePainter(World, WorldPosition, Radius);
+			/*World->OctreeMutex.Lock();
 
 			float FlatValue = 0.f;
 			FColor Color = FColor(7.f, 77.f, 777.f);
@@ -106,24 +109,7 @@ void AVoxelPlayerController::ChangeWorldTerrain(AVoxelLandscape* World, FVector 
 						//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld((FIntVector)PositionVoxel + World->TransferToVoxelWorld(HitPosition)), 30, FColor::Red, false, 25);
 					}
 				}
-			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
-			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
-			
-			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
-
-			for (auto& Octant : OverlapOctants)
-			{
-				if (Octant->Data != nullptr)
-				{
-					if (IsValid(Octant->Data->Chunk))
-					{
-						World->PutChunkOnGeneration(Octant->Data);
-					}
-				}
-			}
-
-			World->OctreeMutex.Unlock();
+			}*/
 		}
 	}
 }
@@ -157,7 +143,7 @@ void AVoxelPlayerController::ChangeWorldColor(AVoxelLandscape* World, FVector Hi
 					}
 				}
 			}
-			FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
+			/*FVoxelCollisionBox Box = FVoxelCollisionBox(World, World->TransferToVoxelWorld(HitPosition), VoxelsRadius * 2);
 			TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;
 
 			World->GetOverlapingOctree(Box, World->MainOctree, OverlapOctants);
@@ -171,7 +157,7 @@ void AVoxelPlayerController::ChangeWorldColor(AVoxelLandscape* World, FVector Hi
 						World->PutChunkOnGeneration(Octant->Data);
 					}
 				}
-			}
+			}*/
 
 			World->OctreeMutex.Unlock();
 		}
