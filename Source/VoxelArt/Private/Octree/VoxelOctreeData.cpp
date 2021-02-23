@@ -234,7 +234,7 @@ FIntVector FVoxelOctreeDensity::TransferToLocal(AVoxelLandscape* World, FIntVect
 	return Position - this->Position + FIntVector(1, 1, 1) * Size / 2;
 }
 
-FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, float _Priority)
+FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, int _Priority)
 	: CurrentOctree(_CurrentOctree)
 	, Depth(_Depth)
 	, Position(_Position)

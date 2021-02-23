@@ -93,7 +93,7 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 			//ChangesOctree->ChunksGeneration.Empty();
 			ChangesOctree.Reset();
 
-			FPlatformProcess::Sleep(0.5);
+			FPlatformProcess::Sleep(0.05);
 		}
 	}
 	return 0;

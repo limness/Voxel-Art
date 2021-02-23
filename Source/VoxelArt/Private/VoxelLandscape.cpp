@@ -202,7 +202,11 @@ void AVoxelLandscape::UpdateOctree()
 		}
 	}
 	{
+<<<<<<< HEAD
 		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
+=======
+		int timeRecalculateBefore = FDateTime::Now().GetTicks();
+>>>>>>> 4b42aed4e6353b3732f75307c5ebc78d2d1cc483
 
 		FViewport* activeViewport = GEditor->GetActiveViewport();
 		FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
@@ -226,9 +230,21 @@ void AVoxelLandscape::UpdateOctree()
 			{
 				return A.Priority > B.Priority;
 			});
+
+		int timeRecalculateAfter = FDateTime::Now().GetTicks();
 	}
 	{
+<<<<<<< HEAD
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
+=======
+		FVoxelChunkData* ChunkData = ChunksCreation.Pop();
+
+		//UE_LOG(VoxelArt, Log, TEXT("Creation priority %d"), ChunkData->Priority);
+
+		OctreeMutex.Lock();
+		TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
+		OctreeMutex.Unlock();
+>>>>>>> 4b42aed4e6353b3732f75307c5ebc78d2d1cc483
 
 		int32 Index = 0;
 		while (Index < ChunksPerFrame)

@@ -3,6 +3,10 @@
 #include "Renders/VoxelLandscapeGenerator.h"
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Helpers/VoxelTools.h"
+
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Heightmap"), STAT_GeneratorHeightmap, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Colormap"), STAT_GeneratorColormap, STATGROUP_Voxel);
 
 UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitializer& objectInitializer) : Super(objectInitializer)
 {
@@ -12,6 +16,8 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 {
 	if (HeightmapTexture && World)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_GeneratorHeightmap);
+
 		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
 
 		WidthHeightmap = (int)MyMipMap->SizeX;
@@ -55,6 +61,8 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 	}
 	if (ColormapTexture && World)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_GeneratorColormap);
+
 		FTexture2DMipMap* MyMipMap = &ColormapTexture->PlatformData->Mips[0];
 
 		WidthColormap = (int)MyMipMap->SizeX;

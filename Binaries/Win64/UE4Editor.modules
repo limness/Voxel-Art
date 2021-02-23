@@ -1,8 +1,0 @@
-{
-	"BuildId": "4541578",
-	"Modules": 
-	{
-		"VoxelArt": "UE4Editor-VoxelArt.dll",
-		"VoxelArtEditor": "UE4Editor-VoxelArtEditor.dll"
-	}
-}
