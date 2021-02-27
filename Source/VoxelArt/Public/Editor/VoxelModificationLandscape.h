@@ -8,6 +8,7 @@
 
 
 class AVoxelLandscape;
+class UVoxelEditorData;
 
 /**
  * 
@@ -24,11 +25,11 @@ public:
 
 public:
 
-	UFUNCTION(BlueprintCallable)
-	static void SpherePainter(AVoxelLandscape* World, FIntVector Position, float Radius);
+	//UFUNCTION(BlueprintCallable)
+	static void SpherePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius);
 
-	UFUNCTION(BlueprintCallable)
-	static void CubePainter(AVoxelLandscape* World, FIntVector Position, float Radius);
+	//UFUNCTION(BlueprintCallable)
+	static void CubePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius);
 
 	UFUNCTION(BlueprintCallable)
 	float BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency);

@@ -40,6 +40,9 @@ public:
 	bool EditorCreatePressed = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
+	TEnumAsByte<BrushType> BrushType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
 	TEnumAsByte<BrushSoftness> BrushSoftness;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
@@ -63,8 +66,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
 	float SmoothInsert = 10.f;
 
-	UPROPERTY(BlueprintCallable)
-	FVoxelEditorData EditorData;
+	UVoxelEditorData* EditorData;
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeWorld(AVoxelLandscape* World, FVector HitPosition);

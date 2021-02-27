@@ -41,10 +41,7 @@ void AVoxelLandscape::BeginPlay()
 
 	if (EnabledWorldInGame)
 	{
-		int TimeBeforeDestroy = FDateTime::Now().GetTicks();
 		CreateVoxelWorld();
-		int TimeAfterDestroy = FDateTime::Now().GetTicks();
-		UE_LOG(VoxelArt, Log, TEXT("Voxel World in %f s."), (TimeAfterDestroy - TimeBeforeDestroy) / 10000.f / 1000.f);
 	}
 }
 
@@ -83,11 +80,11 @@ void AVoxelLandscape::CreateVoxelWorld()
 
 			if (EnabledLOD)
 			{
-				ManagerCheckPositionThreadHandle = new VoxelManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), DrawingRange, MaximumLOD);
+				OctreeManagerThread = new VoxelOctreeManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), DrawingRange, MaximumLOD);
 
 				if (TransitionMesh)
 				{
-					OctreeNeighborsChecker = new VoxelOctreeNeighborsChecker(this);
+					OctreeNeighborsCheckerThread = new VoxelOctreeNeighborsChecker(this);
 				}
 			}
 			TerrainCreated = true;
@@ -107,15 +104,15 @@ void AVoxelLandscape::DestroyVoxelWorld()
 	{
 		int TimeBeforeDestroy = FDateTime::Now().GetMillisecond();
 
-		if (ManagerCheckPositionThreadHandle)
+		if (OctreeManagerThread)
 		{
-			delete ManagerCheckPositionThreadHandle;
-			ManagerCheckPositionThreadHandle = nullptr;
+			delete OctreeManagerThread;
+			OctreeManagerThread = nullptr;
 		}
-		if (OctreeNeighborsChecker)
+		if (OctreeNeighborsCheckerThread)
 		{
-			delete OctreeNeighborsChecker;
-			OctreeNeighborsChecker = nullptr;
+			delete OctreeNeighborsCheckerThread;
+			OctreeNeighborsCheckerThread = nullptr;
 		}
 
 		MainOctree.Reset();
@@ -142,11 +139,6 @@ void AVoxelLandscape::DestroyVoxelWorld()
 	}
 }
 
-void AVoxelLandscape::SpawnBoxTest(FVector location, float radius, float width, FColor color)
-{
-	DrawDebugBox(GetWorld(), location, FVector(radius, radius, radius), color, false, 13.f, 5, width);
-}
-
 void AVoxelLandscape::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	DestroyVoxelWorld();
@@ -169,7 +161,10 @@ void AVoxelLandscape::Tick(float DeltaTime)
 	{
 		Super::Tick(DeltaTime);
 
-		UpdateOctree();
+		if (TerrainCreated)
+		{
+			UpdateOctree();
+		}
 	}
 }
 
@@ -546,9 +541,57 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 	}
 }
 
-void AVoxelLandscape::GetVoxelValue(FIntVector Position, float& Value, FColor& Color)
+void AVoxelLandscape::GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color)
 {
-	OctreeDensity->GetLeaf(Position)->GetVoxelDensity(this, Position, Value, Color);
+	//if (OutOctant != nullptr)
+	{
+		//if (OutOctant->IsInside(Position))
+		{
+			//UE_LOG(VoxelArt, Log, TEXT(" USING inside no null"));
+		}
+		/*	else*/
+		{
+			//	UE_LOG(VoxelArt, Log, TEXT(" USING outside no null"));
+		}
+	}
+	if (OutOctant == nullptr || OutOctant->HasChildren() || !OutOctant->IsInside(Position))
+	{
+		
+		OutOctant = OctreeDensity->GetLeaf(Position);
+	/*	if (OutOctant != nullptr)
+		{
+			if (OutOctant->IsInside(Position))
+			{
+				UE_LOG(VoxelArt, Log, TEXT(" USING inside no null"));
+			}
+			else
+			{
+				UE_LOG(VoxelArt, Log, TEXT("  no null"));
+			}
+		}*/
+	}
+	else
+	{
+		//UE_LOG(VoxelArt, Log, TEXT(" USING outside null"));
+		//if (OutOctant != nullptr)
+		{
+		//	UE_LOG(VoxelArt, Log, TEXT(" USING not null"));
+		}
+	}
+	OutOctant->GetVoxelDensity(this, Position, Value, Color);
+}
+
+void AVoxelLandscape::SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor)
+{
+	if (OutOctant == nullptr || OutOctant->HasChildren() || !OutOctant->IsInside(Position))
+	{
+		OutOctant = OctreeDensity->GetLeaf(Position);
+	}
+	else
+	{
+	//	UE_LOG(VoxelArt, Log, TEXT(" exist"));
+	}
+	OutOctant->SetVoxelValue(this, Position, Density, Color, bSetDensity, bSetColor);
 }
 
 FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector P)
@@ -559,11 +602,6 @@ FIntVector AVoxelLandscape::TransferToVoxelWorld(FVector P)
 FVector AVoxelLandscape::TransferToGameWorld(FIntVector P)
 {
 	return GetTransform().TransformPosition((FVector)P);
-}
-
-void AVoxelLandscape::SetVoxelValue(FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor)
-{
-	OctreeDensity->GetLeaf(Position)->SetVoxelValue(this, Position, Density, Color, bSetDensity, bSetColor);
 }
 
 void AVoxelLandscape::GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree)
@@ -587,6 +625,11 @@ void AVoxelLandscape::GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVo
 FORCEINLINE int AVoxelLandscape::GetIndex(FIntVector P)
 {
 	return P.X + P.Y * (VoxelsPerChunk + 1 + NORMALS) + P.Z * (VoxelsPerChunk + 1 + NORMALS) * (VoxelsPerChunk + 1 + NORMALS);
+}
+
+void AVoxelLandscape::VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color)
+{
+	DrawDebugBox(GetWorld(), Position, FVector(Radius, Radius, Radius), Color, false, 13.f, 5, Width);
 }
 
 #if WITH_EDITOR

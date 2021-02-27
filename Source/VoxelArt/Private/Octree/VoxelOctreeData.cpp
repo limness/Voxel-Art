@@ -146,7 +146,23 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
-#include "Kismet/KismetMathLibrary.h"
+bool FVoxelOctreeDensity::IsInside(FIntVector Position)
+{
+//	UE_LOG(VoxelArt, Log, TEXT(" USING  %s"), *GetMinimumCorner().ToString());
+	return  (GetMinimumCorner().X >= Position.X && GetMaximumCorner().X >= Position.X) &&
+			(GetMinimumCorner().Y >= Position.Y && GetMaximumCorner().Y >= Position.Y) &&
+			(GetMinimumCorner().Z >= Position.Z && GetMaximumCorner().Z >= Position.Z);
+}
+
+FIntVector FVoxelOctreeDensity::GetMinimumCorner()
+{
+	return this->Position - FIntVector(1, 1, 1) * this->Size / 2;
+}
+
+FIntVector FVoxelOctreeDensity::GetMaximumCorner()
+{
+	return this->Position + FIntVector(1, 1, 1) * this->Size / 2;
+}
 
 void FVoxelOctreeDensity::SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor)
 {
@@ -162,7 +178,7 @@ void FVoxelOctreeDensity::SetVoxelValue(AVoxelLandscape* World, FIntVector P, fl
 
 		if (bSetDensity)
 		{
-			DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = UKismetMathLibrary::FMax(DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)], Density);
+			DensityMap[World->GetIndex(LP + FIntVector(1, 1, 1) * NORMAL)] = Density;
 		}
 		if (bSetColor)
 		{
@@ -208,6 +224,8 @@ void FVoxelOctreeDensity::SetDefaultMap(AVoxelLandscape* World)
 
 	int VoxelSteps = (Size / World->VoxelsPerChunk);
 
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
 	for (int Z = 0; Z < World->VoxelsPerChunk + 1 + NORMALS; Z++)
 	{
 		for (int Y = 0; Y < World->VoxelsPerChunk + 1 + NORMALS; Y++)
@@ -220,7 +238,7 @@ void FVoxelOctreeDensity::SetDefaultMap(AVoxelLandscape* World)
 				float Value = -1.f;
 				FColor Color = FColor(77.f, 77.f, 77.f);
 
-				World->GetVoxelValue(DensityLocation, Value, Color);
+				World->GetVoxelValue(OutOctant, DensityLocation, Value, Color);
 
 				DensityMap[World->GetIndex(FIntVector(X, Y, Z))] = Value;
 				ColorMap[World->GetIndex(FIntVector(X, Y, Z))] = Color;

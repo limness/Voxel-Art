@@ -10,11 +10,11 @@
 
 class AVoxelLandscape;
 
-class VOXELART_API VoxelManager : public FRunnable
+class VOXELART_API VoxelOctreeManager : public FRunnable
 {
 public:
-	VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
-	~VoxelManager();
+	VoxelOctreeManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
+	~VoxelOctreeManager();
 
 	void EnsureCompletion();
 	void PauseThread();

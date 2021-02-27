@@ -12,6 +12,7 @@
 
 class AVoxelLandscape;
 class UVoxelLandscapeGenerator;
+class FVoxelOctreeDensity;
 
 /**
  * 
@@ -76,7 +77,7 @@ public:
 	FIntVector TransferToDirection(FIntVector DirectionPosition, float Size);
 
 	template<uint8 Direction>
-	float GetValue(FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree);
+	float GetValue(FVoxelOctreeDensity* OutOctant, FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree);
 
 	template<uint8 Direction>
 	FVector GetPosition(int X, int Y, int Size, int Steps);

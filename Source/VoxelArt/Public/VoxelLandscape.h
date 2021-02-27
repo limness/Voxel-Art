@@ -6,12 +6,15 @@
 #include "GameFramework/Actor.h"
 #include "VoxelChunk.h"
 #include "VoxelChunkComponent.h"
+#include "VoxelPoolComponent.h"
+
 #include "Renders/VoxelRender.h"
 #include "Renders/VoxelLandscapeGenerator.h"
-#include "Octree/VoxelManager.h"
+
+#include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Octree/VoxelOctreeData.h"
-#include "VoxelPoolComponent.h"
+
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "VoxelLandscape.generated.h"
@@ -62,9 +65,9 @@ public:
 
 public:
 
-	VoxelRender* RendererCheckPositionThreadHandle;
-	VoxelManager* ManagerCheckPositionThreadHandle;
-	VoxelOctreeNeighborsChecker* OctreeNeighborsChecker;
+	VoxelRender* RenderThread;
+	VoxelOctreeManager* OctreeManagerThread;
+	VoxelOctreeNeighborsChecker* OctreeNeighborsCheckerThread;
 
 public:
 
@@ -183,9 +186,13 @@ private:
 
 public:	
 
+	UFUNCTION(BlueprintCallable)
 	FIntVector TransferToVoxelWorld(FVector P);
+
+	UFUNCTION(BlueprintCallable)
 	FVector TransferToGameWorld(FIntVector P);
 
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int GetIndex(FIntVector P);
 
 public:
@@ -194,12 +201,13 @@ public:
 
 public:
 
-	void GetVoxelValue(FIntVector Position, float& Value, FColor& Color);
-	void SetVoxelValue(FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
+	void GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color);
+	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
 
-	void SpawnBoxTest(FVector location, float radius, float width, FColor color);
+	UFUNCTION(BlueprintCallable)
+	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
 
 private:
 

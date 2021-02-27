@@ -80,6 +80,8 @@ void FMesherAsyncTask::DoWork()
 
 	int VoxelSteps = (Data->Size / Data->Voxels);
 
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
 	for (int Z = 0; Z < Data->Voxels + 1 + NORMALS; Z++)
 	{
 		for (int Y = 0; Y < Data->Voxels + 1 + NORMALS; Y++)
@@ -92,7 +94,7 @@ void FMesherAsyncTask::DoWork()
 				float Value = -1.f;
 				FColor Color = FColor(77.f, 7.f, 77.f);
 
-				World->GetVoxelValue(DensityLocation, Value, Color);
+				World->GetVoxelValue(OutOctant, DensityLocation, Value, Color);
 
 				Data->DensityMap[GetIndex(X, Y, Z)] = Value;
 				Data->ColorMap[GetIndex(X, Y, Z)] = Color;

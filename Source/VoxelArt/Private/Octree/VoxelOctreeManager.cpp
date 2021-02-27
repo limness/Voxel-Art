@@ -1,7 +1,7 @@
 ﻿
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Octree/VoxelManager.h"
+#include "Octree/VoxelOctreeManager.h"
 #include "VoxelLandscape.h"
 #include "Helpers/VoxelTools.h"
 
@@ -11,7 +11,7 @@
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
 
 
-VoxelManager::VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
+VoxelOctreeManager::VoxelOctreeManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
 	: World(_World)
 	, PlayerController(_PlayerController)
 	, DrawingRange(_DrawingRange)
@@ -22,7 +22,7 @@ VoxelManager::VoxelManager(AVoxelLandscape* _World, APlayerController* _PlayerCo
 	Thread = FRunnableThread::Create(this, TEXT("CheckPosition"), 0, TPri_BelowNormal);
 }
 
-VoxelManager::~VoxelManager()
+VoxelOctreeManager::~VoxelOctreeManager()
 {
 	if (m_semaphore)
 	{
@@ -37,13 +37,13 @@ VoxelManager::~VoxelManager()
 	}
 }
 
-bool VoxelManager::Init()
+bool VoxelOctreeManager::Init()
 {
 	UE_LOG(VoxelArt, Log, TEXT("Octree Manager init"));
 	return true;
 }
 
-uint32 VoxelManager::Run()
+uint32 VoxelOctreeManager::Run()
 {
 	FPlatformProcess::Sleep(0.03);
 
@@ -110,12 +110,12 @@ uint32 VoxelManager::Run()
 	return 0;
 }
 
-void VoxelManager::PauseThread()
+void VoxelOctreeManager::PauseThread()
 {
 	m_Pause = true;
 }
 
-void VoxelManager::ContinueThread()
+void VoxelOctreeManager::ContinueThread()
 {
 	m_Pause = false;
 
@@ -125,7 +125,7 @@ void VoxelManager::ContinueThread()
 	}
 }
 
-void VoxelManager::Stop()
+void VoxelOctreeManager::Stop()
 {
 	m_Kill = true;
 	m_Pause = false;
@@ -136,7 +136,7 @@ void VoxelManager::Stop()
 	}
 }
 
-void VoxelManager::EnsureCompletion()
+void VoxelOctreeManager::EnsureCompletion()
 {
 	if (ChangesOctree)
 	{
@@ -153,12 +153,12 @@ void VoxelManager::EnsureCompletion()
 	}
 }
 
-bool VoxelManager::IsThreadPaused()
+bool VoxelOctreeManager::IsThreadPaused()
 {
 	return (bool)m_Pause;
 }
 
-bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
+bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 {
 	float DistanceLODs = DrawingRange * Octant->Size; 
 	float DistancePlayer = (PlayerPositionToWorld - Octant->Position).Size();
@@ -227,7 +227,7 @@ bool VoxelManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 }
 
 
-TArray<TSharedPtr<FVoxelOctreeData>> VoxelManager::GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk)
+TArray<TSharedPtr<FVoxelOctreeData>> VoxelOctreeManager::GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk)
 {
 	TArray<TSharedPtr<FVoxelOctreeData>> candidates;
 	{

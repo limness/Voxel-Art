@@ -215,25 +215,26 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 	float CornerNoise[13];
 
 	int VoxelSteps = (Size / Voxels);
+	FVoxelOctreeDensity* OutOctant = nullptr;
 
 	for (int x = 0; x < Voxels; x++)
 	{
 		for (int y = 0; y < Voxels; y++)
 		{
-			CornerNoise[0] = GetValue<Direction>(CornerColor[0], x * 2 + 0, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 0 - 9
-			CornerNoise[1] = GetValue<Direction>(CornerColor[1], x * 2 + 1, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 1
-			CornerNoise[2] = GetValue<Direction>(CornerColor[2], x * 2 + 2, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 2 - A
-			CornerNoise[3] = GetValue<Direction>(CornerColor[3], x * 2 + 0, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 3
-			CornerNoise[4] = GetValue<Direction>(CornerColor[4], x * 2 + 1, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 4
-			CornerNoise[5] = GetValue<Direction>(CornerColor[5], x * 2 + 2, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 5
-			CornerNoise[6] = GetValue<Direction>(CornerColor[6], x * 2 + 0, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 6 - B
-			CornerNoise[7] = GetValue<Direction>(CornerColor[7], x * 2 + 1, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 7
-			CornerNoise[8] = GetValue<Direction>(CornerColor[8], x * 2 + 2, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 8 - C
+			CornerNoise[0] = GetValue<Direction>(OutOctant, CornerColor[0], x * 2 + 0, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 0 - 9
+			CornerNoise[1] = GetValue<Direction>(OutOctant, CornerColor[1], x * 2 + 1, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 1
+			CornerNoise[2] = GetValue<Direction>(OutOctant, CornerColor[2], x * 2 + 2, y * 2 + 0, Size, VoxelSteps >> 1, false);	// 2 - A
+			CornerNoise[3] = GetValue<Direction>(OutOctant, CornerColor[3], x * 2 + 0, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 3
+			CornerNoise[4] = GetValue<Direction>(OutOctant, CornerColor[4], x * 2 + 1, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 4
+			CornerNoise[5] = GetValue<Direction>(OutOctant, CornerColor[5], x * 2 + 2, y * 2 + 1, Size, VoxelSteps >> 1, false);	// 5
+			CornerNoise[6] = GetValue<Direction>(OutOctant, CornerColor[6], x * 2 + 0, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 6 - B
+			CornerNoise[7] = GetValue<Direction>(OutOctant, CornerColor[7], x * 2 + 1, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 7
+			CornerNoise[8] = GetValue<Direction>(OutOctant, CornerColor[8], x * 2 + 2, y * 2 + 2, Size, VoxelSteps >> 1, false);	// 8 - C
 
-			CornerNoise[9] =  GetValue<Direction>(CornerColor[9], x + 0, y + 0, Voxels + 0, VoxelSteps, true);	// 9
-			CornerNoise[10] = GetValue<Direction>(CornerColor[10], x + 1, y + 0, Voxels + 0, VoxelSteps, true);	// A
-			CornerNoise[11] = GetValue<Direction>(CornerColor[11], x + 0, y + 1, Voxels + 0, VoxelSteps, true);	// B
-			CornerNoise[12] = GetValue<Direction>(CornerColor[12], x + 1, y + 1, Voxels + 0, VoxelSteps, true);	// C
+			CornerNoise[9] =  GetValue<Direction>(OutOctant, CornerColor[9], x + 0, y + 0, Voxels + 0, VoxelSteps, true);	// 9
+			CornerNoise[10] = GetValue<Direction>(OutOctant, CornerColor[10], x + 1, y + 0, Voxels + 0, VoxelSteps, true);	// A
+			CornerNoise[11] = GetValue<Direction>(OutOctant, CornerColor[11], x + 0, y + 1, Voxels + 0, VoxelSteps, true);	// B
+			CornerNoise[12] = GetValue<Direction>(OutOctant, CornerColor[12], x + 1, y + 1, Voxels + 0, VoxelSteps, true);	// C
 
 			uint32 caseValue =
 				((CornerNoise[0] < 0.f) << 0)
@@ -364,7 +365,7 @@ void FVoxelMarchingCubesMesher::GeometryTransitionCubes(float radius)
 }
 
 template<uint8 Direction>
-float FVoxelMarchingCubesMesher::GetValue(FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree)
+float FVoxelMarchingCubesMesher::GetValue(FVoxelOctreeDensity* OutOctant, FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree)
 {
 	float Value = 0.f;
 
@@ -379,7 +380,7 @@ float FVoxelMarchingCubesMesher::GetValue(FColor& Color, int X, int Y, int Size,
 	{
 		FIntVector GlobalPosition = TransferToDirection<Direction>(FIntVector(X, Y, 0) * Steps, Size) - FIntVector(1, 1, 1) * (Size >> 1) + Position;
 
-		World->GetVoxelValue(GlobalPosition, Value, Color);
+		World->GetVoxelValue(OutOctant, GlobalPosition, Value, Color);
 	}
 	return Value;
 }

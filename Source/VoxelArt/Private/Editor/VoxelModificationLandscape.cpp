@@ -2,6 +2,11 @@
 
 
 #include "Editor/VoxelModificationLandscape.h"
+#include "Editor/VoxelEditorData.h"
+
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
+
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
@@ -9,10 +14,14 @@
 
 using namespace VoxelTools;
 
-void UVoxelModificationLandscape::SpherePainter(AVoxelLandscape* World, FIntVector Position, float Radius)
+
+void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius)
 {
 	int VoxelsRadius = FMath::CeilToInt(Radius);
 
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
+	int32 timeBefore = FDateTime::Now().GetTicks();
 	World->OctreeMutex.Lock();
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 	{
@@ -20,20 +29,42 @@ void UVoxelModificationLandscape::SpherePainter(AVoxelLandscape* World, FIntVect
 		{
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
-				FVector PositionVoxel = FVector(X, Y, Z);
-				float Value = Radius - Offset - PositionVoxel.Size();
+				float SphereSDF = Radius - Offset - FVector(X, Y, Z).Size();
 
-				World->SetVoxelValue((FIntVector)PositionVoxel + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				if (SphereSDF >= -1)
+				{
+					float OutValue = 0.f;
+					FColor OutColor = FColor(77.f, 77.f, 77.f);
+					World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+					float Value = 0.f;
+
+					if (Data->BrushSoftness == BrushSoftness::Smooth)
+					{
+						Value = OutValue + UKismetMathLibrary::FMax(1.f, SphereSDF);
+					}
+					else
+					{
+						Value = UKismetMathLibrary::FMax(OutValue, SphereSDF);
+					}
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+
+					//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(FIntVector(X, Y, Z) + Position), 10, FColor::Red, false, 25);
+				}
 			}
 		}
 	}
 	UpdateOverlapOctants(World, Position, VoxelsRadius * 2);
 	World->OctreeMutex.Unlock();
+	int32 timeAfter = FDateTime::Now().GetTicks();
+	//UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %d"), (timeBefore - timeAfter));
 }
 
-void UVoxelModificationLandscape::CubePainter(AVoxelLandscape* World, FIntVector Position, float Radius)
+void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius)
 {
 	int VoxelsRadius = FMath::CeilToInt(Radius);
+
+	FVoxelOctreeDensity* OutOctant = nullptr;
 
 	World->OctreeMutex.Lock();
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
@@ -45,7 +76,7 @@ void UVoxelModificationLandscape::CubePainter(AVoxelLandscape* World, FIntVector
 				FVector PositionVoxel = FVector(X, Y, Z);
 				float Value = 1.f - Offset;
 
-				World->SetVoxelValue((FIntVector)PositionVoxel + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				World->SetVoxelValue(OutOctant, (FIntVector)PositionVoxel + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
 			}
 		}
 	}

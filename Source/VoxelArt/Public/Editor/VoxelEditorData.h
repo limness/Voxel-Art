@@ -7,6 +7,14 @@
 
 
 UENUM()
+enum BrushType
+{
+	Sphere	UMETA(DisplayName = "Sphere"),
+	Cube	UMETA(DisplayName = "Cube")
+};
+
+
+UENUM()
 enum EditorType
 {
 	Terrain	UMETA(DisplayName = "Terrain"),
@@ -21,19 +29,39 @@ enum BrushSoftness
 	Flat	UMETA(DisplayName = "Flat")
 };
 
-USTRUCT()
-struct VOXELART_API FVoxelEditorData
+UCLASS()
+class VOXELART_API UVoxelEditorData : public UObject
 {
 	GENERATED_BODY()
 
+public:
+
+	UVoxelEditorData(const FObjectInitializer& ObjectInitializer) {}
+	~UVoxelEditorData() {}
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Editor Type"))
 	TEnumAsByte<EditorType> EditorType;
+
+	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Brush Type"))
+	TEnumAsByte<BrushType> BrushType;
+
+	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Softness"))
 	TEnumAsByte<BrushSoftness> BrushSoftness;
 
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Brush Dig"))
 	bool Dig = true;
 
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Radius"))
 	float Radius = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Brush Strength"))
 	float Strength = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Max Distance"))
 	float MaxDictance = 256.f;
 
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Color"))
 	FColor Color = FColor(77.f, 77.f, 77.f);
 };

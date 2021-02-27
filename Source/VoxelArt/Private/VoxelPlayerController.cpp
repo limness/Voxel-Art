@@ -10,12 +10,14 @@ void AVoxelPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EditorData.EditorType =		EditorType;
-	EditorData.BrushSoftness =	BrushSoftness;
-	EditorData.Dig =			Dig;
-	EditorData.Strength =		Strength;
-	EditorData.Radius =			Radius;
-	EditorData.Color =			Color;
+	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage());
+
+	EditorData->EditorType = EditorType;
+	EditorData->BrushSoftness = BrushSoftness;
+	EditorData->Dig = Dig;
+	EditorData->Radius = Radius;
+	EditorData->Strength = Strength;
+	EditorData->Color = Color;
 }
 
 bool AVoxelPlayerController::InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)
@@ -59,7 +61,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	{
 		FHitResult MouseHitResult;
 
-		if(this->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, MouseHitResult))
+		if(GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, MouseHitResult))
 		{
 			if (MouseHitResult.bBlockingHit)
 			{
@@ -69,7 +71,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 				}
 			}
 		}
-		if (!Smooth)
+		if (BrushSoftness != BrushSoftness::Smooth)
 		{
 			EditorRemovePressed ? EditorRemovePressed = false : EditorCreatePressed = false;
 		}
@@ -82,7 +84,11 @@ void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosi
 	{
 		FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
 
-		UVoxelModificationLandscape::SpherePainter(World, WorldPosition, Radius);
+		switch (BrushType)
+		{
+		case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, World, WorldPosition, Radius); break; }
+		case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, World, WorldPosition, Radius); break; }
+		}
 	}
 }
 

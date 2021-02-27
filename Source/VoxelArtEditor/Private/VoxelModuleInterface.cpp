@@ -1,6 +1,7 @@
 
 #include "VoxelModuleInterface.h"
 #include "VoxelLandscapeDetails.h"
+#include "VoxelEdModeTool.h"
 
 #include "VoxelLandscape.h"
 
@@ -54,12 +55,30 @@ void IVoxelModuleInterface::StartupModule()
         PropertyModule.RegisterCustomClassLayout(AVoxelLandscape::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&IVoxelLandscapeDetails::MakeInstance));
     }
 
-	UE_LOG(LogTemp, Warning, TEXT("Startup Voxel Editor Module()"));
+    ModuleListeners.Add(MakeShareable(new FVoxelEdModeTool));
+
+    for (int32 i = 0; i < ModuleListeners.Num(); ++i)
+    {
+        ModuleListeners[i]->OnStartupModule();
+    }
+
+	UE_LOG(LogTemp, Log, TEXT("Startup Voxel Art Editor Module()"));
 }
+
+/*void IVoxelModuleInterface::SetObjects(const TArray<TWeakObjectPtr<>>& InSelectedObjects, const TArray<FGuid>& InObjectBindings)
+{
+    check(InSelectedObjects.Num() == InObjectBindings.Num());
+
+    TArray<TWeakObjectPtr<>> SelectedObjects;
+    SelectedObjects.Insert(Settings, 0);
+
+    StaticCastSharedPtr<SEmpexEditModeTools>(Toolkit->GetInlineContent())->SetDetailsObjects(SelectedObjects);
+}*/
+
 
 void IVoxelModuleInterface::ShutdownModule()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shutdown Voxel Editor Module()"));
+	UE_LOG(LogTemp, Log, TEXT("Shutdown Voxel Art Editor Module()"));
 }
 
 #undef LOCTEXT_NAMESPACE

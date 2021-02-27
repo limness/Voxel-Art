@@ -47,7 +47,6 @@ public:
 	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
 
 	inline FIntVector GetMinimumCorner();
-
 	inline FIntVector GetMaximumCorner();
 
 	inline TWeakPtr<FVoxelOctreeData> GetParent();
@@ -132,8 +131,12 @@ public:
 	inline bool HasOwnDensity() { return OwnDensity; }
 	inline bool HasOwnColor() { return OwnColor; }
 
-	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
+	bool IsInside(FIntVector Position);
 
+	inline FIntVector GetMinimumCorner();
+	inline FIntVector GetMaximumCorner();
+
+	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
 	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
 
 	void SetDefaultMap(AVoxelLandscape* World);

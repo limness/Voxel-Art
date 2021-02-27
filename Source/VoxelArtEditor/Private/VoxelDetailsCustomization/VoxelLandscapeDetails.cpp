@@ -34,22 +34,22 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         [
             SNew(STextBlock)
             .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("World Preview")))
+            .Text(FText::FromString(TEXT("World Preview")))
         ]
-    .ValueContent()
+        .ValueContent()
         .MaxDesiredWidth(125.f)
         .MinDesiredWidth(125.f)
         [
             SNew(SButton)
             .ContentPadding(2)
-        .VAlign(VAlign_Center)
-        .HAlign(HAlign_Center)
-        .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
-        [
-            SNew(STextBlock)
-            .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("Create World")))
-        ]
+            .VAlign(VAlign_Center)
+            .HAlign(HAlign_Center)
+            .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
+            [
+                SNew(STextBlock)
+                .Font(IDetailLayoutBuilder::GetDetailFont())
+                .Text(FText::FromString(TEXT("Create World")))
+            ]
         ];
 
     OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
@@ -57,45 +57,44 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         [
             SNew(STextBlock)
             .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("")))
+            .Text(FText::FromString(TEXT("")))
         ]
-    .ValueContent()
+        .ValueContent()
         .MaxDesiredWidth(125.f)
         .MinDesiredWidth(125.f)
         [
             SNew(SButton)
             .ContentPadding(2)
-        .VAlign(VAlign_Center)
-        .HAlign(HAlign_Center)
-        .OnClicked(this, &IVoxelLandscapeDetails::UpdateWorldInEditor)
-        [
-            SNew(STextBlock)
-            .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("Update World")))
-        ]
+            .VAlign(VAlign_Center)
+            .HAlign(HAlign_Center)
+            .OnClicked(this, &IVoxelLandscapeDetails::UpdateWorldInEditor)
+            [
+                SNew(STextBlock)
+                .Font(IDetailLayoutBuilder::GetDetailFont())
+                .Text(FText::FromString(TEXT("Update World")))
+            ]
         ];
-
     OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
         .NameContent()
         [
             SNew(STextBlock)
             .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("")))
+            .Text(FText::FromString(TEXT("")))
         ]
-    .ValueContent()
+        .ValueContent()
         .MaxDesiredWidth(125.f)
         .MinDesiredWidth(125.f)
         [
             SNew(SButton)
             .ContentPadding(2)
-        .VAlign(VAlign_Center)
-        .HAlign(HAlign_Center)
-        .OnClicked(this, &IVoxelLandscapeDetails::DestroyWorldInEditor)
-        [
-            SNew(STextBlock)
-            .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("Destroy World")))
-        ]
+            .VAlign(VAlign_Center)
+            .HAlign(HAlign_Center)
+            .OnClicked(this, &IVoxelLandscapeDetails::DestroyWorldInEditor)
+            [
+                SNew(STextBlock)
+                .Font(IDetailLayoutBuilder::GetDetailFont())
+                .Text(FText::FromString(TEXT("Destroy World")))
+            ]
         ];
 
     DetailLayout.EditCategory("Export Preview Heightmap")
@@ -104,22 +103,22 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         [
             SNew(STextBlock)
             .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("Preview Density Map")))
+            .Text(FText::FromString(TEXT("Preview Density Map")))
         ]
-    .ValueContent()
+        .ValueContent()
         .MaxDesiredWidth(125.f)
         .MinDesiredWidth(125.f)
         [
             SNew(SButton)
             .ContentPadding(2)
-        .VAlign(VAlign_Center)
-        .HAlign(HAlign_Center)
-        .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
-        [
-            SNew(STextBlock)
-            .Font(IDetailLayoutBuilder::GetDetailFont())
-        .Text(FText::FromString(TEXT("Create texture")))
-        ]
+            .VAlign(VAlign_Center)
+            .HAlign(HAlign_Center)
+            .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
+            [
+                SNew(STextBlock)
+                .Font(IDetailLayoutBuilder::GetDetailFont())
+                .Text(FText::FromString(TEXT("Create texture")))
+            ]
         ];
 }
 
