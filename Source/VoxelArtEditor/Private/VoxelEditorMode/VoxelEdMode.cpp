@@ -39,6 +39,8 @@ void FVoxelEdMode::Exit()
     FToolkitManager::Get().CloseToolkit(Toolkit.ToSharedRef());
     Toolkit.Reset();
 
+	EditorTool->Destroy();
+
     FEdMode::Exit();
 }
 

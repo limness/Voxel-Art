@@ -7,6 +7,7 @@
 #include "VoxelChunk.h"
 #include "VoxelChunkComponent.h"
 #include "VoxelPoolComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 #include "Renders/VoxelRender.h"
 #include "Renders/VoxelLandscapeGenerator.h"
@@ -240,15 +241,22 @@ public:
 		RootComponent = Marker;
 
 		auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+		auto MaterialAsset = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/MVoxel_Tool.MVoxel_Tool'"));
 
 		if (MeshAsset.Succeeded())
 		{
 			Marker->SetStaticMesh(MeshAsset.Object);
 			Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
+		if (MaterialAsset.Object)
+		{
+			Material = UMaterialInstanceDynamic::Create(MaterialAsset.Object, this);
+			Marker->SetMaterial(0, Material);
+		}
 	}
 
 public:
 
 	UStaticMeshComponent* Marker;
+	UMaterialInstanceDynamic* Material;
 };

@@ -17,7 +17,7 @@ void AVoxelPlayerController::BeginPlay()
 	EditorData->Dig = Dig;
 	EditorData->Radius = Radius;
 	EditorData->Strength = Strength;
-	EditorData->Color = Color;
+	EditorData->BrushColor = Color;
 }
 
 bool AVoxelPlayerController::InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)

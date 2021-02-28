@@ -63,5 +63,5 @@ public:
 	float MaxDictance = 256.f;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Color"))
-	FColor Color = FColor(77.f, 77.f, 77.f);
+	FColor BrushColor = FColor(77.f, 77.f, 77.f);
 };

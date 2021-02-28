@@ -43,12 +43,18 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 					{
 						Value = OutValue + UKismetMathLibrary::FMax(1.f, SphereSDF);
 					}
-					else
+					else if (Data->BrushSoftness == BrushSoftness::Insert)
 					{
 						Value = UKismetMathLibrary::FMax(OutValue, SphereSDF);
 					}
-					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
-
+					if (Data->EditorType == EditorType::Terrain)
+					{
+						World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+					}
+					else if (Data->EditorType == EditorType::Color)
+					{
+						World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
+					}
 					//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(FIntVector(X, Y, Z) + Position), 10, FColor::Red, false, 25);
 				}
 			}
@@ -73,10 +79,16 @@ void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLand
 		{
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
-				FVector PositionVoxel = FVector(X, Y, Z);
 				float Value = 1.f - Offset;
 
-				World->SetVoxelValue(OutOctant, (FIntVector)PositionVoxel + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				if (Data->EditorType == EditorType::Terrain)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				}
+				else if (Data->EditorType == EditorType::Color)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
+				}
 			}
 		}
 	}

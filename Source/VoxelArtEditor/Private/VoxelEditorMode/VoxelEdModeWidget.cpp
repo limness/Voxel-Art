@@ -48,7 +48,7 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 							[
 								SNew(STextBlock)
 								.ColorAndOpacity(FLinearColor::White)
-								.Font(FSlateFontInfo(FPaths::GameContentDir() / TEXT("EditorResources/Fonts/BebasNeue Book.otf"), 14))
+								.Font(FSlateFontInfo(FPaths::ProjectContentDir() / TEXT("EditorResources/Fonts/BebasNeue Book.otf"), 14))
 								.Text(FText::FromString(TEXT("Voxel Art")))
 							]
 							+ SHorizontalBox::Slot()
@@ -57,7 +57,7 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 							[
 								SNew(STextBlock)
 								.ColorAndOpacity(FLinearColor::White)
-								.Font(FSlateFontInfo(FPaths::GameContentDir() / TEXT("EditorResources/Fonts/BebasNeue Bold.otf"), 14))
+								.Font(FSlateFontInfo(FPaths::ProjectContentDir() / TEXT("EditorResources/Fonts/BebasNeue Bold.otf"), 14))
 								.Text(FText::FromString(TEXT("Editor")))
 							]
 						]
