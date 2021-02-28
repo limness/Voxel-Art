@@ -146,6 +146,11 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
+TArray<FVoxelOctreeDensity*> FVoxelOctreeDensity::GetChildren()
+{
+	return ChildrenOctants;
+}
+
 bool FVoxelOctreeDensity::IsInside(FIntVector Position)
 {
 //	UE_LOG(VoxelArt, Log, TEXT(" USING  %s"), *GetMinimumCorner().ToString());

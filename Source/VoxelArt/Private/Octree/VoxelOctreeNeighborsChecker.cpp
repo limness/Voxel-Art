@@ -132,6 +132,12 @@ void VoxelOctreeNeighborsChecker::EnsureCompletion()
 	if (Thread)
 	{
 		Thread->WaitForCompletion();
+
+		if (ChangesOctree)
+		{
+			ChangesOctree->ChunksGeneration.Empty();
+			ChangesOctree.Reset();
+		}
 	}
 }
 

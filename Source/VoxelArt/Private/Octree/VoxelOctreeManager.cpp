@@ -138,18 +138,19 @@ void VoxelOctreeManager::Stop()
 
 void VoxelOctreeManager::EnsureCompletion()
 {
-	if (ChangesOctree)
-	{
-		ChangesOctree->ChunksCreation.Empty();
-		ChangesOctree->ChunksRemoving.Empty();
-
-		ChangesOctree = nullptr;
-	}
 	Stop();
 
 	if (Thread)
 	{
 		Thread->WaitForCompletion();
+
+		if (ChangesOctree)
+		{
+			ChangesOctree->ChunksCreation.Empty();
+			ChangesOctree->ChunksRemoving.Empty();
+
+			ChangesOctree.Reset();
+		}
 	}
 }
 

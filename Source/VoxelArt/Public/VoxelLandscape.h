@@ -91,6 +91,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
 	bool EnabledWorldInGame = true;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Main")
+	bool bSaveDensityInGame = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "524288", UIMin = "0.0", UIMax = "524288"))
 	int VoxelMin = 128;
 
@@ -206,6 +209,7 @@ public:
 	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
+	void RemoveOctreeDensityLeaves(FVoxelOctreeDensity* Octant);
 
 	UFUNCTION(BlueprintCallable)
 	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);

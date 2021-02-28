@@ -120,14 +120,11 @@ public:
 
 	void AddChildren();
 
-	inline bool HasChildren() { return ChildrenOctants.Num() == 8; };
+	inline bool HasChildren() { return ChildrenOctants.Num() == 8; }
 
+	inline TArray<FVoxelOctreeDensity*> GetChildren();
 	inline void SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
-
 	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
-
-	FIntVector TransferToLocal(AVoxelLandscape* World, FIntVector Position);
-
 	inline bool HasOwnDensity() { return OwnDensity; }
 	inline bool HasOwnColor() { return OwnColor; }
 
@@ -135,6 +132,8 @@ public:
 
 	inline FIntVector GetMinimumCorner();
 	inline FIntVector GetMaximumCorner();
+
+	FIntVector TransferToLocal(AVoxelLandscape* World, FIntVector Position);
 
 	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
 	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);

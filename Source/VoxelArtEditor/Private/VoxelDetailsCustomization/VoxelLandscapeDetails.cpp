@@ -139,6 +139,7 @@ FReply IVoxelLandscapeDetails::DestroyWorldInEditor()
 {
     if (World.IsValid())
     {
+        World->bSaveDensityInGame = false;
         World->DestroyVoxelWorld();
     }
     else

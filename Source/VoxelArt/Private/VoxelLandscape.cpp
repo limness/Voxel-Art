@@ -47,6 +47,7 @@ void AVoxelLandscape::BeginPlay()
 
 void AVoxelLandscape::Destroyed()
 {
+	bSaveDensityInGame = false;
 	DestroyVoxelWorld();
 }
 
@@ -68,6 +69,7 @@ void AVoxelLandscape::CreateVoxelWorld()
 		{
 			if (TerrainCreated)
 			{
+				bSaveDensityInGame = true;
 				DestroyVoxelWorld();
 			}
 
@@ -104,16 +106,13 @@ void AVoxelLandscape::DestroyVoxelWorld()
 	{
 		int TimeBeforeDestroy = FDateTime::Now().GetMillisecond();
 
-		if (OctreeManagerThread)
-		{
-			delete OctreeManagerThread;
-			OctreeManagerThread = nullptr;
-		}
-		if (OctreeNeighborsCheckerThread)
-		{
-			delete OctreeNeighborsCheckerThread;
-			OctreeNeighborsCheckerThread = nullptr;
-		}
+		OctreeManagerThread->EnsureCompletion();
+		delete OctreeManagerThread;
+		OctreeManagerThread = nullptr;
+
+		OctreeNeighborsCheckerThread->EnsureCompletion();
+		delete OctreeNeighborsCheckerThread;
+		OctreeNeighborsCheckerThread = nullptr;
 
 		MainOctree.Reset();
 
@@ -122,20 +121,31 @@ void AVoxelLandscape::DestroyVoxelWorld()
 		ChunksRemoving.Empty();
 		ChunksGeneration.Empty();
 
+		/* World Density should be removed after playing */
+		if (!bSaveDensityInGame)
+		{
+			// TODO: to make memory deleting for leaves otherwise memory is wrong
+			delete OctreeDensity;
+			OctreeDensity = nullptr;
+		}
+		
 		for (auto& it : PoolThreads)
 		{
 			it->Cancel();
 		}
+		PoolThreads.Empty();
+
 		int32 TotalChunks = PoolChunks->PoolChunks.Num();
 		for (auto& Chunk : PoolChunks->PoolChunks)
 		{
 			Chunk->DestroyComponent();
 		}
-		int32 TimeAfterDestroy = FDateTime::Now().GetMillisecond();
-		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 1000.f, TotalChunks);
 		GEngine->ForceGarbageCollection(true);
 		ThreadPool->Destroy();
 		TerrainCreated = false;
+
+		int32 TimeAfterDestroy = FDateTime::Now().GetMillisecond();
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 1000.f, TotalChunks);
 	}
 }
 
@@ -351,6 +361,32 @@ void AVoxelLandscape::GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData>
 	}
 }
 
+void AVoxelLandscape::RemoveOctreeDensityLeaves(FVoxelOctreeDensity* Octant)
+{
+	if (!Octant->HasChildren())
+	{
+		//if (Octant->Data != nullptr)
+		{
+			//if (IsValid(Octant->Data->Chunk))
+			{
+				//ChunksGeneration.Add(Octant->Data);
+			}
+		}
+	}
+	else
+	{
+		for (auto& ChildOctant : Octant->GetChildren())
+		{
+			RemoveOctreeDensityLeaves(ChildOctant);
+
+			if (!ChildOctant->HasChildren())
+			{
+
+			}
+		}
+	}
+}
+
 void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks)
 {
 	for (auto& Chunk : Chunks)
@@ -368,7 +404,10 @@ void AVoxelLandscape::SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chun
 
 void AVoxelLandscape::GenerateLandscape()
 {
-	OctreeDensity = new FVoxelOctreeDensity(GeneratorLandscape, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0)));
+	if (!OctreeDensity)
+	{
+		OctreeDensity = new FVoxelOctreeDensity(GeneratorLandscape, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0)));
+	}
 	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0))));
 
 	GenerateOctree(MainOctree);
@@ -520,6 +559,8 @@ void AVoxelLandscape::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 	TaskWorkGlobalCounter.Increment();
 	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
 	MesherTask->StartBackgroundTask(ThreadPool);
+
+	PoolThreads.Add(MesherTask);
 }
 
 void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
@@ -543,40 +584,9 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 
 void AVoxelLandscape::GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color)
 {
-	//if (OutOctant != nullptr)
-	{
-		//if (OutOctant->IsInside(Position))
-		{
-			//UE_LOG(VoxelArt, Log, TEXT(" USING inside no null"));
-		}
-		/*	else*/
-		{
-			//	UE_LOG(VoxelArt, Log, TEXT(" USING outside no null"));
-		}
-	}
 	if (OutOctant == nullptr || OutOctant->HasChildren() || !OutOctant->IsInside(Position))
 	{
-		
 		OutOctant = OctreeDensity->GetLeaf(Position);
-	/*	if (OutOctant != nullptr)
-		{
-			if (OutOctant->IsInside(Position))
-			{
-				UE_LOG(VoxelArt, Log, TEXT(" USING inside no null"));
-			}
-			else
-			{
-				UE_LOG(VoxelArt, Log, TEXT("  no null"));
-			}
-		}*/
-	}
-	else
-	{
-		//UE_LOG(VoxelArt, Log, TEXT(" USING outside null"));
-		//if (OutOctant != nullptr)
-		{
-		//	UE_LOG(VoxelArt, Log, TEXT(" USING not null"));
-		}
 	}
 	OutOctant->GetVoxelDensity(this, Position, Value, Color);
 }
@@ -586,10 +596,6 @@ void AVoxelLandscape::SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector 
 	if (OutOctant == nullptr || OutOctant->HasChildren() || !OutOctant->IsInside(Position))
 	{
 		OutOctant = OctreeDensity->GetLeaf(Position);
-	}
-	else
-	{
-	//	UE_LOG(VoxelArt, Log, TEXT(" exist"));
 	}
 	OutOctant->SetVoxelValue(this, Position, Density, Color, bSetDensity, bSetColor);
 }
