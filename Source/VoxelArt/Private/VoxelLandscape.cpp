@@ -10,14 +10,20 @@
 #include "EditorViewportClient.h"
 
 
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Create Voxel World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Destroy Voxel World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Enqueue octants"), STAT_EnqueueOctree, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Update Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Create chunks"), STAT_CreateChunks, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
+
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World ~ Destroy Threads"), STAT_DestroyThreads, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World ~ Clear Data Chunks"), STAT_ClearDataChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World ~ Destroy Chunks"), STAT_DestroyChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World ~ Destroy Thread Pool"), STAT_DestroyPoolThread, STATGROUP_Voxel);
+
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree"), STAT_UpdateOctree, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Enqueue octants"), STAT_EnqueueOctree, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks"), STAT_CreateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
 
 DEFINE_LOG_CATEGORY(VoxelArt);
 
@@ -73,8 +79,8 @@ void AVoxelLandscape::CreateVoxelWorld()
 				DestroyVoxelWorld();
 			}
 
-			TimeForWorldGenerate = FDateTime::Now().GetMillisecond();
-			ThreadPool->Create(4, 128 * 1024);
+			TimeForWorldGenerate = FDateTime::Now().GetTicks();
+			//ThreadPool->Create(4, 128 * 1024);
 
 			SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 			GeneratorLandscape->GeneratorInit();
@@ -104,48 +110,64 @@ void AVoxelLandscape::DestroyVoxelWorld()
 
 	if (TerrainCreated)
 	{
-		int TimeBeforeDestroy = FDateTime::Now().GetMillisecond();
-
-		OctreeManagerThread->EnsureCompletion();
-		delete OctreeManagerThread;
-		OctreeManagerThread = nullptr;
-
-		OctreeNeighborsCheckerThread->EnsureCompletion();
-		delete OctreeNeighborsCheckerThread;
-		OctreeNeighborsCheckerThread = nullptr;
-
-		MainOctree.Reset();
-
-		ChangesOctree.Empty();
-		ChunksCreation.Empty();
-		ChunksRemoving.Empty();
-		ChunksGeneration.Empty();
-
-		/* World Density should be removed after playing */
-		if (!bSaveDensityInGame)
+		int TimeBeforeDestroy = FDateTime::Now().GetTicks();
+		int32 TotalChunks = 0;
 		{
-			// TODO: to make memory deleting for leaves otherwise memory is wrong
-			delete OctreeDensity;
-			OctreeDensity = nullptr;
-		}
-		
-		for (auto& it : PoolThreads)
-		{
-			it->Cancel();
-		}
-		PoolThreads.Empty();
+			SCOPE_CYCLE_COUNTER(STAT_DestroyThreads);
 
-		int32 TotalChunks = PoolChunks->PoolChunks.Num();
-		for (auto& Chunk : PoolChunks->PoolChunks)
-		{
-			Chunk->DestroyComponent();
-		}
-		GEngine->ForceGarbageCollection(true);
-		ThreadPool->Destroy();
-		TerrainCreated = false;
+			//OctreeManagerThread->EnsureCompletion();
+			delete OctreeManagerThread;
+			OctreeManagerThread = nullptr;
 
-		int32 TimeAfterDestroy = FDateTime::Now().GetMillisecond();
-		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 1000.f, TotalChunks);
+			//OctreeNeighborsCheckerThread->EnsureCompletion();
+			delete OctreeNeighborsCheckerThread;
+			OctreeNeighborsCheckerThread = nullptr;
+		}
+		{
+			SCOPE_CYCLE_COUNTER(STAT_ClearDataChunks);
+
+			MainOctree.Reset();
+
+			ChangesOctree.Empty();
+			ChunksCreation.Empty();
+			ChunksRemoving.Empty();
+			ChunksGeneration.Empty();
+
+			/* World Density should be removed after playing */
+			if (!bSaveDensityInGame)
+			{
+				// TODO: to make memory deleting for leaves otherwise memory is wrong
+				delete OctreeDensity;
+				OctreeDensity = nullptr;
+			}
+
+			for (auto& it : PoolThreads)
+			{
+				it->Cancel();
+			}
+			PoolThreads.Empty();
+		}
+		{
+			SCOPE_CYCLE_COUNTER(STAT_DestroyChunks);
+
+			TotalChunks = PoolChunks->PoolChunks.Num();
+			for (auto& Chunk : PoolChunks->PoolChunks)
+			{
+				Chunk->DestroyComponent();
+				Chunk = nullptr;
+			}
+			PoolChunks->PoolChunks.Empty();
+		}
+		{
+			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
+
+			//GEngine->ForceGarbageCollection(true);
+			//ThreadPool->Destroy();
+			TerrainCreated = false;
+			StatsShowed = false;
+		}
+		int32 TimeAfterDestroy = FDateTime::Now().GetTicks();
+		UE_LOG(VoxelArt, Log, TEXT("Voxel World was destroyd in %f s. (chunks %d)"), (TimeAfterDestroy - TimeBeforeDestroy) / 1000.f / 10000.f, TotalChunks);
 	}
 }
 
@@ -272,6 +294,8 @@ void AVoxelLandscape::UpdateOctree()
 	{
 		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
 
+		//UE_LOG(VoxelArt, Log, TEXT("(%d chunks)"), TaskWorkGlobalCounter.GetValue());
+
 		if (TaskWorkGlobalCounter.GetValue() == 0)
 		{
 			int32 Index = 0;
@@ -281,8 +305,8 @@ void AVoxelLandscape::UpdateOctree()
 				{
 					if (!StatsShowed)
 					{
-						int32 timeAfter = FDateTime::Now().GetMillisecond();
-						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 1000.f, PoolChunks->PoolChunks.Num());
+						int32 timeAfter = FDateTime::Now().GetTicks();
+						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), (timeAfter - TimeForWorldGenerate) / 1000.f / 10000.f, PoolChunks->PoolChunks.Num());
 						StatsShowed = true;
 					}
 					//while (ChunksRemoving.Num() > 0)
@@ -551,14 +575,14 @@ void AVoxelLandscape::SpawnChunk(FVoxelChunkData* ChunkData)
 		PoolChunk = PoolChunks->AddChunkToPool();
 	}
 	ChunkInit(PoolChunk, ChunkData);
-	PutChunkOnGeneration(ChunkData);
+	//PutChunkOnGeneration(ChunkData);
 }
 
 void AVoxelLandscape::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
 	TaskWorkGlobalCounter.Increment();
 	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
-	MesherTask->StartBackgroundTask(ThreadPool);
+	MesherTask->StartBackgroundTask(/*ThreadPool*/);
 
 	PoolThreads.Add(MesherTask);
 }

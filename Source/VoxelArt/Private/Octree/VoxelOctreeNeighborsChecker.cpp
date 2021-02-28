@@ -40,7 +40,7 @@ VoxelOctreeNeighborsChecker::VoxelOctreeNeighborsChecker(AVoxelLandscape* _World
 {
 	m_semaphore = FGenericPlatformProcess::GetSynchEventFromPool(false);
 
-	Thread = FRunnableThread::Create(this, TEXT("CheckOctreeNeighbors"), 0, TPri_BelowNormal);
+	Thread = FRunnableThread::Create(this, TEXT("Voxel Octree Nehighbors Checker"), 0, TPri_BelowNormal);
 }
 
 VoxelOctreeNeighborsChecker::~VoxelOctreeNeighborsChecker()
@@ -93,7 +93,7 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 			//ChangesOctree->ChunksGeneration.Empty();
 			ChangesOctree.Reset();
 
-			FPlatformProcess::Sleep(0.05);
+			FPlatformProcess::Sleep(0.05f);
 		}
 	}
 	return 0;

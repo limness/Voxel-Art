@@ -9,6 +9,11 @@
 #include "EditorViewportClient.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Children"), STAT_AddChildren, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Destroy Children"), STAT_DestroyChildren, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Remove Data"), STAT_AddRemoveData, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Create Data"), STAT_AddCreateData, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Remove Chunk"), STAT_AddRemoveChunk, STATGROUP_Voxel);
 
 
 VoxelOctreeManager::VoxelOctreeManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
@@ -19,7 +24,7 @@ VoxelOctreeManager::VoxelOctreeManager(AVoxelLandscape* _World, APlayerControlle
 {
 	m_semaphore = FGenericPlatformProcess::GetSynchEventFromPool(false);
 
-	Thread = FRunnableThread::Create(this, TEXT("CheckPosition"), 0, TPri_BelowNormal);
+	Thread = FRunnableThread::Create(this, TEXT("Voxel Octree Manager"), 0, TPri_BelowNormal);
 }
 
 VoxelOctreeManager::~VoxelOctreeManager()
@@ -73,7 +78,7 @@ uint32 VoxelOctreeManager::Run()
 			}
 			else
 			{
-				if (PlayerController->GetPawn() != nullptr)
+				if (PlayerController != nullptr && PlayerController->GetPawn() != nullptr)
 				{
 					PlayerPositionToWorld = World->TransferToVoxelWorld(PlayerController->GetPawn()->GetActorLocation());
 				}
@@ -88,11 +93,6 @@ uint32 VoxelOctreeManager::Run()
 					SCOPE_CYCLE_COUNTER(STAT_Run);
 
 					ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
-
-					//for (int i = 0; i < 5500; i++)
-					{
-						//ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(World->MainOctree, World->MainOctree->Depth, World->MainOctree->Position, 4096, 16, 1000));
-					}
 					{
 						FScopeLock Lock(&World->OctreeMutex);
 						CheckOctree(World->MainOctree);
@@ -104,7 +104,7 @@ uint32 VoxelOctreeManager::Run()
 					ChangesOctree.Reset();
 				}
 			}
-			FPlatformProcess::Sleep(0.01);
+			FPlatformProcess::Sleep(0.01f);
 		}
 	}
 	return 0;
@@ -171,24 +171,31 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 			if (DistancePlayer <= DistanceLODs / 2.f)
 			{
 				/*Create new branch*/
-				Octant->AddChildren();
-
-				/*Remove old chunk*/
-				if (Octant->Data != nullptr)
 				{
-					ChangesOctree->ChunksRemoving.Add(Octant->Data);
-					Octant->Data = nullptr;
+					SCOPE_CYCLE_COUNTER(STAT_AddChildren);
+
+					Octant->AddChildren();
+				}
+				/*Remove old chunk*/
+				{
+					SCOPE_CYCLE_COUNTER(STAT_AddRemoveChunk);
+
+					if (Octant->Data != nullptr)
+					{
+						ChangesOctree->ChunksRemoving.Add(Octant->Data);
+						Octant->Data = nullptr;
+					}
 				}
 				/*Create new chunks*/
-				for (auto& Leaf : Octant->GetChildren())
-				//for(int i = 0; i < 8; i++)
 				{
-					//if (!CheckOctree(Octant->ChildrenChunks[i]))
-					if (!CheckOctree(Leaf))
+					SCOPE_CYCLE_COUNTER(STAT_AddCreateData);
+
+					for (auto& Leaf : Octant->GetChildren())
 					{
-						ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
-						//ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(nullptr, 8, FIntVector(0,0,0), 10, 10, DistancePlayer));
-						//UE_LOG(VoxelArt, Log, TEXT("size %d"), sizeof(ChangesOctree->ChunksCreation.Last()));
+						if (!CheckOctree(Leaf))
+						{
+							ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
+						}
 					}
 				}
 				return true;
@@ -200,21 +207,30 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 		if (!(DistancePlayer <= DistanceLODs / 2.f) && World->MinimumLOD < Octant->Depth + 1) 
 		{
 			/*Create old chunk*/
-			ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Depth, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
-
-			//UE_LOG(VoxelArt, Log, TEXT("size %d"), sizeof(ChangesOctree->ChunksCreation.Last()));
-
-			/*Remove old chunks*/
-			for (auto& Leaf : GetLeavesChunk(Octant))
 			{
-				if (Leaf->Data != nullptr)
+				SCOPE_CYCLE_COUNTER(STAT_AddRemoveData);
+
+				ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Octant, Octant->Depth, Octant->Position, Octant->Size, World->VoxelsPerChunk, DistancePlayer));
+			}
+			/*Remove old chunks*/
+			{
+				SCOPE_CYCLE_COUNTER(STAT_AddRemoveChunk);
+
+				for (auto& Leaf : GetLeavesChunk(Octant))
 				{
-					ChangesOctree->ChunksRemoving.Add(Leaf->Data);
-					Octant->Data = nullptr;
+					if (Leaf->Data != nullptr)
+					{
+						ChangesOctree->ChunksRemoving.Add(Leaf->Data);
+						Octant->Data = nullptr;
+					}
 				}
 			}
 			/*Remove old branch*/
-			Octant->DestroyChildren();
+			{
+				SCOPE_CYCLE_COUNTER(STAT_DestroyChildren);
+
+				Octant->DestroyChildren();
+			}
 		}
 		else
 		{

@@ -8,7 +8,7 @@ UVoxelPoolComponent::UVoxelPoolComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -32,7 +32,7 @@ UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 		UVoxelChunkComponent* PoolableChunk = NewObject<UVoxelChunkComponent>(this, *name);
 		PoolableChunk->OnComponentCreated();
 		PoolableChunk->RegisterComponent();
-		if (PoolableChunk->bWantsInitializeComponent) PoolableChunk->InitializeComponent();
+		//if (PoolableChunk->bWantsInitializeComponent) PoolableChunk->InitializeComponent();
 		PoolableChunk->SetPoolActive(false);
 
 		PoolChunks.Add(PoolableChunk);

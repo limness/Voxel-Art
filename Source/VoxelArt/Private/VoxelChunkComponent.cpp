@@ -10,9 +10,11 @@
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "DrawDebugHelpers.h"
 
-UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
 {
 	//bUseAsyncCooking = true;
+	//bWantsInitializeComponent = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 UVoxelChunkComponent::~UVoxelChunkComponent()

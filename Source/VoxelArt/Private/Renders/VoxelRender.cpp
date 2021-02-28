@@ -14,7 +14,7 @@ VoxelRender::VoxelRender(AVoxelLandscape* _World) :
 
 	m_semaphore = FGenericPlatformProcess::GetSynchEventFromPool(false);
 
-	Thread = FRunnableThread::Create(this, TEXT("RNGThread" + 1), 0, TPri_BelowNormal);
+	Thread = FRunnableThread::Create(this, TEXT(""), 0, TPri_BelowNormal);
 }
 
 VoxelRender::~VoxelRender()
