@@ -226,3 +226,29 @@ public:
 	FCriticalSection OctreeMutex;
 	FCriticalSection ChunksToCreationMutex;
 };
+
+UCLASS()
+class VOXELART_API AVoxelEditorTool : public AActor
+{
+	GENERATED_BODY()
+
+public:
+
+	AVoxelEditorTool() 
+	{
+		Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
+		RootComponent = Marker;
+
+		auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+
+		if (MeshAsset.Succeeded())
+		{
+			Marker->SetStaticMesh(MeshAsset.Object);
+			Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+
+public:
+
+	UStaticMeshComponent* Marker;
+};

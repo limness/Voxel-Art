@@ -22,6 +22,11 @@ void FVoxelEdMode::Enter()
 
 	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage(), *LOCTEXT("SettingsName", "EmpexEdMode Settings").ToString());
 
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.ObjectFlags = RF_Transient;
+
+	EditorTool = GetWorld()->SpawnActor<AVoxelEditorTool>(AVoxelEditorTool::StaticClass(), SpawnParams);
+
     if (!Toolkit.IsValid())
     {
         Toolkit = MakeShareable(new FExampleEdModeToolkit);
@@ -87,6 +92,8 @@ bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* V
 				if (HitWorld)
 				{
 					HitWorldPosition = HitWorld->TransferToVoxelWorld(Hit.ImpactPoint);
+					EditorTool->Marker->SetWorldLocation(Hit.ImpactPoint);
+					EditorTool->Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * EditorData->Radius * 2.f);
 				}
 			}
 		}
@@ -98,10 +105,13 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 {
 	if (EditorRemovePressed)
 	{
-		switch (EditorData->BrushType)
+		if (HitWorld)
 		{
-		case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
-		case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
+			switch (EditorData->BrushType)
+			{
+			case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
+			case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
+			}
 		}
 	}
 }

@@ -4,9 +4,11 @@
 #include "EdMode.h"
 #include "EditorModes.h"
 
+#include "GameFramework/Actor.h"
 
 class UVoxelEditorData;
 class AVoxelLandscape;
+class AVoxelEditorTool;
 
 class FVoxelEdMode : public FEdMode
 {
@@ -38,9 +40,9 @@ protected:
 private:
 
     UVoxelEditorData* EditorData;
+    AVoxelEditorTool* EditorTool;
 
 public:
 
     UVoxelEditorData* GetEditorData() { return EditorData; }
 };
-
