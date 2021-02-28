@@ -250,8 +250,7 @@ public:
 		}
 		if (MaterialAsset.Object)
 		{
-			Material = UMaterialInstanceDynamic::Create(MaterialAsset.Object, this);
-			Marker->SetMaterial(0, Material);
+			MaterialPath = MaterialAsset.Object;
 		}
 	}
 
@@ -259,4 +258,6 @@ public:
 
 	UStaticMeshComponent* Marker;
 	UMaterialInstanceDynamic* Material;
+
+	UMaterial* MaterialPath;
 };

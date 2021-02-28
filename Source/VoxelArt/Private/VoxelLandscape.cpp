@@ -281,7 +281,7 @@ void AVoxelLandscape::UpdateOctree()
 
 						if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
 						{
-							ChunkData->Chunk->SetActive(false);
+							ChunkData->Chunk->SetPoolActive(false);
 
 							delete ChunkData;
 							ChunkData = nullptr;
@@ -537,7 +537,7 @@ void AVoxelLandscape::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* Ch
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(WorldComponent, FAttachmentTransformRules::KeepWorldTransform);
 		Chunk->SetWorldLocation(TransferToGameWorld(ChunkData->Position));
-		Chunk->SetActive(true);
+		Chunk->SetPoolActive(true);
 	}
 }
 

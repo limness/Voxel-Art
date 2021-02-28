@@ -333,7 +333,7 @@ bool VoxelOctreeNeighborsChecker::CheckOctree(TSharedPtr<FVoxelOctreeData> Octan
 		{
 			if (Octant->Data != nullptr)
 			{
-				if (IsValid(Octant->Data->Chunk) && Octant->Data->Chunk->IsActive())
+				if (IsValid(Octant->Data->Chunk) && Octant->Data->Chunk->IsPoolActive())
 				{
 					//if ((int)Octant->NodeID == 525)
 					if (true)

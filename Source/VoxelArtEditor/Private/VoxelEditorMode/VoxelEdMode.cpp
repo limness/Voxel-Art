@@ -99,6 +99,12 @@ bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* V
 				}
 			}
 		}
+
+		if (!EditorTool->Material)
+		{
+			EditorTool->Material = UMaterialInstanceDynamic::Create(EditorTool->MaterialPath, EditorTool);
+			EditorTool->Marker->SetMaterial(0, EditorTool->Material);
+		}
 	}
     return EditorCreatePressed;
 }
@@ -120,7 +126,7 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 
 bool FVoxelEdMode::DisallowMouseDeltaTracking() const
 {
-	return false;
+	return EditorRemovePressed;
 }
 
 /*

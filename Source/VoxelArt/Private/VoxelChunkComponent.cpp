@@ -25,12 +25,12 @@ void UVoxelChunkComponent::Initialize(FIntPoint inPos, UMaterialInterface* mater
 
 }
 
-bool UVoxelChunkComponent::IsActive()
+bool UVoxelChunkComponent::IsPoolActive()
 {
 	return Active;
 }
 
-void UVoxelChunkComponent::SetActive(bool activeStatus)
+void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 {
 	Active = activeStatus;
 	if (!activeStatus)

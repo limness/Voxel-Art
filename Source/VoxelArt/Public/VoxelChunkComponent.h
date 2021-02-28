@@ -38,8 +38,8 @@ public:
 
 public:
 
-	bool IsActive();
-	void SetActive(bool activeStatus);
+	bool IsPoolActive();
+	void SetPoolActive(bool activeStatus);
 
 public:
 

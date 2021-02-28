@@ -33,7 +33,7 @@ UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 		PoolableChunk->OnComponentCreated();
 		PoolableChunk->RegisterComponent();
 		if (PoolableChunk->bWantsInitializeComponent) PoolableChunk->InitializeComponent();
-		PoolableChunk->SetActive(false);
+		PoolableChunk->SetPoolActive(false);
 
 		PoolChunks.Add(PoolableChunk);
 
@@ -46,7 +46,7 @@ UVoxelChunkComponent* UVoxelPoolComponent::GetChunkFromPool()
 {
 	for(int i = 0; i < PoolChunks.Num(); i++)
 	{
-		if (!PoolChunks[i]->IsActive())
+		if (!PoolChunks[i]->IsPoolActive())
 		{
 			return PoolChunks[i];
 		}
