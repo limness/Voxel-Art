@@ -21,7 +21,6 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 
 	FVoxelOctreeDensity* OutOctant = nullptr;
 
-	int32 timeBefore = FDateTime::Now().GetTicks();
 	World->OctreeMutex.Lock();
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 	{
@@ -41,11 +40,11 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 
 					if (Data->BrushSoftness == BrushSoftness::Smooth)
 					{
-						Value = OutValue + UKismetMathLibrary::FMax(1.f, SphereSDF);
+						Value = OutValue + (Data->Dig ? UKismetMathLibrary::FMax(1.f, SphereSDF) : UKismetMathLibrary::FMin(-1.f, SphereSDF));
 					}
 					else if (Data->BrushSoftness == BrushSoftness::Insert)
 					{
-						Value = UKismetMathLibrary::FMax(OutValue, SphereSDF);
+						Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, SphereSDF) : UKismetMathLibrary::FMin(OutValue, -SphereSDF);
 					}
 					if (Data->EditorType == EditorType::Terrain)
 					{
@@ -55,15 +54,12 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 					{
 						World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
 					}
-					//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(FIntVector(X, Y, Z) + Position), 10, FColor::Red, false, 25);
 				}
 			}
 		}
 	}
 	UpdateOverlapOctants(World, Position, VoxelsRadius * 2);
 	World->OctreeMutex.Unlock();
-	int32 timeAfter = FDateTime::Now().GetTicks();
-	//UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %d"), (timeBefore - timeAfter));
 }
 
 void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius)
@@ -79,7 +75,11 @@ void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLand
 		{
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
-				float Value = 1.f - Offset;
+				float OutValue = 0.f;
+				FColor OutColor = FColor(77.f, 77.f, 77.f);
+				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+				float Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, 1.f) : UKismetMathLibrary::FMin(OutValue, -1.f);
 
 				if (Data->EditorType == EditorType::Terrain)
 				{
@@ -92,7 +92,7 @@ void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLand
 			}
 		}
 	}
-	UpdateOverlapOctants(World, Position, VoxelsRadius * 2);
+	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
 	World->OctreeMutex.Unlock();
 }
 

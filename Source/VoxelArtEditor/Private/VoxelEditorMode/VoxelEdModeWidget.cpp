@@ -31,14 +31,15 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				[
 					SNew(SBorder)
-					.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f))
+					//.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f))
+					.BorderBackgroundColor(FLinearColor(0.122f, 0.138f, 0.491f, 1.f))
 					.BorderImage(FCoreStyle::Get().GetBrush("ErrorReporting.Box"))
 					[
 						SNew(SVerticalBox)
 						+ SVerticalBox::Slot()
 						.AutoHeight()
-						.Padding(15.0f)
-						.HAlign(HAlign_Center)
+						.Padding(5.0f)
+						//.HAlign(HAlign_Center)
 						.VAlign(VAlign_Center)
 						[
 							SNew(SHorizontalBox)
@@ -48,7 +49,7 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 							[
 								SNew(STextBlock)
 								.ColorAndOpacity(FLinearColor::White)
-								.Font(FSlateFontInfo(FPaths::ProjectContentDir() / TEXT("EditorResources/Fonts/BebasNeue Book.otf"), 14))
+								.Font(FSlateFontInfo(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("EditorResources/Fonts/BebasNeue Book.otf"), 14))
 								.Text(FText::FromString(TEXT("Voxel Art")))
 							]
 							+ SHorizontalBox::Slot()
@@ -57,7 +58,7 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 							[
 								SNew(STextBlock)
 								.ColorAndOpacity(FLinearColor::White)
-								.Font(FSlateFontInfo(FPaths::ProjectContentDir() / TEXT("EditorResources/Fonts/BebasNeue Bold.otf"), 14))
+								.Font(FSlateFontInfo(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("EditorResources/Fonts/BebasNeue Bold.otf"), 14))
 								.Text(FText::FromString(TEXT("Editor")))
 							]
 						]

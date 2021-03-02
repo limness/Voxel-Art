@@ -22,8 +22,16 @@ DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree"), STAT_UpdateOctree, STATGROUP
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Enqueue octants"), STAT_EnqueueOctree, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Priority"), STAT_UpdatePriority, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks"), STAT_CreateChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Remove Old Chunk"), STAT_RemoveOldChunk, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Init"), STAT_OctantInit, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Data Init"), STAT_OctantDataInit, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Spawn Chunk"), STAT_SpawnChunk, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
+
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Adding to Task"), STAT_AddChunkToTask, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Initialize"), STAT_ChunkInitialize, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Adding to Pool"), STAT_AddChunkToPool, STATGROUP_Voxel);
 
 DEFINE_LOG_CATEGORY(VoxelArt);
 
@@ -157,6 +165,7 @@ void AVoxelLandscape::DestroyVoxelWorld()
 				Chunk = nullptr;
 			}
 			PoolChunks->PoolChunks.Empty();
+			PoolChunks->FreeChunks.Empty();
 		}
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
@@ -263,27 +272,46 @@ void AVoxelLandscape::UpdateOctree()
 			if (ChunksCreation.Num() > 0)
 			{
 				FVoxelChunkData* ChunkData = ChunksCreation.Pop();
-				OctreeMutex.Lock();
-				TSharedPtr<FVoxelOctreeData> Octant = ChunkData->CurrentOctree.Pin();
-				OctreeMutex.Unlock();
+				TSharedPtr<FVoxelOctreeData> Octant;
+				{
+					SCOPE_CYCLE_COUNTER(STAT_OctantInit);
+
+					//TODO: Fix this line because it takes a lot time for waiting
+					OctreeMutex.Lock();
+					Octant = ChunkData->CurrentOctree.Pin();
+					OctreeMutex.Unlock();
+				}
 
 				if (Octant.IsValid())
 				{
 					if (!Octant->HasChildren())
 					{
-						if (Octant->Data != nullptr)
+						/* Remove old chunk if it exist */
 						{
-							//if (chunk->chunk->Active == true)
+							SCOPE_CYCLE_COUNTER(STAT_RemoveOldChunk);
+
+							if (Octant->Data != nullptr)
 							{
-								ChunksRemoving.Add(Octant->Data);
+								//if (chunk->chunk->Active == true)
+								{
+									ChunksRemoving.Add(Octant->Data);
+								}
 							}
 						}
+						/* Octant Data initialize */
+						{
+							SCOPE_CYCLE_COUNTER(STAT_OctantDataInit);
 
-						OctreeMutex.Lock();
-						Octant->Data = ChunkData;
-						OctreeMutex.Unlock();
+							OctreeMutex.Lock();
+							Octant->Data = ChunkData;
+							OctreeMutex.Unlock();
+						}
+						/* Spawn new chunk for octant */
+						{
+							SCOPE_CYCLE_COUNTER(STAT_SpawnChunk);
 
-						SpawnChunk(ChunkData);
+							SpawnChunk(ChunkData);
+						}
 						Index++;
 					}
 				}
@@ -293,8 +321,6 @@ void AVoxelLandscape::UpdateOctree()
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
-
-		//UE_LOG(VoxelArt, Log, TEXT("(%d chunks)"), TaskWorkGlobalCounter.GetValue());
 
 		if (TaskWorkGlobalCounter.GetValue() == 0)
 		{
@@ -316,6 +342,7 @@ void AVoxelLandscape::UpdateOctree()
 						if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->Active)
 						{
 							ChunkData->Chunk->SetPoolActive(false);
+							PoolChunks->FreeChunks.Add(ChunkData->Chunk);
 
 							delete ChunkData;
 							ChunkData = nullptr;
@@ -505,7 +532,7 @@ void AVoxelLandscape::CreateTextureDensityMap()
 
 		// Create Package
 		FString pathPackage = FString("/Game/" + DirectoryName + "/");
-		FString absolutePathPackage = FPaths::GameContentDir() + "/" + DirectoryName + "/";
+		FString absolutePathPackage = FPaths::ProjectContentDir() + "/" + DirectoryName + "/";
 
 		FPackageName::RegisterMountPoint(*pathPackage, *absolutePathPackage);
 
@@ -569,13 +596,24 @@ void AVoxelLandscape::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant)
 void AVoxelLandscape::SpawnChunk(FVoxelChunkData* ChunkData)
 {
 	UVoxelChunkComponent* PoolChunk = PoolChunks->GetChunkFromPool();
-
-	if (!IsValid(PoolChunk))
 	{
-		PoolChunk = PoolChunks->AddChunkToPool();
+		SCOPE_CYCLE_COUNTER(STAT_AddChunkToPool);
+
+		if (!IsValid(PoolChunk))
+		{
+			PoolChunk = PoolChunks->AddChunkToPool();
+		}
 	}
-	ChunkInit(PoolChunk, ChunkData);
-	//PutChunkOnGeneration(ChunkData);
+	{
+		SCOPE_CYCLE_COUNTER(STAT_ChunkInitialize);
+
+		ChunkInit(PoolChunk, ChunkData);
+	} 
+	{
+		SCOPE_CYCLE_COUNTER(STAT_AddChunkToTask);
+
+		PutChunkOnGeneration(ChunkData);
+	}
 }
 
 void AVoxelLandscape::PutChunkOnGeneration(FVoxelChunkData* ChunkData)

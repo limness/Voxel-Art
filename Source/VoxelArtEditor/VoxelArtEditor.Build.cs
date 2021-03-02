@@ -11,7 +11,7 @@ public class VoxelArtEditor : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "VoxelArt" });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Projects" });
 
         PublicIncludePaths.AddRange(
             new string[]

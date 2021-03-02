@@ -1,27 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 
 #include "VoxelPoolComponent.h"
+#include "Helpers/VoxelTools.h"
 
-// Sets default values for this component's properties
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Getting from Pool"), STAT_GettingFromPool, STATGROUP_Voxel);
+
+
 UVoxelPoolComponent::UVoxelPoolComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UVoxelPoolComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
+
 UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 {
 	UWorld* const World = GetWorld();
@@ -35,6 +30,7 @@ UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 		//if (PoolableChunk->bWantsInitializeComponent) PoolableChunk->InitializeComponent();
 		PoolableChunk->SetPoolActive(false);
 
+		//FreeChunks.Add(PoolableChunk);
 		PoolChunks.Add(PoolableChunk);
 
 		return PoolChunks[PoolChunks.Num() - 1];
@@ -44,12 +40,21 @@ UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
 
 UVoxelChunkComponent* UVoxelPoolComponent::GetChunkFromPool()
 {
-	for(int i = 0; i < PoolChunks.Num(); i++)
 	{
-		if (!PoolChunks[i]->IsPoolActive())
+		SCOPE_CYCLE_COUNTER(STAT_GettingFromPool);
+
+		if (FreeChunks.Num() > 0)
 		{
-			return PoolChunks[i];
+			return FreeChunks.Pop();
 		}
+		//if()
+		/*for (int i = 0; i < PoolChunks.Num(); i++)
+		{
+			if (!PoolChunks[i]->IsPoolActive())
+			{
+				return PoolChunks[i];
+			}
+		}*/
 	}
 	return nullptr;
 }

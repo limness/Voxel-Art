@@ -94,7 +94,7 @@ uint32 VoxelOctreeManager::Run()
 
 					ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 					{
-						FScopeLock Lock(&World->OctreeMutex);
+						//FScopeLock Lock(&World->OctreeMutex);
 						CheckOctree(World->MainOctree);
 					}
 					if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
@@ -174,6 +174,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				{
 					SCOPE_CYCLE_COUNTER(STAT_AddChildren);
 
+					FScopeLock Lock(&World->OctreeMutex);
 					Octant->AddChildren();
 				}
 				/*Remove old chunk*/
@@ -229,6 +230,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 			{
 				SCOPE_CYCLE_COUNTER(STAT_DestroyChildren);
 
+				FScopeLock Lock(&World->OctreeMutex);
 				Octant->DestroyChildren();
 			}
 		}

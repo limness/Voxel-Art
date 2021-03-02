@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page o// Voxel Art Plugin © limit 2018
 
 
 #include "VoxelOctreeData.h"
@@ -40,17 +40,17 @@ bool FVoxelOctreeData::HasChildren()
 
 TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetParent()
 {
-	check((ParentChunk != nullptr));
+	check(ParentChunk != nullptr);
 
 	return ParentChunk;
 }
 
-TArray<TSharedPtr<FVoxelOctreeData>> FVoxelOctreeData::GetChildren()
+TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> FVoxelOctreeData::GetChildren()
 {
 	return ChildrenChunks;
 }
 
-void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children)
+void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> children)
 {
 	for (auto& it : children)
 	{
@@ -146,14 +146,13 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position
 	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
 }
 
-TArray<FVoxelOctreeDensity*> FVoxelOctreeDensity::GetChildren()
+TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> FVoxelOctreeDensity::GetChildren()
 {
 	return ChildrenOctants;
 }
 
 bool FVoxelOctreeDensity::IsInside(FIntVector Position)
 {
-//	UE_LOG(VoxelArt, Log, TEXT(" USING  %s"), *GetMinimumCorner().ToString());
 	return  (GetMinimumCorner().X >= Position.X && GetMaximumCorner().X >= Position.X) &&
 			(GetMinimumCorner().Y >= Position.Y && GetMaximumCorner().Y >= Position.Y) &&
 			(GetMinimumCorner().Z >= Position.Z && GetMaximumCorner().Z >= Position.Z);

@@ -29,7 +29,7 @@ public:
 public:
 
 	TWeakPtr<FVoxelOctreeData> ParentChunk;
-	TArray<TSharedPtr<FVoxelOctreeData>> ChildrenChunks;
+	TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> ChildrenChunks;
 
 public:
 	FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Radius, FIntVector _Position);
@@ -41,29 +41,24 @@ public:
 	void AddChildren();
 
 	inline void DestroyChildren();
-
 	inline bool HasChildren();
-
-	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>> children);
+	inline void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> children);
 
 	inline FIntVector GetMinimumCorner();
 	inline FIntVector GetMaximumCorner();
 
 	inline TWeakPtr<FVoxelOctreeData> GetParent();
-
-	inline TArray<TSharedPtr<FVoxelOctreeData>> GetChildren();
-
+	inline TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> GetChildren();
 	inline TWeakPtr<FVoxelOctreeData> GetChildByPosition(FVector Position);
-
 	inline TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
 };
+
 
 class VOXELART_API FVoxelChunkData
 {
 public:
 
 	int Voxels = 16;
-
 	int Size = 0;
 	int Priority = 0;
 
@@ -74,8 +69,8 @@ public:
 
 public:
 
-	TArray<float> DensityMap;
-	TArray<FColor> ColorMap;
+	TArray<float, TFixedAllocator<19 * 19 * 19>> DensityMap;
+	TArray<FColor, TFixedAllocator<19 * 19 * 19>> ColorMap;
 
 public:
 
@@ -103,8 +98,8 @@ public:
 
 	int Size = 0;
 	FIntVector Position;
-	TArray<float> DensityMap;
-	TArray<FColor> ColorMap;
+	TArray<float, TFixedAllocator<19 * 19 * 19>> DensityMap;
+	TArray<FColor, TFixedAllocator<19 * 19 * 19>> ColorMap;
 
 private:
 
@@ -114,15 +109,14 @@ private:
 public:
 
 	UVoxelLandscapeGenerator* WorldGenerator;
-	TArray<FVoxelOctreeDensity*> ChildrenOctants;
+	TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> ChildrenOctants;
 
 public:
 
 	void AddChildren();
 
+	inline TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> GetChildren();
 	inline bool HasChildren() { return ChildrenOctants.Num() == 8; }
-
-	inline TArray<FVoxelOctreeDensity*> GetChildren();
 	inline void SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
 	inline bool HasOwnDensity() { return OwnDensity; }

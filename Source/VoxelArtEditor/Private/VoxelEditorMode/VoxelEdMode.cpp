@@ -26,6 +26,8 @@ void FVoxelEdMode::Enter()
 	SpawnParams.ObjectFlags = RF_Transient;
 
 	EditorTool = GetWorld()->SpawnActor<AVoxelEditorTool>(AVoxelEditorTool::StaticClass(), SpawnParams);
+	//EditorTool->CurrentTool = EditorData->BrushType;
+	//EditorTool->CurrentRadius = EditorData->Radius;
 
     if (!Toolkit.IsValid())
     {
@@ -93,20 +95,21 @@ bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* V
 
 				if (HitWorld)
 				{
-					HitWorldPosition = HitWorld->TransferToVoxelWorld(Hit.ImpactPoint);
-					EditorTool->Marker->SetWorldLocation(Hit.ImpactPoint);
-					EditorTool->Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * EditorData->Radius * 2.f);
+					HitWorldPosition = Hit.ImpactPoint;
 				}
 			}
 		}
-
-		if (!EditorTool->Material)
+		if (HitWorld)
 		{
-			EditorTool->Material = UMaterialInstanceDynamic::Create(EditorTool->MaterialPath, EditorTool);
-			EditorTool->Marker->SetMaterial(0, EditorTool->Material);
+			EditorTool->ToolInitialize(EditorData, HitWorldPosition);
 		}
 	}
     return EditorCreatePressed;
+}
+
+bool FVoxelEdMode::CapturedMouseMove(FEditorViewportClient* ViewportClient, FViewport* Viewport, int32 MouseX, int32 MouseY)
+{
+	return MouseMove(ViewportClient, Viewport, MouseX, MouseY);
 }
 
 void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
@@ -115,10 +118,11 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 	{
 		if (HitWorld)
 		{
+			FIntVector HitVoxelWorldPosition = HitWorld->TransferToVoxelWorld(HitWorldPosition);
 			switch (EditorData->BrushType)
 			{
-			case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
-			case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, HitWorld, HitWorldPosition, EditorData->Radius); break; }
+			case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -15,28 +15,28 @@ class VOXELART_API UVoxelPoolComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UVoxelPoolComponent();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void BeginPlay() override;
 
 public:
 
-//	UPROPERTY(Transient)
 	TArray<UVoxelChunkComponent*> PoolChunks;
+
+	//Need to make time low for search of free chunk less
+	TArray<UVoxelChunkComponent*> FreeChunks;
 
 public:
 
 	//Has our pool free actors or not
 	UVoxelChunkComponent* AddChunkToPool();
 
-	//Get our chunk from the pool
-	//If chunks are exist in queue we get it
+	/*
+	* Get our chunk from the pool
+	* If chunk is exist in queue we get it
+	*/
 	UVoxelChunkComponent* GetChunkFromPool();
 };

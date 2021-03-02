@@ -4,6 +4,8 @@
 #include "VoxelModuleInterface.h"
 #include "VoxelEdMode.h"
 
+#include "Interfaces/IPluginManager.h"
+
 #define IMAGE_BRUSH(RelativePath, ...) FSlateImageBrush(StyleSet->RootToContentDir(RelativePath, TEXT(".png")), __VA_ARGS__)
 
 TSharedPtr< FSlateStyleSet > FVoxelEdModeTool::StyleSet = nullptr;
@@ -33,8 +35,8 @@ void FVoxelEdModeTool::RegisterStyleSet()
     }
 
     StyleSet = MakeShareable(new FSlateStyleSet("ExampleEdModeToolStyle"));
-    StyleSet->SetContentRoot(FPaths::ProjectContentDir() / TEXT("/EditorResources"));
-    StyleSet->SetCoreContentRoot(FPaths::ProjectContentDir() / TEXT("/EditorResources"));
+    StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("/EditorResources"));
+    StyleSet->SetCoreContentRoot(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("/EditorResources"));
 
     // Spline editor
     {

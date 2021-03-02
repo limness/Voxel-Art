@@ -24,7 +24,7 @@ private:
     bool EditorRemovePressed = false;
     bool EditorCreatePressed = false;
 
-    FIntVector HitWorldPosition;
+    FVector HitWorldPosition;
     AVoxelLandscape* HitWorld;
 
 protected:
@@ -34,6 +34,8 @@ protected:
     virtual bool MouseMove(FEditorViewportClient* ViewportClient, FViewport* Viewport, int32 x, int32 y) override;
 
     virtual bool InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event) override;
+
+    virtual bool CapturedMouseMove(FEditorViewportClient* InViewportClient, FViewport* InViewport, int32 InMouseX, int32 InMouseY) override;
 
     virtual bool DisallowMouseDeltaTracking() const override;
 

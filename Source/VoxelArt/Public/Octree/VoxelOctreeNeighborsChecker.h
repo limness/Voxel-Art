@@ -51,13 +51,13 @@ private:
 private:
 
 	template<uint8 Direction>
-	TArray<TWeakPtr<FVoxelOctreeData>> GetNodeNeighbors(int level, uint64 nodeID);
+	TArray<uint64> GetNodeNeighbors(int level, uint64 nodeID);
 
 	template<uint8 Direction>
-	TWeakPtr<FVoxelOctreeData> GetBiggestNeighbor(int level, uint64 nodeID);
+	TSharedPtr<FVoxelOctreeData> GetBiggestNeighbor(int level, uint64 nodeID);
 
 	template<uint8 Direction>
-	TArray<TWeakPtr<FVoxelOctreeData>> GetSmallerNeighbors(int level, int chunkLevel, uint64 chunkNodeID, TWeakPtr<FVoxelOctreeData> biggestNeighbor);
+	TArray<uint64> GetSmallerNeighbors(int level, int chunkLevel, uint64 chunkNodeID, TSharedPtr<FVoxelOctreeData> NeighborChild);
 
 	template<uint8 Direction>
 	uint8 GetLocalNeighbor(uint8 H, uint8 D, uint8 W);
@@ -68,9 +68,9 @@ private:
 	template<uint8 Direction>
 	uint8 GetSideNeighbor(uint8 H, uint8 D, uint8 W);
 
-	TWeakPtr<FVoxelOctreeData> GetChunkByNodeID(int level, uint64 nodeID);
+	TSharedPtr<FVoxelOctreeData> GetOctantByNodeID(int level, uint64 nodeID);
 
-	TWeakPtr<FVoxelOctreeData> FindNodeByID(TWeakPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
+	TSharedPtr<FVoxelOctreeData> GetDefaultOctantByNodeID(TSharedPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant, int level);
 };

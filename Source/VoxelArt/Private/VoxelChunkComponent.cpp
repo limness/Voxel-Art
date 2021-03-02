@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelChunkComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -10,21 +9,10 @@
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "DrawDebugHelpers.h"
 
+
 UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
 {
-	//bUseAsyncCooking = true;
-	//bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = false;
-}
-
-UVoxelChunkComponent::~UVoxelChunkComponent()
-{
-}
-
-
-void UVoxelChunkComponent::Initialize(FIntPoint inPos, UMaterialInterface* material)
-{
-
 }
 
 bool UVoxelChunkComponent::IsPoolActive()
@@ -37,9 +25,7 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 	Active = activeStatus;
 	if (!activeStatus)
 	{
-		//ClearMeshSection(0);
 		ClearAllMeshSections();
-	//	ClearCollisionConvexMeshes();
 		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else
@@ -49,24 +35,13 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 	ToggleVisibility(!activeStatus);
 }
 
-//Thanks to
-//https://www.iquilezles.org/www/articles/smin/smin.htm
-
-float UVoxelChunkComponent::VoxelValueMin(float a, float b, float k)
-{
-	float h = FMath::Clamp((b - a + k) / (2.f * k), 0.0f, 1.0f);
-	return a * h + b * (1 - h) - k * h * (1.0 - h);
-}
-
 void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors)
 {
 	ClearMeshSection(0);
 
 	if (Vertices.Num() > 0)
 	{
-	//	bUseComplexAsSimpleCollision = false;
 		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), Colors, TArray<FProcMeshTangent>(), true);
-	//	SetCollisionConvexMeshes({ Vertices });
 		SetMaterial(0, Material);
 	}
 }
@@ -103,10 +78,10 @@ void FMesherAsyncTask::DoWork()
 			}
 		}
 	}
-
+	
 	FVoxelMarchingCubesMesher mesher = FVoxelMarchingCubesMesher(World, Data);
 	mesher.GenerateMarchingCubesMesh();
-
+	
 	TArray<FVector> Vertices = mesher.Vertices;
 	TArray<int32> Triangles = mesher.Triangles;
 	TArray<FVector> Normals = mesher.Normals;
@@ -121,6 +96,8 @@ void FMesherAsyncTask::DoWork()
 			}
 		});
 
+	Data->DensityMap.Empty();
+	Data->ColorMap.Empty();
 
 	World->TaskWorkGlobalCounter.Decrement();
 }

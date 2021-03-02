@@ -42,13 +42,13 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Editor Type"))
-	TEnumAsByte<EditorType> EditorType;
+	TEnumAsByte<EditorType> EditorType = EditorType::Terrain;
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Brush Type"))
-	TEnumAsByte<BrushType> BrushType;
+	TEnumAsByte<BrushType> BrushType = BrushType::Sphere;
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Softness"))
-	TEnumAsByte<BrushSoftness> BrushSoftness;
+	TEnumAsByte<BrushSoftness> BrushSoftness = BrushSoftness::Insert;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Brush Dig"))
 	bool Dig = true;

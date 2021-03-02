@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -10,31 +10,26 @@
 
 class FVoxelOctreeData;
 class FVoxelChunkData;
-class AVoxelLandscape;
 class FVoxelMarchingCubesMesher;
-//class UVoxelLandscapeGenerator;
+class AVoxelLandscape;
 
 UCLASS()
 class VOXELART_API UVoxelChunkComponent : public UProceduralMeshComponent
 {
 	GENERATED_BODY()
-	
-public:
-
-	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-	UVoxelLandscapeGenerator* GeneratorLandscape;
-	FCriticalSection ChunkMutex;
 
 public:
 
 	UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer);
-	~UVoxelChunkComponent();
 
-	void Initialize(FIntPoint, UMaterialInterface*);
+public:
 
-	bool Active = false;
-	bool hasOwnGrid = false;
-	bool isPool = false;
+	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+	UVoxelLandscapeGenerator* GeneratorLandscape;
+
+	bool Active =		false;
+	bool hasOwnGrid =	false;
+	bool isPool =		false;
 
 public:
 
@@ -43,33 +38,30 @@ public:
 
 public:
 
-	float VoxelValueMin(float a, float b, float k);
-
 	void UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors);
 
 public:
 
 	UMaterialInterface* Material;
-
-	//AVoxelLandscape* Worldd;
 };
+
 
 class FMesherAsyncTask : public FNonAbandonableTask
 {
 public:
 
+	FMesherAsyncTask(AVoxelLandscape* _World, FVoxelChunkData* _Data) 
+		: World(_World)
+		, Data(_Data)
+	{
+	}
+
+private:
+
 	AVoxelLandscape* World;
 	FVoxelChunkData* Data;
-	
-public:
 
-	FMesherAsyncTask(
-		AVoxelLandscape* World,
-		FVoxelChunkData* Data)
-	{
-		this->World = World;
-		this->Data = Data;
-	}
+public:
 
 	FORCEINLINE TStatId GetStatId() const
 	{

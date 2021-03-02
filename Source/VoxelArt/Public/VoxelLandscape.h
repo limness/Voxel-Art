@@ -9,6 +9,8 @@
 #include "VoxelPoolComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include "Editor/VoxelEditorData.h"
+
 #include "Renders/VoxelRender.h"
 #include "Renders/VoxelLandscapeGenerator.h"
 
@@ -41,6 +43,7 @@ enum RenderTexture
 };
 
 class FVoxelCollisionBox;
+
 
 UCLASS()
 class VOXELART_API AVoxelLandscape : public AActor
@@ -232,6 +235,7 @@ public:
 	FCriticalSection ChunksToCreationMutex;
 };
 
+
 UCLASS()
 class VOXELART_API AVoxelEditorTool : public AActor
 {
@@ -244,21 +248,57 @@ public:
 		Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
 		RootComponent = Marker;
 
-		auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-		auto MaterialAsset = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/MVoxel_Tool.MVoxel_Tool'"));
+		auto CubeTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+		auto SphereTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+		auto MaterialTool = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/MVoxel_Tool.MVoxel_Tool'"));
 
-		if (MeshAsset.Succeeded())
+		if (CubeTool.Succeeded())
 		{
-			Marker->SetStaticMesh(MeshAsset.Object);
-			Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			CubeToolMesh = CubeTool.Object;
 		}
-		if (MaterialAsset.Object)
+		if (SphereTool.Succeeded())
 		{
-			MaterialPath = MaterialAsset.Object;
+			SphereToolMesh = SphereTool.Object;
 		}
+		if (MaterialTool.Object)
+		{
+			MaterialPath = MaterialTool.Object;
+		}
+		Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Marker->SetStaticMesh(SphereToolMesh);
+	}
+
+	void ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition)
+	{
+		if (!Material)
+		{
+			Material = UMaterialInstanceDynamic::Create(MaterialPath, this);
+			Marker->SetMaterial(0, Material);
+		}
+		if (CurrentTool != Data->BrushType)
+		{
+			switch (Data->BrushType)
+			{
+			case BrushType::Cube: { Marker->SetStaticMesh(CubeToolMesh); break;  }
+			case BrushType::Sphere: { Marker->SetStaticMesh(SphereToolMesh); break; }
+			}
+			CurrentTool = Data->BrushType;
+		}
+		Marker->SetWorldLocation(ToolPosition);
+		Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
 	}
 
 public:
+
+	TEnumAsByte<BrushType> CurrentTool;
+	float CurrentRadius;
+
+private:
+
+	UStaticMesh* CubeToolMesh;
+	UStaticMesh* SphereToolMesh;
+
+private:
 
 	UStaticMeshComponent* Marker;
 	UMaterialInstanceDynamic* Material;
