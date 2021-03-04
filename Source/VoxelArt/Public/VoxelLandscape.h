@@ -225,6 +225,8 @@ private:
 
 public:
 
+	float TimeToCallGarbageCollection = 0.f;
+
 	int TotalTasksCounter = 0;
 
 	FQueuedThreadPool* ThreadPool;

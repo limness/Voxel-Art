@@ -22,6 +22,10 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 	FVoxelOctreeDensity* OutOctant = nullptr;
 
 	World->OctreeMutex.Lock();
+
+	bool TerrainEdit = Data->EditorType == EditorType::Terrain;
+	bool ColorEdit = Data->EditorType == EditorType::Color;
+
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 	{
 		for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
@@ -30,30 +34,27 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 			{
 				float SphereSDF = Radius - Offset - FVector(X, Y, Z).Size();
 
-				if (SphereSDF >= -1)
+				//if (SphereSDF >= -2)
 				{
 					float OutValue = 0.f;
 					FColor OutColor = FColor(77.f, 77.f, 77.f);
 					World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
 
 					float Value = 0.f;
+					{
+						if (TerrainEdit)
+						{
+							if (Data->BrushSoftness == BrushSoftness::Smooth)
+							{
+							}
+							else if (Data->BrushSoftness == BrushSoftness::Insert)
+							{
+								Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, SphereSDF) : UKismetMathLibrary::FMin(OutValue, -SphereSDF);
+							}
+						}
+					}
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, Data->BrushColor, TerrainEdit, ColorEdit);
 
-					if (Data->BrushSoftness == BrushSoftness::Smooth)
-					{
-						Value = OutValue + (Data->Dig ? UKismetMathLibrary::FMax(1.f, SphereSDF) : UKismetMathLibrary::FMin(-1.f, SphereSDF));
-					}
-					else if (Data->BrushSoftness == BrushSoftness::Insert)
-					{
-						Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, SphereSDF) : UKismetMathLibrary::FMin(OutValue, -SphereSDF);
-					}
-					if (Data->EditorType == EditorType::Terrain)
-					{
-						World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
-					}
-					else if (Data->EditorType == EditorType::Color)
-					{
-						World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
-					}
 				}
 			}
 		}

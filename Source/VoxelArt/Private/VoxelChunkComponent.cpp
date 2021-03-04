@@ -37,7 +37,7 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 
 void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors)
 {
-	ClearMeshSection(0);
+	//ClearMeshSection(0);
 
 	if (Vertices.Num() > 0)
 	{

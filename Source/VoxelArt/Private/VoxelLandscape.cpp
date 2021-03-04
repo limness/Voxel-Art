@@ -195,6 +195,29 @@ void AVoxelLandscape::Tick(float DeltaTime)
 		if (TerrainCreated)
 		{
 			UpdateOctree();
+
+			TimeToCallGarbageCollection += 0.01f;
+			if (TimeToCallGarbageCollection > 5.f)
+			{
+				/*for (auto& Chunk : ChunksCreation)
+				{
+					delete Chunk;
+					Chunk = nullptr;
+				}
+				for (auto& Chunk : ChunksRemoving)
+				{
+					delete Chunk;
+					Chunk = nullptr;
+				}
+				ChunksCreation.Empty();
+				ChunksRemoving.Empty();*/
+
+				TimeToCallGarbageCollection = 0.f;
+
+				//GEngine->ForceGarbageCollection(true);
+
+				UE_LOG(VoxelArt, Warning, TEXT("GC called %d"), ChunksCreation.Num());
+			}
 		}
 #endif
 	}
@@ -292,10 +315,7 @@ void AVoxelLandscape::UpdateOctree()
 
 							if (Octant->Data != nullptr)
 							{
-								//if (chunk->chunk->Active == true)
-								{
-									ChunksRemoving.Add(Octant->Data);
-								}
+								ChunksRemoving.Add(Octant->Data);
 							}
 						}
 						/* Octant Data initialize */
@@ -355,7 +375,7 @@ void AVoxelLandscape::UpdateOctree()
 			}
 		}
 	}
-	{
+	/*{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
 
 		while (ChunksGeneration.Num() > 0)
@@ -367,7 +387,7 @@ void AVoxelLandscape::UpdateOctree()
 				PutChunkOnGeneration(ChunkData);
 			}
 		}
-	}
+	}*/
 }
 
 /*
