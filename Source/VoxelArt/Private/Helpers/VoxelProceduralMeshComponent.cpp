@@ -858,7 +858,7 @@ void UVoxelProceduralMeshComponent::UpdateCollision()
 	SCOPE_CYCLE_COUNTER(STAT_ProcMesh_UpdateCollision);
 
 	UWorld* World = GetWorld();
-	const bool bUseAsyncCook = true;// World && World->IsGameWorld() && bUseAsyncCooking;
+	const bool bUseAsyncCook = World && World->IsGameWorld() && bUseAsyncCooking;
 
 	if (bUseAsyncCook)
 	{
