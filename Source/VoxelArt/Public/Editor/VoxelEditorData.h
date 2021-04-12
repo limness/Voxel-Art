@@ -1,8 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/VoxelTools.h"
 #include "VoxelEditorData.generated.h"
 
 
@@ -63,5 +64,5 @@ public:
 	float MaxDictance = 256.f;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Color"))
-	FColor BrushColor = FColor(77.f, 77.f, 77.f);
+	FColor BrushColor = VOXEL_COLOR;
 };

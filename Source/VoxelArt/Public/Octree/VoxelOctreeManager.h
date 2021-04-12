@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelChunk.h"
 #include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
@@ -13,7 +12,7 @@ class AVoxelLandscape;
 class VOXELART_API VoxelOctreeManager : public FRunnable
 {
 public:
-	VoxelOctreeManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
+	VoxelOctreeManager(AVoxelWorld* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
 	~VoxelOctreeManager();
 
 	void EnsureCompletion();
@@ -28,7 +27,7 @@ public:
 
 private:
 
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 	APlayerController* PlayerController;
 	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
@@ -55,6 +54,8 @@ private:
 private:
 
 	TArray<TSharedPtr<FVoxelOctreeData>> GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk);
+
+	FEditorViewportClient* GetEditorViewportClient();
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant);
 };

@@ -1,9 +1,13 @@
+// Voxel Art Plugin © limit 2018
+
 #pragma once
 
 #include "CoreMinimal.h"
 
-#define NORMALS 2
-#define NORMAL 1
+#define VOXEL_COLOR		FColor(143, 126, 255)
+
+#define NORMALS			2
+#define NORMAL			1
 
 
 DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);

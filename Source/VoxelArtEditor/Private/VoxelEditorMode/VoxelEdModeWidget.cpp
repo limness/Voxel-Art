@@ -2,6 +2,7 @@
 #include "VoxelEdModeWidget.h"
 #include "VoxelModuleInterface.h"
 #include "VoxelEdMode.h"
+#include "EngineUtils.h"
 #include "Editor/VoxelEditorData.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
@@ -20,6 +21,30 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 	DetailsView = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(DetailsViewArgs);
 	DetailsView->SetObject(EditorTools);
 
+	World = GetEdMode()->GetWorld();
+
+	bool bShowTools = false;
+
+	if (World.IsValid())
+	{
+		for (auto* VoxelWorld : TActorRange<AVoxelWorld>(World.Get()))
+		{
+			bShowTools = true;
+
+			if (!VoxelWorld->bWorldCreated)
+			{
+				VoxelWorld->CreateVoxelWorldInEditor();
+			}
+			break;
+		}
+		if (World->WorldType != EWorldType::Editor)
+		{
+			bShowTools = false;
+		}
+	}
+
+	FString ErrorDescription =
+		"No one Voxel World was found on the game scene\nPlease create the Voxel World manually through the editor panel and come back here again :)";
 
     ChildSlot
         [
@@ -31,8 +56,8 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				[
 					SNew(SBorder)
-					//.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f))
-					.BorderBackgroundColor(FLinearColor(0.122f, 0.138f, 0.491f, 1.f))
+					//.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f)) // Dark Grey
+					.BorderBackgroundColor(FLinearColor(0.122f, 0.138f, 0.491f, 1.f)) // Voxel Blue
 					.BorderImage(FCoreStyle::Get().GetBrush("ErrorReporting.Box"))
 					[
 						SNew(SVerticalBox)
@@ -67,10 +92,89 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				.AutoHeight()
 				[
-					DetailsView.ToSharedRef()
+					SAssignNew(EditorObject, SVerticalBox)
+					.Visibility(bShowTools ? EVisibility::Visible : EVisibility::Collapsed)
+					+ SVerticalBox::Slot()
+					[
+						DetailsView.ToSharedRef()
+					]
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SAssignNew(ErrorEditorObject, SVerticalBox)
+					.Visibility(bShowTools ? EVisibility::Collapsed : EVisibility::Visible)
+					
+					+ SVerticalBox::Slot()
+					.Padding(10.f)
+					[
+						SNew(STextBlock)
+						.AutoWrapText(true)
+						.Justification(ETextJustify::Center)
+						.ColorAndOpacity(FLinearColor::White)
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+						.Text(FText::FromString(ErrorDescription))
+					]
 				]
 			]
         ];
+}
+
+
+void SVoxelEdModeWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, float InDeltaTime)
+{
+	bool bShowError = true;
+
+	if(GEditor->bIsSimulatingInEditor || (GEditor->PlayWorld != NULL))
+	{
+		if (ErrorEditorObject->GetVisibility() == EVisibility::Collapsed)
+		{
+			ErrorEditorObject->SetVisibility(EVisibility::Visible);
+		}
+		if (EditorObject->GetVisibility() == EVisibility::Visible)
+		{
+			EditorObject->SetVisibility(EVisibility::Collapsed);
+		}
+		return;
+	}
+	if (World.IsValid())
+	{
+		for (auto* VoxelWorld : TActorRange<AVoxelWorld>(World.Get()))
+		{
+			if (ErrorEditorObject->GetVisibility() == EVisibility::Visible)
+			{
+				ErrorEditorObject->SetVisibility(EVisibility::Collapsed);
+			}
+			if (EditorObject->GetVisibility() == EVisibility::Collapsed)
+			{
+				EditorObject->SetVisibility(EVisibility::Visible);
+			}
+			bShowError = false;
+			break;
+		}
+	}
+	if(bShowError)
+	{
+		if (ErrorEditorObject->GetVisibility() == EVisibility::Collapsed)
+		{
+			ErrorEditorObject->SetVisibility(EVisibility::Visible);
+		}
+		if (EditorObject->GetVisibility() == EVisibility::Visible)
+		{
+			EditorObject->SetVisibility(EVisibility::Collapsed);
+		}
+		return;
+	}
+
+	//if (DetailsView.Get() != nullptr)
+	{
+	//	UE_LOG(LogTemp, Warning, TEXT("EditorTools is not"));
+	}
+	//else
+	{
+		
+		//	UE_LOG(LogTemp, Warning, TEXT("EditorTools it is"));
+	}
 }
 
 void SVoxelEdModeWidget::SetDetailsObjects(const TArray<TWeakObjectPtr<>>& InObjects)

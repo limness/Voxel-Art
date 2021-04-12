@@ -5,6 +5,7 @@
 
 
 class IDetailsView;
+class AVoxelWorld;
 class UVoxelEditorData;
 
 class SVoxelEdModeWidget : public SCompoundWidget
@@ -16,6 +17,7 @@ public:
     SLATE_END_ARGS();
 
     void Construct(const FArguments& InArgs);
+    virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, float InDeltaTime);
 
     // Util Functions
     class FVoxelEdMode* GetEdMode() const;
@@ -31,4 +33,9 @@ public:
 public:
 
     UVoxelEditorData* EditorTools;
+
+    TSharedPtr<class SWidget> EditorObject;
+    TSharedPtr<class SWidget> ErrorEditorObject;
+
+    TWeakObjectPtr<UWorld> World;
 };

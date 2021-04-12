@@ -1,13 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "VoxelOctreeData.generated.h"
 
-class AVoxelLandscape;
+
+class AVoxelWorld;
 class UVoxelChunkComponent;
-class UVoxelLandscapeGenerator;
+class UVoxelWorldGenerator;
 
 
 class VOXELART_API FVoxelOctreeData : public TSharedFromThis<FVoxelOctreeData>
@@ -58,7 +59,7 @@ class VOXELART_API FVoxelChunkData
 {
 public:
 
-	int Voxels = 16;
+	int Voxels = 32;
 	int Size = 0;
 	int Priority = 0;
 
@@ -69,8 +70,8 @@ public:
 
 public:
 
-	TArray<float, TFixedAllocator<19 * 19 * 19>> DensityMap;
-	TArray<FColor, TFixedAllocator<19 * 19 * 19>> ColorMap;
+//	TArray<float> DensityMap;
+//	TArray<FColor> ColorMap;
 
 public:
 
@@ -97,9 +98,11 @@ public:
 	uint8 Depth = 0;
 
 	int Size = 0;
+	int Voxels = 32;
+
 	FIntVector Position;
-	TArray<float, TFixedAllocator<19 * 19 * 19>> DensityMap;
-	TArray<FColor, TFixedAllocator<19 * 19 * 19>> ColorMap;
+	TArray<float> DensityMap;
+	TArray<FColor> ColorMap;
 
 private:
 
@@ -108,7 +111,7 @@ private:
 
 public:
 
-	UVoxelLandscapeGenerator* WorldGenerator;
+	UVoxelWorldGenerator* WorldGenerator;
 	TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> ChildrenOctants;
 
 public:
@@ -117,8 +120,8 @@ public:
 
 	inline TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> GetChildren();
 	inline bool HasChildren() { return ChildrenOctants.Num() == 8; }
-	inline void SetVoxelValue(AVoxelLandscape* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
-	inline void GetVoxelDensity(AVoxelLandscape* World, FIntVector P, float& Value, FColor& Color);
+	inline void SetVoxelValue(AVoxelWorld* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
+	inline void GetVoxelDensity(AVoxelWorld* World, FIntVector P, float& Value, FColor& Color);
 	inline bool HasOwnDensity() { return OwnDensity; }
 	inline bool HasOwnColor() { return OwnColor; }
 
@@ -127,15 +130,15 @@ public:
 	inline FIntVector GetMinimumCorner();
 	inline FIntVector GetMaximumCorner();
 
-	FIntVector TransferToLocal(AVoxelLandscape* World, FIntVector Position);
+	FIntVector TransferToLocal(AVoxelWorld* World, FIntVector Position);
 
 	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
 	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
 
-	void SetDefaultMap(AVoxelLandscape* World);
+	void SetDefaultMap(AVoxelWorld* World);
 
 public:
-	FVoxelOctreeDensity(UVoxelLandscapeGenerator* _WorldGenerator, uint8 _Depth, int _Size, FIntVector _Position);
+	FVoxelOctreeDensity(UVoxelWorldGenerator* _WorldGenerator, uint8 _Depth, int _Size, int _Voxels, FIntVector _Position);
 	~FVoxelOctreeDensity() {}
 
 };

@@ -1,7 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 
-#include "Editor/VoxelModificationLandscape.h"
+#include "Editor/VoxelModificationWorld.h"
 #include "Editor/VoxelEditorData.h"
 
 #include "DrawDebugHelpers.h"
@@ -10,12 +10,12 @@
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 
 using namespace VoxelTools;
 
 
-void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius)
+void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius)
 {
 	int VoxelsRadius = FMath::CeilToInt(Radius);
 
@@ -63,7 +63,7 @@ void UVoxelModificationLandscape::SpherePainter(UVoxelEditorData* Data, AVoxelLa
 	World->OctreeMutex.Unlock();
 }
 
-void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLandscape* World, FIntVector Position, float Radius)
+void UVoxelModificationWorld::CubePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius)
 {
 	int VoxelsRadius = FMath::CeilToInt(Radius);
 
@@ -97,7 +97,7 @@ void UVoxelModificationLandscape::CubePainter(UVoxelEditorData* Data, AVoxelLand
 	World->OctreeMutex.Unlock();
 }
 
-float UVoxelModificationLandscape::BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency)
+float UVoxelModificationWorld::BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency)
 {
 	float value = 0.f;
 	float valuefractal = 0.f;
@@ -114,7 +114,7 @@ float UVoxelModificationLandscape::BangPainter(int X, int Y, int Z, float Radius
 	return value + valuefractal;
 }
 
-void UVoxelModificationLandscape::UpdateOverlapOctants(AVoxelLandscape* World, FIntVector Position, int Size)
+void UVoxelModificationWorld::UpdateOverlapOctants(AVoxelWorld* World, FIntVector Position, int Size)
 {
 	FVoxelCollisionBox Box = FVoxelCollisionBox(World, Position, Size);
 	TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;

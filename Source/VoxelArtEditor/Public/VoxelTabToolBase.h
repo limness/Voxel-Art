@@ -28,7 +28,6 @@ public:
     /** Set the objects to be displayed in the details panel */
     void SetObjects(const TArray<TWeakObjectPtr<>>& InSelectedObjects, const TArray<FGuid>& InObjectBindings);
 
-
     // In this function set TabName/TabDisplayName/ToolTipText
     virtual void Initialize() {};
     virtual TSharedRef<SDockTab> SpawnTab(const FSpawnTabArgs& TabSpawnArgs) { return SNew(SDockTab); };

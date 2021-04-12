@@ -1,14 +1,14 @@
 
-#include "VoxelLandscapeDetails.h"
+#include "VoxelWorldDetails.h"
 #include "VoxelModuleInterface.h"
 #include "Helpers/VoxelTools.h"
 
-TSharedRef<IDetailCustomization> IVoxelLandscapeDetails::MakeInstance()
+TSharedRef<IDetailCustomization> IVoxelWorldDetails::MakeInstance()
 {
-    return MakeShareable(new IVoxelLandscapeDetails);
+    return MakeShareable(new IVoxelWorldDetails);
 }
 
-void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout)
+void IVoxelWorldDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout)
 {
     TArray<TWeakObjectPtr<UObject>> Objects;
     DetailLayout.GetObjectsBeingCustomized(Objects);
@@ -17,7 +17,7 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         return;
     }
 
-    World = (AVoxelLandscape*)Objects[0].Get();
+    World = (AVoxelWorld*)Objects[0].Get();
 
     // hide original property
    // DetailLayout.HideProperty(DetailLayout.GetProperty(GET_MEMBER_NAME_CHECKED(AVoxelLandscape, &AVoxelLandscape::CreateVoxelWorld)));
@@ -44,7 +44,7 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
             .ContentPadding(2)
             .VAlign(VAlign_Center)
             .HAlign(HAlign_Center)
-            .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
+            .OnClicked(this, &IVoxelWorldDetails::CreateWorldInEditor)
             [
                 SNew(STextBlock)
                 .Font(IDetailLayoutBuilder::GetDetailFont())
@@ -67,11 +67,11 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
             .ContentPadding(2)
             .VAlign(VAlign_Center)
             .HAlign(HAlign_Center)
-            .OnClicked(this, &IVoxelLandscapeDetails::UpdateWorldInEditor)
+            .OnClicked(this, &IVoxelWorldDetails::SaveWorldInEditor)
             [
                 SNew(STextBlock)
                 .Font(IDetailLayoutBuilder::GetDetailFont())
-                .Text(FText::FromString(TEXT("Update World")))
+                .Text(FText::FromString(TEXT("Save World")))
             ]
         ];
     OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
@@ -89,7 +89,7 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
             .ContentPadding(2)
             .VAlign(VAlign_Center)
             .HAlign(HAlign_Center)
-            .OnClicked(this, &IVoxelLandscapeDetails::DestroyWorldInEditor)
+            .OnClicked(this, &IVoxelWorldDetails::DestroyWorldInEditor)
             [
                 SNew(STextBlock)
                 .Font(IDetailLayoutBuilder::GetDetailFont())
@@ -113,7 +113,7 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
             .ContentPadding(2)
             .VAlign(VAlign_Center)
             .HAlign(HAlign_Center)
-            .OnClicked(this, &IVoxelLandscapeDetails::CreateWorldInEditor)
+            .OnClicked(this, &IVoxelWorldDetails::CreateTextureInEditor)
             [
                 SNew(STextBlock)
                 .Font(IDetailLayoutBuilder::GetDetailFont())
@@ -122,11 +122,12 @@ void IVoxelLandscapeDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout
         ];
 }
 
-FReply IVoxelLandscapeDetails::CreateWorldInEditor()
+FReply IVoxelWorldDetails::CreateWorldInEditor()
 {
     if (World.IsValid())
     {
-        World->CreateVoxelWorld();
+        World->bCreatedInEditor = true;
+        World->CreateVoxelWorldInEditor();
     }
     else
     {
@@ -135,11 +136,11 @@ FReply IVoxelLandscapeDetails::CreateWorldInEditor()
     return FReply::Handled();
 }
 
-FReply IVoxelLandscapeDetails::DestroyWorldInEditor()
+FReply IVoxelWorldDetails::DestroyWorldInEditor()
 {
     if (World.IsValid())
     {
-        World->bSaveDensityInGame = false;
+        World->bCreatedInEditor = false;
         World->DestroyVoxelWorld();
     }
     else
@@ -149,11 +150,24 @@ FReply IVoxelLandscapeDetails::DestroyWorldInEditor()
     return FReply::Handled();
 }
 
-FReply IVoxelLandscapeDetails::UpdateWorldInEditor()
+FReply IVoxelWorldDetails::SaveWorldInEditor()
 {
     if (World.IsValid())
     {
-        World->UpdateWorld();
+        World->SaveWorldUtility();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("World is NULL"));
+    }
+    return FReply::Handled();
+}
+
+FReply IVoxelWorldDetails::CreateTextureInEditor()
+{
+    if (World.IsValid())
+    {
+        World->CreateTextureDensityMap();
     }
     else
     {

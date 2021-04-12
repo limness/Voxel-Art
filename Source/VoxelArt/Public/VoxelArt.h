@@ -1,4 +1,4 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 

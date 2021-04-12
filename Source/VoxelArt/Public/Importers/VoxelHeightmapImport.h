@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -7,8 +7,7 @@
 #include "Engine/Texture2D.h"
 #include "VoxelHeightmapImport.generated.h"
 
-class AVoxelChunk;
-class AVoxelLandscape;
+class AVoxelWorld;
 
 /**
  * 
@@ -28,7 +27,7 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Importer")
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Importer")
 	UTexture2D* TextureImage;

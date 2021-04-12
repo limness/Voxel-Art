@@ -8,10 +8,14 @@
 #include "VoxelChunkComponent.generated.h"
 
 
+class AVoxelWorld;
+
+class UVoxelWorldGenerator;
+
 class FVoxelOctreeData;
 class FVoxelChunkData;
 class FVoxelMarchingCubesMesher;
-class AVoxelLandscape;
+
 
 UCLASS()
 class VOXELART_API UVoxelChunkComponent : public UVoxelProceduralMeshComponent
@@ -25,11 +29,10 @@ public:
 public:
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-	UVoxelLandscapeGenerator* GeneratorLandscape;
+	UVoxelWorldGenerator* WorldGenerator;
 
-	bool Active =		false;
-	bool hasOwnGrid =	false;
-	bool isPool =		false;
+	bool PoolActive = false;
+	//bool HasOwnDensity =	false;
 
 public:
 
@@ -50,7 +53,7 @@ class FMesherAsyncTask : public FNonAbandonableTask
 {
 public:
 
-	FMesherAsyncTask(AVoxelLandscape* _World, FVoxelChunkData* _Data) 
+	FMesherAsyncTask(AVoxelWorld* _World, FVoxelChunkData* _Data) 
 		: World(_World)
 		, Data(_Data)
 	{
@@ -58,7 +61,7 @@ public:
 
 private:
 
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 	FVoxelChunkData* Data;
 
 public:

@@ -1,27 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
-#include "VoxelLandscape.h"
-//#include "VoxelMarchingCubesMesher.generated.h"
+#include "VoxelWorld.h"
 
-#define NORMALS_SKIRT 2
-#define NORMALS_SKIRT_HALF 1
 
-class AVoxelLandscape;
-class UVoxelLandscapeGenerator;
+class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
-/**
- * 
- */
-//UCLASS()
 class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
-	FVoxelMarchingCubesMesher(AVoxelLandscape* _World, FVoxelChunkData* _Data);
+	FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap);
 	~FVoxelMarchingCubesMesher();
 
 private:
@@ -58,7 +50,7 @@ public:
 
 public:
 
-	void GenerateMarchingCubesMesh();
+	void GenerateMesh();
 
 	void MarchingCubes(int x, int y, int z);
 
@@ -86,8 +78,8 @@ public:
 
 	float VoxelValueMin(float a, float b, float k);
 	
-	AVoxelLandscape* World;
-	UVoxelLandscapeGenerator* GeneratorLandscape;
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
 
 	TArray<FVector> positionSide;
 
@@ -95,15 +87,15 @@ public:
 
 	FORCEINLINE float GetDensity(int x, int y, int z)
 	{
-		return DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
+		return DensityMap[x + y * (Voxels + 1 + NORMALS) + z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
 	}
 
 	FORCEINLINE float GetValueNoise(FVector positionGrid)
 	{
-		FVector GlobalLocation = FVector::OneVector;//World->GetTransform().InverseTransformPosition(positionGrid + Position);
+		FVector GlobalLocation = FVector::OneVector;
 
 		FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
 
-		return GeneratorLandscape->GetDensityMap(P);
+		return WorldGenerator->GetDensityMap(P);
 	}
 };

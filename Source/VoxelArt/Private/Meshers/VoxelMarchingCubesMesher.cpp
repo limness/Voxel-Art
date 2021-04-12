@@ -1,19 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 
 #include "Meshers/VoxelMarchingCubesMesher.h"
-#include "VoxelLandscape.h"
 #include "Helpers/MarchingCubes.h"
 
-FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelLandscape* _World, FVoxelChunkData* _Data)
+FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap)
 	: World(_World)
-	, GeneratorLandscape(_World->GeneratorLandscape)
+	, WorldGenerator(_World->WorldGenerator)
 	, Voxels(_Data->Voxels)
 	, Size(_Data->Size)
 	, Position(_Data->Position)
 	, TransitionSides(_Data->TransitionSides)
-	, DensityMap(_Data->DensityMap)
-	, ColorMap(_Data->ColorMap)
+	, DensityMap(_DensityMap)
+	, ColorMap(_ColorMap)
 {
 }
 
@@ -23,7 +22,7 @@ FVoxelMarchingCubesMesher::~FVoxelMarchingCubesMesher()
 
 #include "DrawDebugHelpers.h"
 
-void FVoxelMarchingCubesMesher::GenerateMarchingCubesMesh()
+void FVoxelMarchingCubesMesher::GenerateMesh()
 {
 	Vertices.Empty();
 	Triangles.Empty();

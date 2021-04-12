@@ -1,26 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "VoxelChunk.h"
 #include "VoxelChunkComponent.h"
 #include "VoxelPoolComponent.h"
-#include "Materials/MaterialInstanceDynamic.h"
-
 #include "Editor/VoxelEditorData.h"
-
-#include "Renders/VoxelRender.h"
-#include "Renders/VoxelLandscapeGenerator.h"
-
+#include "Generators/VoxelWorldGenerator.h"
 #include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Octree/VoxelOctreeData.h"
-
+#include "Save/VoxelSaveData.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "VoxelLandscape.generated.h"
+#include "VoxelWorld.generated.h"
 
 namespace EVoxelDirection
 {
@@ -42,24 +37,38 @@ enum RenderTexture
 	RedGreenBlue	UMETA(DisplayName = "RGB")
 };
 
+UENUM()
+enum Meshers
+{
+	Cubes			UMETA(DisplayName = "Cubes"),
+	MarchingCubes	UMETA(DisplayName = "Marching Cubes"),
+	SurfaceNets		UMETA(DisplayName = "Surface Nets")
+};
+
 class FVoxelCollisionBox;
 
-
-UCLASS()
-class VOXELART_API AVoxelLandscape : public AActor
+UCLASS(Blueprintable, HideCategories = ("Input", "Actor", "LOD"))
+class VOXELART_API AVoxelWorld : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 
-	AVoxelLandscape();
+	AVoxelWorld();
 
-protected:
+public:
+
+#if WITH_EDITOR
+	void OnPreBeginPIE(bool bIsSimulating);
+	void OnEndPIE(bool bIsSimulating);
+#endif
 
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Destroyed() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
 
 public:
 
@@ -69,7 +78,6 @@ public:
 
 public:
 
-	VoxelRender* RenderThread;
 	VoxelOctreeManager* OctreeManagerThread;
 	VoxelOctreeNeighborsChecker* OctreeNeighborsCheckerThread;
 
@@ -89,21 +97,24 @@ private:
 public:
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
-	UVoxelLandscapeGenerator* GeneratorLandscape;
+	UVoxelWorldGenerator* WorldGenerator;
+
+	UPROPERTY(EditAnywhere, Category = "Main")
+	UVoxelSaveData* SaveFile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
 	bool EnabledWorldInGame = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Main")
-	bool bSaveDensityInGame = true;
+	bool bCreatedInEditor = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "524288", UIMin = "0.0", UIMax = "524288"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "1", ClampMax = "524288", UIMin = "1", UIMax = "524288"))
 	int VoxelMin = 128;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0.0", ClampMax = "524288", UIMin = "0.0", UIMax = "524288"))
-	int WorldSize = 32768;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "32", ClampMax = "524288", UIMin = "32", UIMax = "524288"))
+	int WorldSize = 4096;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "0", ClampMax = "32", UIMin = "0", UIMax = "32"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main", meta = (ClampMin = "2", ClampMax = "32", UIMin = "2", UIMax = "32"))
 	int VoxelsPerChunk = 16;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main")
@@ -115,31 +126,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"), Category = "Main")
 	float TransitionSize = 0.25f;
 
-	UFUNCTION(BlueprintCallable, Category = "Main")
+public:
+
 	void CreateVoxelWorld();
-
-	UFUNCTION(BlueprintCallable, Category = "Main")
+	void CreateVoxelWorldInEditor();
 	void DestroyVoxelWorld();
-
-	UFUNCTION(BlueprintCallable, Category = "Main")
 	void UpdateWorld();
+	void SaveWorldUtility();
+	UVoxelSaveData* SaveWorldToFile();
 
 public:	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool TerrainCreated = false;
+	bool bWorldCreated = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	bool EnabledLOD = true;
 
+	UPROPERTY()
+	bool bEnableUpdateOctree = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	uint8 DrawingRange = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "15", UIMin = "0", UIMax = "15"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12"))
 	int32 MinimumLOD = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "15", UIMin = "0", UIMax = "15"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12", EditCondition = bMaximumLOD))
 	int32 MaximumLOD = 8;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
+	TEnumAsByte<Meshers> MesherType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering", meta = (ClampMin = "1", ClampMax = "4096", UIMin = "1", UIMax = "4096"))
 	int32 ChunksPerFrame = 32;
@@ -152,9 +169,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage")
 	UStaticMesh* MeshTree;
-
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
-	UVoxelLandscapeGenerator *GeneratorDensity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
 	FString MapName = "DensityMapTexture";
@@ -174,7 +188,11 @@ public:
 private:
 
 	int32 TimeForWorldGenerate = 0;
-	bool StatsShowed = false;
+
+	bool bStatsShowed = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bMaximumLOD = false;
 
 public:
 
@@ -187,8 +205,8 @@ private:
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
 	void SpawnChunk(FVoxelChunkData* ChunkData);
 	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
-	void SaveChunksBuffer(TArray<TSharedPtr<FVoxelOctreeData>> Chunks);
 	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
+	FEditorViewportClient* GetEditorViewportClient();
 	void UpdateOctree();
 
 public:	
@@ -212,7 +230,6 @@ public:
 	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
-	void RemoveOctreeDensityLeaves(FVoxelOctreeDensity* Octant);
 
 	UFUNCTION(BlueprintCallable)
 	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
@@ -235,75 +252,4 @@ public:
 
 	FCriticalSection OctreeMutex;
 	FCriticalSection ChunksToCreationMutex;
-};
-
-
-UCLASS()
-class VOXELART_API AVoxelEditorTool : public AActor
-{
-	GENERATED_BODY()
-
-public:
-
-	AVoxelEditorTool() 
-	{
-		Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
-		RootComponent = Marker;
-
-		auto CubeTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-		auto SphereTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-		auto MaterialTool = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/MVoxel_Tool.MVoxel_Tool'"));
-
-		if (CubeTool.Succeeded())
-		{
-			CubeToolMesh = CubeTool.Object;
-		}
-		if (SphereTool.Succeeded())
-		{
-			SphereToolMesh = SphereTool.Object;
-		}
-		if (MaterialTool.Object)
-		{
-			MaterialPath = MaterialTool.Object;
-		}
-		Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		Marker->SetStaticMesh(SphereToolMesh);
-	}
-
-	void ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition)
-	{
-		if (!Material)
-		{
-			Material = UMaterialInstanceDynamic::Create(MaterialPath, this);
-			Marker->SetMaterial(0, Material);
-		}
-		if (CurrentTool != Data->BrushType)
-		{
-			switch (Data->BrushType)
-			{
-			case BrushType::Cube: { Marker->SetStaticMesh(CubeToolMesh); break;  }
-			case BrushType::Sphere: { Marker->SetStaticMesh(SphereToolMesh); break; }
-			}
-			CurrentTool = Data->BrushType;
-		}
-		Marker->SetWorldLocation(ToolPosition);
-		Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
-	}
-
-public:
-
-	TEnumAsByte<BrushType> CurrentTool;
-	float CurrentRadius;
-
-private:
-
-	UStaticMesh* CubeToolMesh;
-	UStaticMesh* SphereToolMesh;
-
-private:
-
-	UStaticMeshComponent* Marker;
-	UMaterialInstanceDynamic* Material;
-
-	UMaterial* MaterialPath;
 };

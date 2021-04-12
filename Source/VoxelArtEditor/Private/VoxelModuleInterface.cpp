@@ -1,9 +1,14 @@
 
 #include "VoxelModuleInterface.h"
-#include "VoxelLandscapeDetails.h"
+#include "VoxelWorldDetails.h"
 #include "VoxelEdModeTool.h"
 
-#include "VoxelLandscape.h"
+#include "ISettingsModule.h"
+#include "Developer/Settings/Public/ISettingsContainer.h"
+#include "VoxelSettings/VoxelCustomSettings.h"
+
+#include "VoxelWorld.h"
+#include "VoxelTabTool.h"
 
 //#include "CustomAssetEditorModule.h"
 
@@ -24,17 +29,17 @@ void IVoxelModuleInterface::MakePulldownMenu(FMenuBarBuilder& menuBuilder)
 {
     menuBuilder.AddPullDownMenu(
         FText::FromString("Voxel Art"),
-        FText::FromString("Open the Voxel Art help menu"),
+        FText::FromString("Open Voxel Art Help Menu"),
         FNewMenuDelegate::CreateRaw(this, &IVoxelModuleInterface::FillPulldownMenu),
         "Voxel Art",
-        FName(TEXT("ExampleMenu"))
+        FName(TEXT("Unable menu"))
     );
 }
 
 void IVoxelModuleInterface::FillPulldownMenu(FMenuBuilder& menuBuilder)
 {
-    menuBuilder.BeginSection("ExampleSection", FText::FromString("No sections yet"));
-    menuBuilder.AddMenuSeparator(FName("Section_1"));
+    menuBuilder.BeginSection("Unable", FText::FromString("Unable"));
+    menuBuilder.AddMenuSeparator(FName("Section_2"));
     menuBuilder.EndSection();
 }
 
@@ -48,14 +53,29 @@ void IVoxelModuleInterface::StartupModule()
         MenuExtender->AddMenuBarExtension("Help", EExtensionHook::After, NULL, FMenuBarExtensionDelegate::CreateRaw(this, &IVoxelModuleInterface::MakePulldownMenu));
         LevelEditorMenuExtensibilityManager->AddExtender(MenuExtender);
     }
-
     {
         static FName PropertyEditor("PropertyEditor");
         FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
-        PropertyModule.RegisterCustomClassLayout(AVoxelLandscape::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&IVoxelLandscapeDetails::MakeInstance));
+        PropertyModule.RegisterCustomClassLayout(AVoxelWorld::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&IVoxelWorldDetails::MakeInstance));
+    }
+    // register settings:
+    {
+        ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+        if (SettingsModule)
+        {
+            TSharedPtr<ISettingsContainer> ProjectSettingsContainer = SettingsModule->GetContainer("Project");
+            ProjectSettingsContainer->DescribeCategory("VoxelCtegory", FText::FromString("Voxel Art Category"), FText::FromString("Voxel Art settings here"));
+
+            SettingsModule->RegisterSettings("Project", "VoxelCategory", "VoxelSettings",
+                FText::FromString("Voxel Art Settings"),
+                FText::FromString("Configure Voxel Art Settings"),
+                GetMutableDefault<UVoxelCustomSettings>()
+            );
+        }
     }
 
     ModuleListeners.Add(MakeShareable(new FVoxelEdModeTool));
+    ModuleListeners.Add(MakeShareable(new FVoxelTabTool));
 
     for (int32 i = 0; i < ModuleListeners.Num(); ++i)
     {
@@ -65,19 +85,14 @@ void IVoxelModuleInterface::StartupModule()
 	UE_LOG(LogTemp, Log, TEXT("Startup Voxel Art Editor Module()"));
 }
 
-/*void IVoxelModuleInterface::SetObjects(const TArray<TWeakObjectPtr<>>& InSelectedObjects, const TArray<FGuid>& InObjectBindings)
-{
-    check(InSelectedObjects.Num() == InObjectBindings.Num());
-
-    TArray<TWeakObjectPtr<>> SelectedObjects;
-    SelectedObjects.Insert(Settings, 0);
-
-    StaticCastSharedPtr<SEmpexEditModeTools>(Toolkit->GetInlineContent())->SetDetailsObjects(SelectedObjects);
-}*/
-
-
 void IVoxelModuleInterface::ShutdownModule()
 {
+    ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+    if (SettingsModule)
+    {
+        SettingsModule->UnregisterSettings("Project", "UnableCategory", "VoxelSettings");
+    }
+
 	UE_LOG(LogTemp, Log, TEXT("Shutdown Voxel Art Editor Module()"));
 }
 

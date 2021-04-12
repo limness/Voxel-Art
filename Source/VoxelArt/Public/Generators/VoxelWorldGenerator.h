@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -6,18 +6,19 @@
 #include "UObject/NoExportTypes.h"
 #include "Math/Vector2D.h"
 #include "Engine/Texture2D.h"
-#include "VoxelLandscapeGenerator.generated.h"
+#include "VoxelWorldGenerator.generated.h"
 
-class AVoxelLandscape;
+
+class AVoxelWorld;
+
 
 UCLASS(Blueprintable, BlueprintType, EditInlineNew)
-class VOXELART_API UVoxelLandscapeGenerator : public UObject
+class VOXELART_API UVoxelWorldGenerator : public UObject
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 public:
 
-	//virtual void PostLoad() override;
 	void GeneratorInit();
 
 public:
@@ -28,7 +29,7 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	UTexture2D* HeightmapTexture;
@@ -39,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Import Own Heightmap")
 	float Multiply = 100.f;
 
-private:
+protected:
 
 	float RadiusHeighestVoxel = 0.f;
 
@@ -57,25 +58,38 @@ private:
 
 public:
 
-	float GetDensityMap(const FIntVector& CellPosition);
-	FColor GetColorMap(const FIntVector& CellPosition);
+	/*
+	 * Get Density at position
+	 * @param	CellPosition: Position of your position
+	 * @return	Density of the World at the position 
+	 */
 
-private:
+	virtual float GetDensityMap(const FIntVector& CellPosition);
+
+	/*
+	 * Get Color at position
+	 * @param	CellPosition: Position of your position
+	 * @return	Color of the World at the position
+	 */
+
+	virtual FColor GetColorMap(const FIntVector& CellPosition);
+
+protected:
 
 	UFUNCTION(BlueprintCallable)
-	float FlatLandscape(float A);
+	float FlatSDF(int A);
 
 	UFUNCTION(BlueprintCallable)
-	float SphereLandscape(float X = 0.f, float Y = 0.f, float Z = 0.f, float radius = 50.f);
+	float SphereSDF(int X = 0, int Y = 0, int Z = 0, float Radius = 50.f);
 
 	UFUNCTION(BlueprintCallable)
-	float TorusLandscape(float X, float Y, float Z, float radius, float radiusInside);
+	float TorusSDF(int X = 0, int Y = 0, int Z = 0, float Radius = 77.f, float RadiusInside = 37.f);
 
 
-private:
+protected:
 
 	UFUNCTION(BlueprintCallable)
-	float FractalNoise(float X = 0.f, float Y = 0.f, float Z = 0.f, int seed = 0, int octaves = 5, float amplitude = 1.f, float frequency = 0.003f);
+	float FractalNoise(int X = 0, int Y = 0, int Z = 0, int Octaves = 3, float Amplitude = 50.f, float Frequency = 0.003f);
 
 	UFUNCTION(BlueprintCallable)
 	float IQNoise(FVector p);
@@ -84,9 +98,9 @@ private:
 	float Cone(FVector p, FVector2D c, float h);
 
 	UFUNCTION(BlueprintCallable)
-	float SimplexNoise(float X, float Y, float Z, int seed);
+	float SimplexNoise(int X, int Y, int Z);
 
-private:
+protected:
 
 	UFUNCTION(BlueprintCallable)
 	float VectorDistanceAB(FVector A, FVector B);

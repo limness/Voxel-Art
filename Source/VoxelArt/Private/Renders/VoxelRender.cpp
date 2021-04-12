@@ -1,13 +1,12 @@
+// Voxel Art Plugin © limit 2018
 
 #include "Renders/VoxelRender.h"
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 #include "Async/ParallelFor.h"
-#include "Helpers/MarchingCubes.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Misc/DateTime.h"
 
-VoxelRender::VoxelRender(AVoxelLandscape* _World) :
-	World(_World)
+VoxelRender::VoxelRender(AVoxelWorld* _World) : World(_World)
 {
 	m_Kill = false;
 	m_Pause = false;

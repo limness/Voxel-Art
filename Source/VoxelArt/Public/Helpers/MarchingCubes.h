@@ -1,3 +1,5 @@
+// Voxel Art Plugin © limit 2018
+
 #pragma once
 
 #include "CoreMinimal.h"

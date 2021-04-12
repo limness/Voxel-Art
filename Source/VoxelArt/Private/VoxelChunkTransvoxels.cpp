@@ -1,15 +1,13 @@
-
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelChunkTransvoxels.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Helpers/MarchingCubes.h"
+#include "Helpers/VoxelTools.h"
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "Helpers/Transvoxels.h"
 #include "DrawDebugHelpers.h"
 
-#define NORMALS 2 //2
-#define NORMAL 1 //1
 
 namespace EVoxelDirectionRender
 {

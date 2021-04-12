@@ -6,15 +6,20 @@
 
 #include "GameFramework/Actor.h"
 
-class UVoxelEditorData;
-class AVoxelLandscape;
+
+class AVoxelWorld;
 class AVoxelEditorTool;
+
+class UVoxelEditorData;
+
 
 class FVoxelEdMode : public FEdMode
 {
 public:
 
     const static FEditorModeID EM_Example;
+
+    FVoxelEdMode();
 
     virtual void Enter() override;
     virtual void Exit() override;
@@ -25,9 +30,11 @@ private:
     bool EditorCreatePressed = false;
 
     FVector HitWorldPosition;
-    AVoxelLandscape* HitWorld;
+    AVoxelWorld* HitWorld;
 
 protected:
+
+    virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 
     virtual void Tick(FEditorViewportClient* ViewportClient, float DeltaTime) override;
 
@@ -36,6 +43,8 @@ protected:
     virtual bool InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event) override;
 
     virtual bool CapturedMouseMove(FEditorViewportClient* InViewportClient, FViewport* InViewport, int32 InMouseX, int32 InMouseY) override;
+
+    virtual bool IsSelectionAllowed(AActor* InActor, bool bInSelection) const override;
 
     virtual bool DisallowMouseDeltaTracking() const override;
 

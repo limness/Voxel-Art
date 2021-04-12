@@ -1,4 +1,4 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved. 
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelProceduralMeshComponent.h"
 #include "PrimitiveViewRelevance.h"
@@ -273,7 +273,7 @@ public:
 		{
 			WireframeMaterialInstance = new FColoredMaterialRenderProxy(
 				GEngine->WireframeMaterial ? GEngine->WireframeMaterial->GetRenderProxy(IsSelected()) : NULL,
-				FLinearColor(0, 0.5f, 1.f)
+				FLinearColor(0.2, 0.36f, 1.f)
 			);
 
 			Collector.RegisterOneFrameMaterialProxy(WireframeMaterialInstance);
@@ -308,6 +308,13 @@ public:
 						Mesh.Type = PT_TriangleList;
 						Mesh.DepthPriorityGroup = SDPG_World;
 						Mesh.bCanApplyViewModeOverrides = false;
+
+						if (bWireframe)
+						{
+							Mesh.bWireframe = true;
+							Mesh.bDisableBackfaceCulling = true;
+						}
+
 						Collector.AddMesh(ViewIndex, Mesh);
 					}
 				}
@@ -431,11 +438,11 @@ void UVoxelProceduralMeshComponent::CreateMeshSection(int32 SectionIndex, const 
 
 		Vertex.Position = Vertices[VertIdx];
 		Vertex.Normal = (Normals.Num() == NumVerts) ? Normals[VertIdx] : FVector(0.f, 0.f, 1.f);
-		Vertex.UV0 = (UV0.Num() == NumVerts) ? UV0[VertIdx] : FVector2D(0.f, 0.f);
-		Vertex.UV1 = (UV1.Num() == NumVerts) ? UV1[VertIdx] : FVector2D(0.f, 0.f);
-		Vertex.UV2 = (UV2.Num() == NumVerts) ? UV2[VertIdx] : FVector2D(0.f, 0.f);
-		Vertex.UV3 = (UV3.Num() == NumVerts) ? UV3[VertIdx] : FVector2D(0.f, 0.f);
-		Vertex.Color = (VertexColors.Num() == NumVerts) ? VertexColors[VertIdx] : FColor(255, 255, 255);
+		Vertex.UV0 =	(UV0.Num() == NumVerts) ? UV0[VertIdx] : FVector2D(0.f, 0.f);
+		Vertex.UV1 =	(UV1.Num() == NumVerts) ? UV1[VertIdx] : FVector2D(0.f, 0.f);
+		Vertex.UV2 =	(UV2.Num() == NumVerts) ? UV2[VertIdx] : FVector2D(0.f, 0.f);
+		Vertex.UV3 =	(UV3.Num() == NumVerts) ? UV3[VertIdx] : FVector2D(0.f, 0.f);
+		Vertex.Color =	(VertexColors.Num() == NumVerts) ? VertexColors[VertIdx] : FColor(255, 255, 255);
 		Vertex.Tangent = (Tangents.Num() == NumVerts) ? Tangents[VertIdx] : FVoxelProcMeshTangent();
 
 		// Update bounding box
@@ -608,7 +615,7 @@ void UVoxelProceduralMeshComponent::ClearMeshSection(int32 SectionIndex)
 		UpdateCollision();
 		MarkRenderStateDirty();
 	}
-}
+} 
 
 void UVoxelProceduralMeshComponent::ClearAllMeshSections()
 {

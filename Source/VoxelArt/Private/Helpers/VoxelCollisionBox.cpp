@@ -1,15 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 
 #include "VoxelCollisionBox.h"
 /*#include "Helpers/VoxelTools.h"
 #include "Renders/VoxelLandscapeGenerator.h"
 #include "VoxelLandscape.h"*/
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 #include "VoxelOctreeData.h"
 #include "DrawDebugHelpers.h"
 
-FVoxelCollisionBox::FVoxelCollisionBox(AVoxelLandscape* _World, FIntVector _Position, int _Size)
+FVoxelCollisionBox::FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, int _Size)
 	: Position(_Position)
 	, Size(_Size)
 	, World(_World)
