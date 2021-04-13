@@ -1,4 +1,8 @@
 // Voxel Art Plugin © limit 2018
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 #include "VoxelSplineImport.h"
 

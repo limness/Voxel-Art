@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class FVoxelOctreeData;
 class AVoxelWorld;
 
@@ -29,6 +33,10 @@ public:
 public:
 
 	AVoxelWorld* World;
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	FIntVector Position;
 	int Size;
 };

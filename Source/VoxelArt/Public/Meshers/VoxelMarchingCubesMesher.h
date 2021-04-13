@@ -6,12 +6,19 @@
 #include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
+<<<<<<< HEAD
 class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
 /*
 * Voxel Marching Cubes Mesher
 */
+=======
+
+class UVoxelWorldGenerator;
+class FVoxelOctreeDensity;
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
@@ -55,7 +62,11 @@ private:
 	TArray<FVector> positionSide;
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 
+<<<<<<< HEAD
 public:
+=======
+	void GenerateMesh();
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 	void GenerateMesh();
 	void MarchingCubes(int x, int y, int z);
@@ -69,7 +80,30 @@ public:
 
 	void ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color);
 
+<<<<<<< HEAD
 private:
+=======
+	template<uint8 Direction>
+	void GeometryTransitionCubes(float radius);
+
+	template<uint8 Direction>
+	FIntVector TransferToDirection(FIntVector DirectionPosition, float Size);
+
+	template<uint8 Direction>
+	float GetValue(FVoxelOctreeDensity* OutOctant, FColor& Color, int X, int Y, int Size, int Steps, bool CurrentOctree);
+
+	template<uint8 Direction>
+	FVector GetPosition(int X, int Y, int Size, int Steps);
+
+	FORCEINLINE int PositionToIndices(FIntVector position);
+
+	float VoxelValueMin(float a, float b, float k);
+	
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
+
+	TArray<FVector> positionSide;
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 	FORCEINLINE int PositionToIndices(FIntVector Position)
 	{

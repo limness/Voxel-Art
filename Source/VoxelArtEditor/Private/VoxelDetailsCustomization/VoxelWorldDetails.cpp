@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // Voxel Art Plugin © limit 2018
+=======
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 #include "VoxelWorldDetails.h"
 #include "VoxelModuleInterface.h"
@@ -13,7 +16,10 @@ void IVoxelWorldDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout)
 {
     TArray<TWeakObjectPtr<UObject>> Objects;
     DetailLayout.GetObjectsBeingCustomized(Objects);
+<<<<<<< HEAD
 
+=======
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
     if (Objects.Num() != 1)
     {
         return;
@@ -21,8 +27,21 @@ void IVoxelWorldDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout)
 
     World = (AVoxelWorld*)Objects[0].Get();
 
+<<<<<<< HEAD
     IDetailCategoryBuilder& OptionsCategory = DetailLayout.EditCategory("Main", FText::FromString(""), ECategoryPriority::Important);
    
+=======
+    // hide original property
+   // DetailLayout.HideProperty(DetailLayout.GetProperty(GET_MEMBER_NAME_CHECKED(AVoxelLandscape, &AVoxelLandscape::CreateVoxelWorld)));
+   // DetailLayout.HideProperty(DetailLayout.GetProperty(GET_MEMBER_NAME_CHECKED(AVoxelLandscape, bOption2)));
+
+    // add custom widget to "Options" category
+    IDetailCategoryBuilder& OptionsCategory = DetailLayout.EditCategory("Main", FText::FromString(""), ECategoryPriority::Important);
+   
+  //  auto& Builder = static_cast<FDetailCategoryImpl&>(DetailLayout.EditCategory(Name, NewNameText));
+  //  Builder.SortCategories
+   //     OptionsCategory.Sort
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
     OptionsCategory.AddCustomRow(FText::FromString(TEXT("")))
         .NameContent()
         [

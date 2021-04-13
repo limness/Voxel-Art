@@ -11,6 +11,8 @@
 #include "Editor/PropertyEditor/Public/PropertyEditing.h"
 #include "IAssetTypeActions.h"
 
+//class FVoxelTabTool;
+
 class IVoxelModuleListenerInterface
 {
 public:
@@ -53,6 +55,7 @@ protected:
     void MakePulldownMenu(FMenuBarBuilder& menuBuilder);
     void FillPulldownMenu(FMenuBuilder& menuBuilder);
 
+    TSharedPtr<IVoxelModuleListenerInterface> faf;
 };
 
 

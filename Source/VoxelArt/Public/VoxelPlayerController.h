@@ -34,10 +34,15 @@ protected:
 	/*Overridable function called whenever this actor is being removed from a level*/
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+<<<<<<< HEAD
 	/*Called when a property on this object has been modified externally*/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
 
 	/*Handles a key press*/
+=======
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	virtual bool InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad);
 
 	// ~ End AActor Interface
@@ -82,4 +87,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
 	float MaxDictance = 256.f;
+<<<<<<< HEAD
+=======
+
+	UVoxelEditorData* EditorData;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeWorld(AVoxelWorld* World, FVector HitPosition);
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 };

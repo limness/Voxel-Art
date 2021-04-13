@@ -8,9 +8,14 @@
 
 class AVoxelWorld;
 
+<<<<<<< HEAD
 /*
 * Voxel Render class (Not used now)
 */
+=======
+class AVoxelWorld;
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class VOXELART_API VoxelRender : public FRunnable
 {
 

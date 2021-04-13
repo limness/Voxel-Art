@@ -79,6 +79,16 @@ public:
 
 	/*Called when an instance of this class is placed (in editor) or spawned*/
 	virtual void OnConstruction(const FTransform& Transform) override;
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
+
+	/*Called when a property on this object has been modified externally*/
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+
+#if WITH_EDITOR
+
+	/*Called before the editor tries to begin PIE*/
+	void OnPreBeginPIE(bool bIsSimulating);
+=======
 
 	/*Called when a property on this object has been modified externally*/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
@@ -97,6 +107,32 @@ public:
 #endif
 
 	// ~ End AActor Interface
+
+public:
+
+	VoxelOctreeManager*				OctreeManagerThread;
+	VoxelOctreeNeighborsChecker*	OctreeNeighborsCheckerThread;
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
+
+	/*Called as PIE ends*/
+	void OnEndPIE(bool bIsSimulating);
+
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
+	/*If true, actor is ticked*/
+	virtual bool ShouldTickIfViewportsOnly() const override;
+=======
+	TSharedPtr<FVoxelOctreeData>	MainOctree;
+	FVoxelOctreeDensity*			OctreeDensity;
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
+
+#endif
+
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
+	// ~ End AActor Interface
+=======
+	UVoxelPoolComponent*			PoolChunks;
+	TArray<UVoxelChunkComponent*>	ChunkComponents;
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
 
 public:
 
@@ -130,6 +166,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"), Category = "Main")
 	float TransitionSize = 0.25f;
 
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
+=======
+public:
+
+	void CreateVoxelWorld();
+	void CreateVoxelWorldInEditor();
+	void DestroyVoxelWorld();
+	void UpdateWorld();
+	void SaveWorldUtility();
+	UVoxelSaveData* SaveWorldToFile();
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
 public:	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -180,6 +228,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Export Preview Heightmap")
 	void CreateTextureDensityMap();
 
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
+=======
+private:
+
+	int32 TimeForWorldGenerate = 0;
+
+	bool bStatsShowed = false;
+
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -231,6 +288,7 @@ public:
 	* @return	Color			Color of the Position
 	*/
 	void GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color);
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
 
 	/*
 	* Set the Voxel Value of density and color at the given world position
@@ -267,6 +325,29 @@ private:
 
 	UVoxelPoolComponent*					PoolChunks;
 	TArray<UVoxelChunkComponent*>			ChunkComponents;
+=======
+
+	/*
+	* Set the Voxel Value of density and color at the given world position
+	*
+	* @param	OutOctant		Saved octant from the last integration
+	* @param	Position		Local World Position
+	* @param	Density			New Position Density
+	* @param	Color			New Position Color
+	* @param	bSetDensity		Should the Density be set?
+	* @param	bSetColor		Should the Color be set?
+	*/
+	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
+
+private:
+
+	//An array of all changes that must be made to the Octree with the next tick of the game
+	TQueue<TSharedPtr<FChunksRenderInfo>>	ChangesOctree;
+
+	TArray<FVoxelChunkData*>				ChunksCreation;
+	TArray<FVoxelChunkData*>				ChunksGeneration;
+	TArray<FVoxelChunkData*>				ChunksRemoving;
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
 
 public:
 
@@ -280,6 +361,7 @@ public:
 	FCriticalSection ChunksToCreationMutex;
 
 	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
+<<<<<<< HEAD:Source/VoxelArt/Public/VoxelWorld.h
 	
 private:
 
@@ -289,4 +371,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	bool bMaximumLOD = false;
+=======
+>>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Public/VoxelLandscape.h
 };
