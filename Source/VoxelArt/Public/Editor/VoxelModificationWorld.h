@@ -6,7 +6,6 @@
 #include "UObject/NoExportTypes.h"
 #include "VoxelModificationWorld.generated.h"
 
-<<<<<<< HEAD
 class AVoxelWorld;
 class UVoxelEditorData;
 
@@ -14,16 +13,6 @@ class UVoxelEditorData;
 * Main Voxel Modif class
 */
 UCLASS(Blueprintable, BlueprintType, EditInlineNew)
-=======
-
-class AVoxelWorld;
-class UVoxelEditorData;
-
-/**
- * 
- */
-UCLASS(Blueprintable, BlueprintType, EditInlineNew) //hidecategories = (Object)
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class VOXELART_API UVoxelModificationWorld : public UObject
 {
 	GENERATED_BODY()

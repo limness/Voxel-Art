@@ -6,33 +6,22 @@
 #include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
-<<<<<<< HEAD
 class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
 /*
 * Voxel Cubes Mesher class (not completed)
 */
-=======
-
-class UVoxelWorldGenerator;
-class FVoxelOctreeDensity;
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class VOXELART_API FVoxelCubesMesher
 {
 public:
 
-<<<<<<< HEAD
 	FVoxelCubesMesher(
 		AVoxelWorld* _World, 
 		FVoxelChunkData* _Data, 
 		TArray<float> _DensityMap,
 		TArray<FColor> _ColorMap
 	);
-=======
-	FVoxelCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap);
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	~FVoxelCubesMesher();
 
 private:
@@ -61,7 +50,6 @@ public:
 	FVector GetInterp(FVector p1, FVector p2, float d1, float d2);
 
 	UPROPERTY(EditDefaultsOnly)
-<<<<<<< HEAD
 	TArray<FVector> GridGrad;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -69,15 +57,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FVector> normalsAverage;
-=======
-		TArray<FVector> GridGrad;
-
-	UPROPERTY(EditDefaultsOnly)
-		TArray<FVector> deltas;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		TArray<FVector> normalsAverage;
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 private:
 
@@ -89,7 +68,6 @@ private:
 
 public:
 
-<<<<<<< HEAD
 	TArray<FVector>				Vertices;
 	TArray<int32>				Triangles;
 	TArray<FVector>				Normals;
@@ -98,17 +76,6 @@ public:
 	TArray<FVector2D>			TextureCoordinates;
 	TArray<FVector>				VerticesTransition;
 	TArray<int32>				TrianglesTransition;
-=======
-	TArray<FVector> Vertices;
-	TArray<int32> Triangles;
-	TArray<FVector> Normals;
-	TArray<FLinearColor> VertexColors;
-	TArray<FProcMeshTangent> Tangents;
-	TArray<FVector2D> TextureCoordinates;
-
-	TArray<FVector> VerticesTransition;
-	TArray<int32> TrianglesTransition;
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 private:
 
