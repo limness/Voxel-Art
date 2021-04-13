@@ -6,19 +6,12 @@
 #include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
-<<<<<<< HEAD
 class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
 /*
 * Voxel Surface Nets Mesher class
 */
-=======
-
-class UVoxelWorldGenerator;
-class FVoxelOctreeDensity;
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 class VOXELART_API FVoxelSurfaceNetsMesher
 {
 public:
@@ -26,7 +19,6 @@ public:
 	FVoxelSurfaceNetsMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap);
 	~FVoxelSurfaceNetsMesher();
 
-<<<<<<< HEAD
 public:
 
 	void GenerateMesh();
@@ -35,8 +27,6 @@ public:
 	FVector GetGradient(FVector pos);
 	FVector GetInterp(FVector p1, FVector p2, float d1, float d2);
 
-=======
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 private:
 
 	int Voxels;
@@ -56,15 +46,12 @@ public:
 
 public:
 
-<<<<<<< HEAD
-=======
 	void GenerateMesh();
 	void GeneratePlane();
 
 	FVector GetGradient(FVector pos);
 	FVector GetInterp(FVector p1, FVector p2, float d1, float d2);
 
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FVector> GridGrad;
 

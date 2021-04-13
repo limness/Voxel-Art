@@ -169,21 +169,10 @@ float UVoxelWorldGenerator::TorusSDF(int X, int Y, int Z, float Radius, float Ra
 	return Value;
 }
 
-<<<<<<< HEAD:Source/VoxelArt/Private/Generators/VoxelWorldGenerator.cpp
-float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float Amplitude, float Frequency)
-=======
-float UVoxelWorldGenerator::VectorDistanceAB(FVector A, FVector B)
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/Renders/VoxelLandscapeGenerator.cpp
-{
-	float Value = 0.f;
-
-<<<<<<< HEAD:Source/VoxelArt/Private/Generators/VoxelWorldGenerator.cpp
-=======
 float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float Amplitude, float Frequency)
 {
 	float Value = 0.f;
 
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/Renders/VoxelLandscapeGenerator.cpp
 	for (int i = 0; i < Octaves; i++)
 	{
 		Value += USimplexNoiseBPLibrary::SimplexNoise3D(X * Frequency, Y * Frequency, Z * Frequency) * Amplitude;
@@ -193,11 +182,7 @@ float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float
 	return Value;
 }
 
-<<<<<<< HEAD:Source/VoxelArt/Private/Generators/VoxelWorldGenerator.cpp
 float UVoxelWorldGenerator::ConeSDF(FVector p, FVector2D c, float h)
-=======
-float UVoxelWorldGenerator::Cone(FVector p, FVector2D c, float h)
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/Renders/VoxelLandscapeGenerator.cpp
 {
 	FVector2D q = h * FVector2D(c.X, -c.Y) / c.Y;
 

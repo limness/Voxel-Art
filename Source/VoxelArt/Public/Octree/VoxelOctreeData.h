@@ -5,18 +5,9 @@
 #include "CoreMinimal.h"
 #include "VoxelOctreeData.generated.h"
 
-<<<<<<< HEAD
 class AVoxelWorld;
 class UVoxelChunkComponent;
 class UVoxelWorldGenerator;
-=======
-
-class AVoxelWorld;
-class UVoxelChunkComponent;
-class UVoxelWorldGenerator;
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
-
 /*
 * Parent Voxel Octree Data
 */
@@ -73,7 +64,6 @@ class VOXELART_API FVoxelChunkData
 {
 public:
 
-<<<<<<< HEAD
 	FVoxelChunkData(
 		TWeakPtr<FVoxelOctreeData> _CurrentOctree,
 		uint8 _Depth,
@@ -86,8 +76,6 @@ public:
 
 public:
 
-=======
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	int Voxels = 32;
 	int Size = 0;
 	int Priority = 0;
@@ -99,14 +87,6 @@ public:
 
 public:
 
-<<<<<<< HEAD
-=======
-//	TArray<float> DensityMap;
-//	TArray<FColor> ColorMap;
-
-public:
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 	UVoxelChunkComponent* Chunk = nullptr;
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 };
@@ -138,15 +118,9 @@ public:
 	int Size = 0;
 	int Voxels = 32;
 
-<<<<<<< HEAD
 	FIntVector		Position;
 	TArray<float>	DensityMap;
 	TArray<FColor>	ColorMap;
-=======
-	FIntVector Position;
-	TArray<float> DensityMap;
-	TArray<FColor> ColorMap;
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 private:
 
@@ -162,17 +136,8 @@ public:
 
 	FORCEINLINE TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> GetChildren();
 
-<<<<<<< HEAD
 	FORCEINLINE void SetVoxelValue(AVoxelWorld* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 	FORCEINLINE void GetVoxelDensity(AVoxelWorld* World, FIntVector P, float& Value, FColor& Color);
-=======
-	inline TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> GetChildren();
-	inline bool HasChildren() { return ChildrenOctants.Num() == 8; }
-	inline void SetVoxelValue(AVoxelWorld* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
-	inline void GetVoxelDensity(AVoxelWorld* World, FIntVector P, float& Value, FColor& Color);
-	inline bool HasOwnDensity() { return OwnDensity; }
-	inline bool HasOwnColor() { return OwnColor; }
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 	FORCEINLINE bool HasChildren() { return ChildrenOctants.Num() == 8; }
 	FORCEINLINE bool HasOwnDensity() { return OwnDensity; }
@@ -183,26 +148,11 @@ public:
 	FORCEINLINE FIntVector GetMaximumCorner();
 	FORCEINLINE FIntVector TransferToLocal(AVoxelWorld* World, FIntVector Position);
 
-<<<<<<< HEAD
-public:
-=======
-	FIntVector TransferToLocal(AVoxelWorld* World, FIntVector Position);
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
-
 	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
 	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
 
-<<<<<<< HEAD
 public:
-=======
-	void SetDefaultMap(AVoxelWorld* World);
 
-public:
-	FVoxelOctreeDensity(UVoxelWorldGenerator* _WorldGenerator, uint8 _Depth, int _Size, int _Voxels, FIntVector _Position);
-	~FVoxelOctreeDensity() {}
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
-
-	void AddChildren();
 	void SetDefaultMap(AVoxelWorld* World);
 };
 

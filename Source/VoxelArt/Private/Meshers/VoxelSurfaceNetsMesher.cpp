@@ -23,10 +23,7 @@ FVoxelSurfaceNetsMesher::~FVoxelSurfaceNetsMesher()
 FVector FVoxelSurfaceNetsMesher::GetGradient(FVector pos)
 {
 	//float d = de;
-<<<<<<< HEAD
 	//TODO: Add normals to the Mesher
-=======
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 	FVector average_normal;
 /*

@@ -6,17 +6,11 @@
 #include "VoxelOctreeData.h"
 #include "VoxelSaveData.generated.h"
 
-<<<<<<< HEAD
 class AVoxelWorld;
 
 /*
 * Voxel Save Data in memory class
 */
-=======
-
-class AVoxelWorld;
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 USTRUCT(BlueprintType)
 struct VOXELART_API FVoxelSaveOctant
 {

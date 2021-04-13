@@ -63,10 +63,6 @@ void AVoxelWorld::BeginPlay()
 
 void AVoxelWorld::Destroyed()
 {
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
-=======
-//	bSaveDensityInGame = false;
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
 	DestroyVoxelWorld();
 }
 
@@ -112,7 +108,6 @@ void AVoxelWorld::Tick(float DeltaTime)
 }
 
 void AVoxelWorld::CreateVoxelWorldInEditor()
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
@@ -135,10 +130,6 @@ void AVoxelWorld::CreateVoxelWorld()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
-=======
-{
-	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
-
 	if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(this))
 	{
 		FEditorDelegates::PreBeginPIE.AddUObject(this, &AVoxelWorld::OnPreBeginPIE);
@@ -158,7 +149,6 @@ void AVoxelWorld::CreateVoxelWorld()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
 	if (WorldGenerator)
 	{
 		if (MinimumLOD < 0)
@@ -226,58 +216,9 @@ void AVoxelWorld::SaveWorldUtility()
 	else
 	{
 		SaveFile = SaveWorldToFile();
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
-=======
 	}
 }
 
-UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
-{
-	if (bWorldCreated)
-	{
-		FString ObjectName = TEXT("WorldSave");
-
-		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-
-		FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
-		AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
-
-		UPackage* Package = CreatePackage(nullptr, *PackageName);
-		UPackage* OuterPack = Package->GetOutermost();
-		Package->FullyLoad();
-
-		UVoxelSaveData* NewSave = NewObject<UVoxelSaveData>(OuterPack, *ObjectName, RF_Public | RF_Standalone);
-		
-		NewSave->SetVoxelWorld(this);
-		NewSave->SaveData();
-
-		FAssetRegistryModule::AssetCreated(NewSave);
-
-		NewSave->MarkPackageDirty();
-		NewSave->PostEditChange();
-		NewSave->AddToRoot();
-
-		FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
-
-		bool bSaveSuccess = UPackage::SavePackage(
-			Package,
-			NewSave,
-			EObjectFlags::RF_Public | EObjectFlags::RF_Standalone,
-			*PackageFileName,
-			GError, nullptr, true, true, SAVE_NoError);
-
-		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSaveSuccess ? TEXT("True") : TEXT("False"));
-
-		if (bSaveSuccess)
-		{
-			return NewSave;
-		}
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
-	}
-	return nullptr;
-}
-
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
 UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 {
 	if (bWorldCreated)
@@ -323,8 +264,51 @@ UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 	return nullptr;
 }
 
-=======
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
+UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
+{
+	if (bWorldCreated)
+	{
+		FString ObjectName = TEXT("WorldSave");
+
+		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+
+		FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
+		AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
+
+		UPackage* Package = CreatePackage(nullptr, *PackageName);
+		UPackage* OuterPack = Package->GetOutermost();
+		Package->FullyLoad();
+
+		UVoxelSaveData* NewSave = NewObject<UVoxelSaveData>(OuterPack, *ObjectName, RF_Public | RF_Standalone);
+		
+		NewSave->SetVoxelWorld(this);
+		NewSave->SaveData();
+
+		FAssetRegistryModule::AssetCreated(NewSave);
+
+		NewSave->MarkPackageDirty();
+		NewSave->PostEditChange();
+		NewSave->AddToRoot();
+
+		FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
+
+		bool bSaveSuccess = UPackage::SavePackage(
+			Package,
+			NewSave,
+			EObjectFlags::RF_Public | EObjectFlags::RF_Standalone,
+			*PackageFileName,
+			GError, nullptr, true, true, SAVE_NoError);
+
+		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSaveSuccess ? TEXT("True") : TEXT("False"));
+
+		if (bSaveSuccess)
+		{
+			return NewSave;
+		}
+	}
+	return nullptr;
+}
+
 void AVoxelWorld::DestroyVoxelWorld()
 {
 	SCOPE_CYCLE_COUNTER(STAT_DestroyVoxelWorld);
@@ -410,15 +394,12 @@ void AVoxelWorld::OnEndPIE(bool bIsSimulating)
 void AVoxelWorld::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
-=======
 
 #if WITH_EDITOR
 	if (GetWorld()->WorldType == EWorldType::EditorPreview || GetWorld()->WorldType == EWorldType::GamePreview || GetWorld()->WorldType == EWorldType::Editor)
 	{
 	}
 #endif
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
 }
 
 FEditorViewportClient* AVoxelWorld::GetEditorViewportClient()
@@ -624,10 +605,6 @@ void AVoxelWorld::UpdateOctree()
 * UpdateWorld doesn't support the Priorities
 * because its not needed
 */
-<<<<<<< HEAD:Source/VoxelArt/Private/VoxelWorld.cpp
-=======
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d:Source/VoxelArt/Private/VoxelLandscape.cpp
 void AVoxelWorld::UpdateWorld()
 {
 	if (!bWorldCreated)
