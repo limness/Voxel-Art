@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 
+#ifndef VOXELTOOLS_H
+#define VOXELTOOLS_H
+
+
 #define VOXEL_COLOR		FColor(143, 126, 255)
 
 #define NORMALS			2
@@ -18,3 +22,5 @@ namespace VoxelTools
 {
 	const float Offset = 0.001f;
 }
+
+#endif VOXELTOOLS_H

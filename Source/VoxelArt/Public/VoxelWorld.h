@@ -47,6 +47,9 @@ enum Meshers
 
 class FVoxelCollisionBox;
 
+/*
+* Voxel World Main class
+*/
 UCLASS(Blueprintable, HideCategories = ("Input", "Actor", "LOD"))
 class VOXELART_API AVoxelWorld : public AActor
 {
@@ -57,42 +60,58 @@ public:
 	AVoxelWorld();
 
 public:
+	// ~ Begin AActor Interface
 
-#if WITH_EDITOR
-	void OnPreBeginPIE(bool bIsSimulating);
-	void OnEndPIE(bool bIsSimulating);
-#endif
-
+	/*Overridable native event for when play begins for this actor*/
 	virtual void BeginPlay() override;
+
+	/*Overridable function called whenever this actor is being removed from a level*/
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	/*
+	*Called when this actor is explicitly being destroyed during gameplay or in the editor, 
+	*not called during level streaming or gameplay ending
+	*/
 	virtual void Destroyed() override;
+
+	/*Function called every frame on this Actor*/
 	virtual void Tick(float DeltaTime) override;
+
+	/*Called when an instance of this class is placed (in editor) or spawned*/
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	/*Called when a property on this object has been modified externally*/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
 
-public:
-
 #if WITH_EDITOR
+
+	/*Called before the editor tries to begin PIE*/
+	void OnPreBeginPIE(bool bIsSimulating);
+
+	/*Called as PIE ends*/
+	void OnEndPIE(bool bIsSimulating);
+
+	/*If true, actor is ticked*/
 	virtual bool ShouldTickIfViewportsOnly() const override;
+
 #endif
 
-public:
-
-	VoxelOctreeManager* OctreeManagerThread;
-	VoxelOctreeNeighborsChecker* OctreeNeighborsCheckerThread;
+	// ~ End AActor Interface
 
 public:
 
-	TSharedPtr<FVoxelOctreeData> MainOctree;
-	FVoxelOctreeDensity* OctreeDensity;
+	VoxelOctreeManager*				OctreeManagerThread;
+	VoxelOctreeNeighborsChecker*	OctreeNeighborsCheckerThread;
 
-	TQueue<TSharedPtr<FChunksRenderInfo>> ChangesOctree;
-	TMap<uint64, TSharedPtr<FVoxelOctreeData>> SavedChunks;
+public:
+
+	TSharedPtr<FVoxelOctreeData>	MainOctree;
+	FVoxelOctreeDensity*			OctreeDensity;
 
 private:
 
-	UVoxelPoolComponent* PoolChunks;
-	TArray<UVoxelChunkComponent*> ChunkComponents;
+	UVoxelPoolComponent*			PoolChunks;
+	TArray<UVoxelChunkComponent*>	ChunkComponents;
 
 public:
 
@@ -191,9 +210,6 @@ private:
 
 	bool bStatsShowed = false;
 
-	UPROPERTY(EditDefaultsOnly)
-	bool bMaximumLOD = false;
-
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -205,51 +221,69 @@ private:
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
 	void SpawnChunk(FVoxelChunkData* ChunkData);
 	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
+	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
 	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
+	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
 	FEditorViewportClient* GetEditorViewportClient();
 	void UpdateOctree();
 
 public:	
 
 	UFUNCTION(BlueprintCallable)
-	FIntVector TransferToVoxelWorld(FVector P);
+	FORCEINLINE FIntVector TransferToVoxelWorld(FVector P);
 
 	UFUNCTION(BlueprintCallable)
-	FVector TransferToGameWorld(FIntVector P);
+	FORCEINLINE FVector TransferToGameWorld(FIntVector P);
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int GetIndex(FIntVector P);
 
-public:
-
-	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
-
-public:
-
-	void GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color);
-	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
-
-	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
-
 	UFUNCTION(BlueprintCallable)
-	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
+	FORCEINLINE void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
+
+public:
+
+	/*
+	* Get the Voxel Value of density and color at the given world position
+	*
+	* @param	OutOctant		Saved octant from the last integration
+	* @param	Position		Local World Position
+	* @return	Value			Density of the Position
+	* @return	Color			Color of the Position
+	*/
+	void GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color);
+
+	/*
+	* Set the Voxel Value of density and color at the given world position
+	*
+	* @param	OutOctant		Saved octant from the last integration
+	* @param	Position		Local World Position
+	* @param	Density			New Position Density
+	* @param	Color			New Position Color
+	* @param	bSetDensity		Should the Density be set?
+	* @param	bSetColor		Should the Color be set?
+	*/
+	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
 private:
 
-	TArray<FVoxelChunkData*> ChunksCreation;
-	TArray<FVoxelChunkData*> ChunksGeneration;
-	TArray<FVoxelChunkData*> ChunksRemoving;
+	//An array of all changes that must be made to the Octree with the next tick of the game
+	TQueue<TSharedPtr<FChunksRenderInfo>>	ChangesOctree;
+
+	TArray<FVoxelChunkData*>				ChunksCreation;
+	TArray<FVoxelChunkData*>				ChunksGeneration;
+	TArray<FVoxelChunkData*>				ChunksRemoving;
 
 public:
 
 	float TimeToCallGarbageCollection = 0.f;
-
 	int TotalTasksCounter = 0;
 
 	FQueuedThreadPool* ThreadPool;
-	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
 	FThreadSafeCounter TaskWorkGlobalCounter;
 
 	FCriticalSection OctreeMutex;
 	FCriticalSection ChunksToCreationMutex;
+
+	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
 };
