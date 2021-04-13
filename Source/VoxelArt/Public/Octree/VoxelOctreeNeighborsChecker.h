@@ -1,20 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelChunk.h"
 #include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
-class AVoxelLandscape;
+class AVoxelWorld;
 
+/*
+* Voxel Octree Neighbors Checker class (Need to rewrite and destroy)
+*/
 class VOXELART_API VoxelOctreeNeighborsChecker : public FRunnable
 {
-
 public:
 
-	VoxelOctreeNeighborsChecker(AVoxelLandscape* _World);
+	VoxelOctreeNeighborsChecker(AVoxelWorld* _World);
 	~VoxelOctreeNeighborsChecker();
 
 	void EnsureCompletion();
@@ -29,12 +30,11 @@ public:
 
 private:
 
-	//TArray<UVoxelChunkComponent*> ChunksGeneration;
 	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
 private:
 
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 
 	FVector PlayerPositionToWorld;
 
@@ -51,13 +51,13 @@ private:
 private:
 
 	template<uint8 Direction>
-	TArray<uint64> GetNodeNeighbors(int level, uint64 nodeID);
+	TArray<TWeakPtr<FVoxelOctreeData>> GetNodeNeighbors(int level, uint64 nodeID);
 
 	template<uint8 Direction>
-	TSharedPtr<FVoxelOctreeData> GetBiggestNeighbor(int level, uint64 nodeID);
+	TWeakPtr<FVoxelOctreeData> GetBiggestNeighbor(int level, uint64 nodeID);
 
 	template<uint8 Direction>
-	TArray<uint64> GetSmallerNeighbors(int level, int chunkLevel, uint64 chunkNodeID, TSharedPtr<FVoxelOctreeData> NeighborChild);
+	TArray<TWeakPtr<FVoxelOctreeData>> GetSmallerNeighbors(int level, int chunkLevel, uint64 chunkNodeID, TWeakPtr<FVoxelOctreeData> biggestNeighbor);
 
 	template<uint8 Direction>
 	uint8 GetLocalNeighbor(uint8 H, uint8 D, uint8 W);
@@ -68,9 +68,9 @@ private:
 	template<uint8 Direction>
 	uint8 GetSideNeighbor(uint8 H, uint8 D, uint8 W);
 
-	TSharedPtr<FVoxelOctreeData> GetOctantByNodeID(int level, uint64 nodeID);
+	TWeakPtr<FVoxelOctreeData> GetChunkByNodeID(int level, uint64 nodeID);
 
-	TSharedPtr<FVoxelOctreeData> GetDefaultOctantByNodeID(TSharedPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
+	TWeakPtr<FVoxelOctreeData> FindNodeByID(TWeakPtr<FVoxelOctreeData> chunk, int levelTo, int level, uint64 nodeID);
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant, int level);
 };

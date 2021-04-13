@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "VoxelSplineImport.generated.h"
 
+/*
+* Voxel Spline Importer class (Haven't done)
+*/
 UCLASS()
 class VOXELART_API AVoxelSplineImport : public AActor
 {
@@ -22,5 +25,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

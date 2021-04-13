@@ -1,35 +1,55 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 #include "Editor/VoxelEditorData.h"
-
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "GameFramework/PlayerController.h"
 #include "VoxelPlayerController.generated.h"
 
-/**
- * 
- */
+/*
+* Voxel Player Controller class
+* Use this in any case when you want to edit World in real time
+*/
 UCLASS()
 class VOXELART_API AVoxelPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 protected:
+	// ~ Begin AActor Interface
+
+	/*Called before destroying the object*/
 	virtual void BeginDestroy() override;
 
+	/*Function called every frame on this Actor*/
 	virtual void Tick(float DeltaTime) override;
 
+	/*Overridable native event for when play begins for this actor*/
 	virtual void BeginPlay() override;
 
+	/*Overridable function called whenever this actor is being removed from a level*/
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	/*Called when a property on this object has been modified externally*/
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+
+	/*Handles a key press*/
 	virtual bool InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad);
+
+	// ~ End AActor Interface
+
+public:
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeWorld(AVoxelWorld* World, FVector HitPosition);
+
+public:
+
+	UVoxelEditorData* EditorData;
 
 public:
 
@@ -40,34 +60,26 @@ public:
 	bool EditorCreatePressed = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<BrushType> BrushType;
+	TEnumAsByte<BrushType> BrushType = BrushType::Sphere;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<BrushSoftness> BrushSoftness;
+	TEnumAsByte<BrushSoftness> BrushSoftness = BrushSoftness::Insert;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<EditorType> EditorType;
+	TEnumAsByte<EditorType> EditorType = EditorType::Terrain;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	bool Dig = false;
+	bool Dig = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	float Radius = 20.f;
+	float Radius = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	FColor Color = FColor(77.f, 77.f, 77.f);
+	FColor Color = FColor(0.17f, 0.07f,	1.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	float Strength = 0.5f;
+	float Strength = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	float MaxDictance = 5000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	float SmoothInsert = 10.f;
-
-	UVoxelEditorData* EditorData;
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeWorld(AVoxelLandscape* World, FVector HitPosition);
+	float MaxDictance = 256.f;
 };

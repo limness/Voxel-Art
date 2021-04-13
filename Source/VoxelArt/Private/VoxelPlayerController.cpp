@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelPlayerController.h"
 #include "Helpers/VoxelTools.h"
-#include "Editor/VoxelModificationLandscape.h"
+#include "Editor/VoxelModificationWorld.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -67,7 +67,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 			{
 				if (GEngine)
 				{
-					ChangeWorld(Cast<AVoxelLandscape>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
+					ChangeWorld(Cast<AVoxelWorld>(MouseHitResult.Component->GetOwner()), MouseHitResult.Location);
 				}
 			}
 		}
@@ -78,7 +78,19 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosition)
+void AVoxelPlayerController::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	EditorData->EditorType = EditorType;
+	EditorData->BrushSoftness = BrushSoftness;
+	EditorData->Dig = Dig;
+	EditorData->Radius = Radius;
+	EditorData->Strength = Strength;
+	EditorData->BrushColor = Color;
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void AVoxelPlayerController::ChangeWorld(AVoxelWorld* World, FVector HitPosition)
 {
 	if (World)
 	{
@@ -86,8 +98,8 @@ void AVoxelPlayerController::ChangeWorld(AVoxelLandscape* World, FVector HitPosi
 
 		switch (BrushType)
 		{
-		case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, World, WorldPosition, Radius); break; }
-		case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, World, WorldPosition, Radius); break; }
+		case BrushType::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, World, WorldPosition, Radius); break; }
+		case BrushType::Cube: { UVoxelModificationWorld::CubePainter(EditorData, World, WorldPosition, Radius); break; }
 		}
 	}
 }

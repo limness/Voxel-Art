@@ -1,10 +1,8 @@
-﻿                                                                                                                                                    
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Voxel Art Plugin © limit 2018
 
 #include "Octree/VoxelOctreeManager.h"
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 #include "Helpers/VoxelTools.h"
-
 #include "Editor.h"
 #include "EditorViewportClient.h"
 
@@ -16,7 +14,7 @@ DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Create Data"), STA
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Remove Chunk"), STAT_AddRemoveChunk, STATGROUP_Voxel);
 
 
-VoxelOctreeManager::VoxelOctreeManager(AVoxelLandscape* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
+VoxelOctreeManager::VoxelOctreeManager(AVoxelWorld* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
 	: World(_World)
 	, PlayerController(_PlayerController)
 	, DrawingRange(_DrawingRange)
@@ -48,12 +46,35 @@ bool VoxelOctreeManager::Init()
 	return true;
 }
 
+FEditorViewportClient* VoxelOctreeManager::GetEditorViewportClient()
+{
+	FEditorViewportClient* EditorViewportClient = nullptr;
+
+	if (GEditor)
+	{
+		if (FViewport* Viewport = GEditor->GetActiveViewport())
+		{
+			if (FViewportClient* CurrentClient = Viewport->GetClient())
+			{
+				for (FEditorViewportClient* Client : GEditor->AllViewportClients)
+				{
+					if (Client == CurrentClient)
+					{
+						EditorViewportClient = Client;
+						break;
+					}
+				}
+			}
+		}
+	}
+	return EditorViewportClient;
+}
+
 uint32 VoxelOctreeManager::Run()
 {
 	FPlatformProcess::Sleep(0.03);
 
-	FViewport* activeViewport = GEditor->GetActiveViewport();
-	FEditorViewportClient* editorViewClient = (activeViewport != nullptr) ? (FEditorViewportClient*)activeViewport->GetClient() : nullptr;
+	FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
 
 	while (!m_Kill)
 	{
@@ -71,9 +92,13 @@ uint32 VoxelOctreeManager::Run()
 #if WITH_EDITOR
 			if (World->GetWorld() && (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview))
 			{
-				if (editorViewClient)
+				if (EditorViewportClient)
 				{
-					PlayerPositionToWorld = World->TransferToVoxelWorld(editorViewClient->GetViewLocation());
+					PlayerPositionToWorld = World->TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
+				}
+				else
+				{
+					EditorViewportClient = GetEditorViewportClient();
 				}
 			}
 			else
@@ -94,12 +119,20 @@ uint32 VoxelOctreeManager::Run()
 
 					ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
 					{
-						//FScopeLock Lock(&World->OctreeMutex);
+						FScopeLock Lock(&World->OctreeMutex);
 						CheckOctree(World->MainOctree);
 					}
 					if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
 					{
 						World->ChangesOctree.Enqueue(ChangesOctree);
+					}
+					/*
+					* After the first Octree update, we have to enable
+					* the update in the game branch to then update the priority and update this
+					*/
+					if (!World->bEnableUpdateOctree)
+					{
+						World->bEnableUpdateOctree = true;
 					}
 					ChangesOctree.Reset();
 				}
@@ -174,7 +207,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				{
 					SCOPE_CYCLE_COUNTER(STAT_AddChildren);
 
-					FScopeLock Lock(&World->OctreeMutex);
+					//FScopeLock Lock(&World->OctreeMutex);
 					Octant->AddChildren();
 				}
 				/*Remove old chunk*/
@@ -230,7 +263,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 			{
 				SCOPE_CYCLE_COUNTER(STAT_DestroyChildren);
 
-				FScopeLock Lock(&World->OctreeMutex);
+			//	FScopeLock Lock(&World->OctreeMutex);
 				Octant->DestroyChildren();
 			}
 		}

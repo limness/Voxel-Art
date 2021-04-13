@@ -1,4 +1,4 @@
-
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelEdMode.h"
 #include "VoxelModuleInterface.h"
@@ -6,28 +6,28 @@
 #include "ScopedTransaction.h"
 #include "VoxelEdModeToolkit.h"
 
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 #include "Editor/VoxelEditorData.h"
-#include "Editor/VoxelModificationLandscape.h"
-
+#include "Editor/VoxelEditorTool.h"
+#include "Editor/VoxelModificationWorld.h"
 
 const FEditorModeID FVoxelEdMode::EM_Example(TEXT("EM_Example"));
 
 #define LOCTEXT_NAMESPACE "PListEditor"
 
+FVoxelEdMode::FVoxelEdMode()
+{
+	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage(), TEXT("VoxelArtEditor"), RF_Transactional);
+}
 
 void FVoxelEdMode::Enter()
 {
     FEdMode::Enter();
 
-	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage(), *LOCTEXT("SettingsName", "EmpexEdMode Settings").ToString());
-
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.ObjectFlags = RF_Transient;
 
 	EditorTool = GetWorld()->SpawnActor<AVoxelEditorTool>(AVoxelEditorTool::StaticClass(), SpawnParams);
-	//EditorTool->CurrentTool = EditorData->BrushType;
-	//EditorTool->CurrentRadius = EditorData->Radius;
 
     if (!Toolkit.IsValid())
     {
@@ -46,6 +46,13 @@ void FVoxelEdMode::Exit()
     FEdMode::Exit();
 }
 
+void FVoxelEdMode::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	FEdMode::AddReferencedObjects(Collector);
+	Collector.AddReferencedObject(EditorData);
+}
+
+
 bool FVoxelEdMode::InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event)
 {
 	if (Event == IE_Pressed)
@@ -53,7 +60,7 @@ bool FVoxelEdMode::InputKey(FEditorViewportClient* ViewportClient, FViewport* Vi
 		if (Key == EKeys::LeftMouseButton)
 		{
 			EditorRemovePressed = true;
-			//return true;
+		//	return true;
 		}
 		if (Key == EKeys::RightMouseButton)
 		{
@@ -74,6 +81,11 @@ bool FVoxelEdMode::InputKey(FEditorViewportClient* ViewportClient, FViewport* Vi
 	return false;
 }
 
+bool FVoxelEdMode::IsSelectionAllowed(AActor* InActor, bool bInSelection) const
+{
+	return EditorRemovePressed; 
+}
+
 bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* Viewport, int32 x, int32 y)
 {
 	//if (EditorCreatePressed)
@@ -91,7 +103,7 @@ bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* V
 		{
 			for (auto& Hit : MouseHitResults)
 			{
-				HitWorld = Cast<AVoxelLandscape>(Hit.Component->GetOwner());
+				HitWorld = Cast<AVoxelWorld>(Hit.Component->GetOwner());
 
 				if (HitWorld)
 				{
@@ -104,7 +116,7 @@ bool FVoxelEdMode::MouseMove(FEditorViewportClient* ViewportClient, FViewport* V
 			EditorTool->ToolInitialize(EditorData, HitWorldPosition);
 		}
 	}
-    return EditorCreatePressed;
+    return EditorRemovePressed;
 }
 
 bool FVoxelEdMode::CapturedMouseMove(FEditorViewportClient* ViewportClient, FViewport* Viewport, int32 MouseX, int32 MouseY)
@@ -119,10 +131,13 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 		if (HitWorld)
 		{
 			FIntVector HitVoxelWorldPosition = HitWorld->TransferToVoxelWorld(HitWorldPosition);
+
+			//UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %s"), *HitVoxelWorldPosition.ToString());
+			
 			switch (EditorData->BrushType)
 			{
-			case BrushType::Sphere: { UVoxelModificationLandscape::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
-			case BrushType::Cube: { UVoxelModificationLandscape::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case BrushType::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case BrushType::Cube: { UVoxelModificationWorld::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
 			}
 		}
 	}

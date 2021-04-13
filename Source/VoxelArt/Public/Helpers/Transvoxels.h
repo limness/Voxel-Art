@@ -1,3 +1,5 @@
+// Voxel Art Plugin © limit 2018
+
 //================================================================================
 //
 // The Transvoxel Algorithm look-up tables

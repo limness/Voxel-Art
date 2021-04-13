@@ -1,13 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "GameFramework/Actor.h"
-//#include "VoxelBoundChunkData.h"
 #include "Components/BoxComponent.h"
-//#include "MarchingCubes.h"
-//#include "MyObject.h"
-//#include "SimplexNoiseBPLibrary.h"
 #include "ProceduralMeshComponent.h"
 #include "VoxelChunkTransvoxels.generated.h"
 

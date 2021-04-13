@@ -8,7 +8,9 @@
 #include "Components/ActorComponent.h"
 #include "VoxelPoolComponent.generated.h"
 
-
+/*
+* Voxel Main Pool Component class
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VOXELART_API UVoxelPoolComponent : public UActorComponent
 {
@@ -20,7 +22,12 @@ public:
 
 protected:
 
+	// ~ Begin UActorComponent Interface
+
+	/*Overridable native event for when play begins for this component*/
 	virtual void BeginPlay() override;
+
+	// ~ End UActorComponent Interface
 
 public:
 
@@ -31,12 +38,10 @@ public:
 
 public:
 
-	//Has our pool free actors or not
+	// Has our pool free actors or not
 	UVoxelChunkComponent* AddChunkToPool();
 
-	/*
-	* Get our chunk from the pool
-	* If chunk is exist in queue we get it
-	*/
+	// Get our chunk from the pool
+	// If chunk is exist in queue we get it
 	UVoxelChunkComponent* GetChunkFromPool();
 };

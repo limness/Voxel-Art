@@ -5,9 +5,9 @@
 #include "IDetailCustomization.h"
 #include "Input/Reply.h"
 
-#include "VoxelLandscape.h"
+#include "VoxelWorld.h"
 
-class IVoxelLandscapeDetails : public IDetailCustomization
+class IVoxelWorldDetails : public IDetailCustomization
 {
 public:
 
@@ -18,15 +18,14 @@ public:
     virtual void CustomizeDetails(IDetailLayoutBuilder& DetailLayout) override;
 
 protected:
-    // widget functions
-   // ECheckBoxState IsModeRadioChecked(AVoxelLandscape* actor, int optionIndex) const;
-   // void OnModeRadioChanged(ECheckBoxState CheckType, AVoxelLandscape* actor, int optionIndex);
 
     FReply CreateWorldInEditor();
+    FReply SaveWorldInEditor();
     FReply DestroyWorldInEditor();
-    FReply UpdateWorldInEditor();
+
+    FReply CreateTextureInEditor();
 
 private:
 
-    TWeakObjectPtr<AVoxelLandscape> World;
+    TWeakObjectPtr<AVoxelWorld> World;
 };

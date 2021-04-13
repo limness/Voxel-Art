@@ -1,10 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/VoxelTools.h"
 #include "VoxelEditorData.generated.h"
-
 
 UENUM()
 enum BrushType
@@ -12,7 +12,6 @@ enum BrushType
 	Sphere	UMETA(DisplayName = "Sphere"),
 	Cube	UMETA(DisplayName = "Cube")
 };
-
 
 UENUM()
 enum EditorType
@@ -29,6 +28,9 @@ enum BrushSoftness
 	Flat	UMETA(DisplayName = "Flat")
 };
 
+/*
+* Voxel Editor Data class
+*/
 UCLASS()
 class VOXELART_API UVoxelEditorData : public UObject
 {
@@ -63,5 +65,5 @@ public:
 	float MaxDictance = 256.f;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Color"))
-	FColor BrushColor = FColor(77.f, 77.f, 77.f);
+	FColor BrushColor = VOXEL_COLOR;
 };

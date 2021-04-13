@@ -1,6 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
-#include "Renders/VoxelLandscapeGenerator.h"
+#include "Generators/VoxelWorldGenerator.h"
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Helpers/VoxelTools.h"
@@ -8,11 +8,8 @@
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Heightmap"), STAT_GeneratorHeightmap, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Colormap"), STAT_GeneratorColormap, STATGROUP_Voxel);
 
-UVoxelLandscapeGenerator::UVoxelLandscapeGenerator(const class FObjectInitializer& objectInitializer) : Super(objectInitializer)
-{
-}
 
-void UVoxelLandscapeGenerator::GeneratorInit()
+void UVoxelWorldGenerator::GeneratorInit()
 {
 	if (HeightmapTexture && World)
 	{
@@ -93,7 +90,7 @@ void UVoxelLandscapeGenerator::GeneratorInit()
 }
 
 
-FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, float Z) const
+FORCEINLINE float UVoxelWorldGenerator::GetHeightmapData(float X, float Y, float Z) const
 {
 	float offset = 0.001f;
 	float MapX = X + WidthHeightmap / 2.f;
@@ -105,26 +102,31 @@ FORCEINLINE float UVoxelLandscapeGenerator::GetHeightmapData(float X, float Y, f
 	return Z - (TextureHeightMap[round(MapY) * WidthHeightmap + round(MapX)].R - 128.f) / 63.f * Multiply + offset;
 }
 
-FORCEINLINE FColor UVoxelLandscapeGenerator::GetColormapData(float X, float Y, float Z) const
+FORCEINLINE FColor UVoxelWorldGenerator::GetColormapData(float X, float Y, float Z) const
 {
 	float MapX = X + WidthColormap / 2.f;
 	float MapY = Y + HeightColormap / 2.f;
 
-	if (MapX > WidthColormap - 1 || MapX < 0) return FColor(121.f, 121.f, 121.f);
-	if (MapY > HeightColormap - 1 || MapY < 0) return FColor(121.f, 121.f, 121.f);
+	if (MapX > WidthColormap - 1 || MapX < 0) return VOXEL_COLOR;
+	if (MapY > HeightColormap - 1 || MapY < 0) return VOXEL_COLOR;
 
 	return TextureColorMap[round(MapY) * WidthColormap + round(MapX)];
 }
 
-float UVoxelLandscapeGenerator::GetDensityMap(const FIntVector& CellPosition)
+float UVoxelWorldGenerator::GetDensityMap(const FIntVector& CellPosition)
 {
-	float offset = 0.001f;
-	return TextureHeightMap.Num() > 0 ? GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z) : ((CellPosition.Z + Height) + offset);
+	float Value = 0.f;
+
+	if (TextureHeightMap.Num() > 0)
+	{
+		Value = GetHeightmapData(CellPosition.X, CellPosition.Y, CellPosition.Z);
+	}
+	return Value;
 }
 
-FColor UVoxelLandscapeGenerator::GetColorMap(const FIntVector& CellPosition)
+FColor UVoxelWorldGenerator::GetColorMap(const FIntVector& CellPosition)
 {
-	FColor color = FColor(77.f, 77.f, 77.f);
+	FColor color = VOXEL_COLOR;
 
 	if (TextureColorMap.Num() > 0)
 	{
@@ -133,60 +135,54 @@ FColor UVoxelLandscapeGenerator::GetColorMap(const FIntVector& CellPosition)
 	return color;
 }
 
-float UVoxelLandscapeGenerator::FlatLandscape(float A)
+float UVoxelWorldGenerator::FlatSDF(int A)
 {
-	float value = 0.f;
+	float Value = 0.f;
 
-	if (A >= 0.f)
+	if (A >= 0)
 	{
-		value = (-1) * UKismetMathLibrary::FMax(1.f, A);
+		Value = (-1) * UKismetMathLibrary::FMax(1.f, A);
 	}
-	else if (A < 0.f)
+	else if (A < 0)
 	{
-		value = (-1) * UKismetMathLibrary::FMin(-1.f, A);
+		Value = (-1) * UKismetMathLibrary::FMin(-1.f, A);
 	}
-	return value;
+	return Value;
 }
 
 
-float UVoxelLandscapeGenerator::SphereLandscape(float X, float Y, float Z, float radius)
+float UVoxelWorldGenerator::SphereSDF(int X, int Y, int Z, float Radius)
 {
-	float value = 0.f;
+	float Value = 0.f;
 
-	value = radius - sqrt(X * X + Y * Y + Z * Z);
+	Value = Radius - FVector(X, Y, Z).Size();
 
-	return value;
+	return -Value;
 }
 
-float UVoxelLandscapeGenerator::TorusLandscape(float X, float Y, float Z, float radius, float radiusInside)
+float UVoxelWorldGenerator::TorusSDF(int X, int Y, int Z, float Radius, float RadiusInside)
 {
-	float value = 0.f;
+	float Value = 0.f;
 
-	value = (radius - sqrt(X * X + Y * Y)) * (radius - sqrt(X * X + Y * Y)) + Z * Z - radiusInside * radiusInside;
+	Value = (Radius - sqrt(X * X + Y * Y)) * (Radius - sqrt(X * X + Y * Y)) + Z * Z - RadiusInside * RadiusInside;
 
-	return value;
+	return Value;
 }
 
-float UVoxelLandscapeGenerator::VectorDistanceAB(FVector A, FVector B)
+float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float Amplitude, float Frequency)
 {
-	return sqrt(pow(A.X - B.X, 2) + pow(A.Y - B.Y, 2) + pow(A.Z - B.Z, 2));
-}
+	float Value = 0.f;
 
-float UVoxelLandscapeGenerator::FractalNoise(float X, float Y, float Z, int seed, int octaves, float amplitude, float frequency)
-{
-	float value = 0.f;
-
-	for (int i = 0; i < octaves; i++)
+	for (int i = 0; i < Octaves; i++)
 	{
-		value += USimplexNoiseBPLibrary::SimplexNoise3D(X * frequency, Y * frequency, Z * frequency) * amplitude;
-		frequency *= 2.f;
-		amplitude *= 0.5f;
+		Value += USimplexNoiseBPLibrary::SimplexNoise3D(X * Frequency, Y * Frequency, Z * Frequency) * Amplitude;
+		Frequency *= 2.f;
+		Amplitude *= 0.5f;
 	}
-
-	return value;
+	return Value;
 }
 
-float UVoxelLandscapeGenerator::Cone(FVector p, FVector2D c, float h)
+float UVoxelWorldGenerator::ConeSDF(FVector p, FVector2D c, float h)
 {
 	FVector2D q = h * FVector2D(c.X, -c.Y) / c.Y;
 
@@ -204,18 +200,17 @@ float UVoxelLandscapeGenerator::Cone(FVector p, FVector2D c, float h)
 	return sqrt(d) * FMath::Sign(s);
 }
 
-float UVoxelLandscapeGenerator::IQNoise(FVector p)
+float UVoxelWorldGenerator::IQNoise(FVector p)
 {
 	float a = 0.0;
 	
 	return a;
 }
 
-float UVoxelLandscapeGenerator::SimplexNoise(float X, float Y, float Z, int seed)
+float UVoxelWorldGenerator::SimplexNoise(int X, int Y, int Z)
 {
 	float value = 0.f;
 
-	//USimplexNoiseBPLibrary::setNoiseSeed(seed);
 	value = USimplexNoiseBPLibrary::SimplexNoise3D(X, Y, Z);
 
 	return value;

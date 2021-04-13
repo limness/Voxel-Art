@@ -1,15 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "VoxelChunk.h"
-#include "VoxelLandscape.h"
-#include "Editor/VoxelModificationLandscape.h"
+#include "VoxelWorld.h"
+#include "Editor/VoxelModificationWorld.h"
 #include "VoxelModificationComponent.generated.h"
 
-
+/*
+* Voxel Modif Component (not used now)
+*/
 UCLASS(Blueprintable, BlueprintType, EditInlineNew, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class VOXELART_API UVoxelModificationComponent : public UActorComponent
 {
@@ -22,7 +23,7 @@ public:
 public:
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
-	UVoxelModificationLandscape* modificator;
+	UVoxelModificationWorld* WorldModificator;
 
 //public:
 	//UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Nice Cock"))
@@ -37,11 +38,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	/*UFUNCTION(BlueprintCallable)
 	void Modification(
-		AVoxelLandscape* terrain,
+		AVoxelWorld* terrain,
 		AVoxelChunk* chunkCenter,
 		FVector position,
 		float range
-	);
+	);*/
 };

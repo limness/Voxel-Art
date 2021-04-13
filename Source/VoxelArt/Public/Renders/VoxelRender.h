@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
@@ -6,20 +6,22 @@
 #include "ProceduralMeshComponent.h"
 #include "Octree/VoxelOctreeData.h"
 
+class AVoxelWorld;
 
-class AVoxelLandscape;
-
+/*
+* Voxel Render class (Not used now)
+*/
 class VOXELART_API VoxelRender : public FRunnable
 {
 
 public:
 
-	VoxelRender(AVoxelLandscape* _World);
+	VoxelRender(AVoxelWorld* _World);
 	~VoxelRender();
 
 private:
 
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 
 public:
 
@@ -42,9 +44,6 @@ private:
 
 	FCriticalSection m_mutex;
 	FEvent* m_semaphore;
-
-	int m_chunkCount;
-	int m_amount;
 
 	bool g_stop = false;
 

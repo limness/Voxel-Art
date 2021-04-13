@@ -1,20 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "VoxelCollisionBox.generated.h"
 
-/*class AVoxelLandscape;
-class UVoxelChunkComponent;
-class UVoxelLandscapeGenerator;*/
 class FVoxelOctreeData;
-class AVoxelLandscape;
+class AVoxelWorld;
 
+/*
+* Voxel Collision Box class
+*/
 class VOXELART_API FVoxelCollisionBox
 {
 public:
-	FVoxelCollisionBox(AVoxelLandscape* _World, FIntVector _Position, int _Size);
+	FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, int _Size);
 	~FVoxelCollisionBox();
 
 public:
@@ -29,8 +28,7 @@ public:
 
 public:
 
+	AVoxelWorld* World;
 	FIntVector Position;
 	int Size;
-
-	AVoxelLandscape* World;
 };

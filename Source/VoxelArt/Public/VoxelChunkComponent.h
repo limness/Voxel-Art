@@ -7,12 +7,15 @@
 #include "Helpers/VoxelTools.h"
 #include "VoxelChunkComponent.generated.h"
 
-
+class AVoxelWorld;
+class UVoxelWorldGenerator;
 class FVoxelOctreeData;
 class FVoxelChunkData;
 class FVoxelMarchingCubesMesher;
-class AVoxelLandscape;
 
+/*
+* Voxel Chunk Component class
+*/
 UCLASS()
 class VOXELART_API UVoxelChunkComponent : public UVoxelProceduralMeshComponent
 {
@@ -25,32 +28,29 @@ public:
 public:
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-	UVoxelLandscapeGenerator* GeneratorLandscape;
+	UVoxelWorldGenerator* WorldGenerator;
+	UMaterialInterface* Material;
 
-	bool Active =		false;
-	bool hasOwnGrid =	false;
-	bool isPool =		false;
+public:
+
+	bool PoolActive = false;
 
 public:
 
 	bool IsPoolActive();
 	void SetPoolActive(bool activeStatus);
-
-public:
-
 	void UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors);
-
-public:
-
-	UMaterialInterface* Material;
 };
 
 
+/*
+* Voxel Chunk Async Mesher class
+*/
 class FMesherAsyncTask : public FNonAbandonableTask
 {
 public:
 
-	FMesherAsyncTask(AVoxelLandscape* _World, FVoxelChunkData* _Data) 
+	FMesherAsyncTask(AVoxelWorld* _World, FVoxelChunkData* _Data) 
 		: World(_World)
 		, Data(_Data)
 	{
@@ -58,7 +58,7 @@ public:
 
 private:
 
-	AVoxelLandscape* World;
+	AVoxelWorld* World;
 	FVoxelChunkData* Data;
 
 public:

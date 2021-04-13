@@ -1,27 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
-#include "VoxelLandscape.h"
-//#include "VoxelMarchingCubesMesher.generated.h"
+#include "VoxelWorld.h"
 
-#define NORMALS_SKIRT 2
-#define NORMALS_SKIRT_HALF 1
-
-class AVoxelLandscape;
-class UVoxelLandscapeGenerator;
+class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
-/**
- * 
- */
-//UCLASS()
+/*
+* Voxel Marching Cubes Mesher
+*/
 class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
-	FVoxelMarchingCubesMesher(AVoxelLandscape* _World, FVoxelChunkData* _Data);
+	FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap);
 	~FVoxelMarchingCubesMesher();
 
 private:
@@ -30,36 +24,40 @@ private:
 	int Depth;
 	int Size;
 
-	FIntVector Position;
-	uint8 TransitionSides;
-	TArray<float> DensityMap;
-	TArray<FColor> ColorMap;
+	FIntVector		Position;
+	uint8			TransitionSides;
+	TArray<float>	DensityMap;
+	TArray<FColor>	ColorMap;
 
 private:
 
-	FVector NormalsInfo[8];
-	FVector PositionInfo[8];
-	float DensityInfo[8];
-	FColor ColorInfo[8];
-
-	float isolevel = 0.f;
-
-public:
-
-	TArray<FVector> Vertices;
-	TArray<int32> Triangles;
-	TArray<FVector> Normals;
-	TArray<FLinearColor> VertexColors;
-	TArray<FProcMeshTangent> Tangents;
-	TArray<FVector2D> TextureCoordinates;
-
-	TArray<FVector> VerticesTransition;
-	TArray<int32> TrianglesTransition;
+	FVector		NormalsInfo[8];
+	FVector		PositionInfo[8];
+	float		DensityInfo[8];
+	FColor		ColorInfo[8];
+	float		isolevel = 0.f;
 
 public:
 
-	void GenerateMarchingCubesMesh();
+	TArray<FVector>				Vertices;
+	TArray<int32>				Triangles;
+	TArray<FVector>				Normals;
+	TArray<FLinearColor>		VertexColors;
+	TArray<FProcMeshTangent>	Tangents;
+	TArray<FVector2D>			TextureCoordinates;
+	TArray<FVector>				VerticesTransition;
+	TArray<int32>				TrianglesTransition;
 
+private:
+
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
+	TArray<FVector> positionSide;
+	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+
+public:
+
+	void GenerateMesh();
 	void MarchingCubes(int x, int y, int z);
 
 	FVector GetGradient(int x, int y, int z);
@@ -67,8 +65,32 @@ public:
 
 	float GetVoxelSize();
 	float GetVoxelSizeHalf();
+	float VoxelValueMin(float a, float b, float k);
 
 	void ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color);
+
+private:
+
+	FORCEINLINE int PositionToIndices(FIntVector Position)
+	{
+		return (Position.X + NORMAL) + (Position.Y + NORMAL) * (Voxels + 1 + NORMALS) + (Position.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
+	}
+
+	FORCEINLINE float GetDensity(int x, int y, int z)
+	{
+		return DensityMap[x + y * (Voxels + 1 + NORMALS) + z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
+	}
+
+	FORCEINLINE float GetValueNoise(FVector positionGrid)
+	{
+		FVector GlobalLocation = FVector::OneVector;
+
+		FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
+
+		return WorldGenerator->GetDensityMap(P);
+	}
+
+private:
 
 	template<uint8 Direction>
 	void GeometryTransitionCubes(float radius);
@@ -81,29 +103,4 @@ public:
 
 	template<uint8 Direction>
 	FVector GetPosition(int X, int Y, int Size, int Steps);
-
-	FORCEINLINE int PositionToIndices(FIntVector position);
-
-	float VoxelValueMin(float a, float b, float k);
-	
-	AVoxelLandscape* World;
-	UVoxelLandscapeGenerator* GeneratorLandscape;
-
-	TArray<FVector> positionSide;
-
-	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-
-	FORCEINLINE float GetDensity(int x, int y, int z)
-	{
-		return DensityMap[x + y * (Voxels + 1 + NORMALS_SKIRT) + z * (Voxels + 1 + NORMALS_SKIRT) * (Voxels + 1 + NORMALS_SKIRT)];
-	}
-
-	FORCEINLINE float GetValueNoise(FVector positionGrid)
-	{
-		FVector GlobalLocation = FVector::OneVector;//World->GetTransform().InverseTransformPosition(positionGrid + Position);
-
-		FIntVector P = FIntVector(FMath::RoundToInt(GlobalLocation.X), FMath::RoundToInt(GlobalLocation.Y), FMath::RoundToInt(GlobalLocation.Z));
-
-		return GeneratorLandscape->GetDensityMap(P);
-	}
 };

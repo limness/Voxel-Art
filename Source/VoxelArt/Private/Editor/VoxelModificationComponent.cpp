@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Voxel Art Plugin © limit 2018
 
 
 #include "Editor/VoxelModificationComponent.h"
@@ -31,7 +31,7 @@ void UVoxelModificationComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	// ...
 }
 
-void UVoxelModificationComponent::Modification(
+/*void UVoxelModificationComponent::Modification(
 	AVoxelLandscape* terrain,
 	AVoxelChunk* chunkCenter,
 	FVector position,
@@ -78,3 +78,4 @@ void UVoxelModificationComponent::Modification(
 		UE_LOG(LogTemp, Warning, TEXT("[ VoxelCord Plugin : ModificatorComponent ] Error: Painter is empty, modificator can't be started"));
 	}
 }
+*/
