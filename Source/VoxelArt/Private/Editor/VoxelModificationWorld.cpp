@@ -23,8 +23,8 @@ void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld*
 
 	World->OctreeMutex.Lock();
 
-	bool TerrainEdit = Data->EditorType == EditorType::Terrain;
-	bool ColorEdit = Data->EditorType == EditorType::Color;
+	bool TerrainEdit = Data->EditorType == EditorType::TerrainEdit;
+	bool ColorEdit = Data->EditorType == EditorType::ColorEdit;
 
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 	{
@@ -32,7 +32,7 @@ void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld*
 		{
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
-				float SphereSDF = Radius - Offset - FVector(X, Y, Z).Size();
+				float SphereSDF = Radius - VoxelOffset - FVector(X, Y, Z).Size();
 
 				//if (SphereSDF >= -2)
 				{
@@ -82,11 +82,11 @@ void UVoxelModificationWorld::CubePainter(UVoxelEditorData* Data, AVoxelWorld* W
 
 				float Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, 1.f) : UKismetMathLibrary::FMin(OutValue, -1.f);
 
-				if (Data->EditorType == EditorType::Terrain)
+				if (Data->EditorType == EditorType::TerrainEdit)
 				{
 					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
 				}
-				else if (Data->EditorType == EditorType::Color)
+				else if (Data->EditorType == EditorType::ColorEdit)
 				{
 					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
 				}

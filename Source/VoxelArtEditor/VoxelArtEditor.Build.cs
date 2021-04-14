@@ -1,28 +1,22 @@
+
+using System.IO;
 using UnrealBuildTool;
 
 public class VoxelArtEditor : ModuleRules
 {
     public VoxelArtEditor(ReadOnlyTargetRules Target) : base(Target)
     {
-        // PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        bEnforceIWYU = true;
 
         PublicDependencyModuleNames.AddRange(new string[] { "VoxelArt" });
-
         PrivateDependencyModuleNames.AddRange(new string[] { "Projects" });
-
-        PublicIncludePaths.AddRange(
-            new string[]
-            {
-           //     "VoxelArtEditor/Public"
-            });
 
         PrivateIncludePaths.AddRange(
             new string[]
             {
-                "VoxelArtEditor/Private"
+           //     "VoxelArtEditor/Private"
             });
 
         PublicDependencyModuleNames.AddRange(
@@ -33,10 +27,10 @@ public class VoxelArtEditor : ModuleRules
                 "InputCore",
                 "LevelEditor",
                 "Slate",
+                "UnrealEd",
                 "EditorStyle",
                 "AssetTools",
                 "EditorWidgets",
-                "UnrealEd",
                 "BlueprintGraph",
                 "AnimGraph",
                 "ComponentVisualizers"

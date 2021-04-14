@@ -1,8 +1,8 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
-#include "SlateApplication.h"
-
+#include "Framework/Application/SlateApplication.h"
 
 class IDetailsView;
 class AVoxelWorld;

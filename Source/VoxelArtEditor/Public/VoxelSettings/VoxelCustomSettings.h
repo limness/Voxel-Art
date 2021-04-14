@@ -1,10 +1,8 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 #include "VoxelCustomSettings.generated.h"
 
-//UCLASS(config = EditorUserSettings, defaultconfig)
-
-//UCLASS(config = EditorUserSettings, defaultconfig)
 UCLASS(config = MySettings)
 class UVoxelCustomSettings : public UObject
 {

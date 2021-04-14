@@ -14,10 +14,10 @@
 #include "DrawDebugHelpers.h"
 
 
-UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
+/*UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
-}
+}*/
 
 bool UVoxelChunkComponent::IsPoolActive()
 {
@@ -45,7 +45,7 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Tr
 
 	if (Vertices.Num() > 0)
 	{
-		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), Colors, TArray<FVoxelProcMeshTangent>(), true);
+		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), Colors, TArray<FProcMeshTangent>(), true);
 		SetMaterial(0, Material);
 	}
 }

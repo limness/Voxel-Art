@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
 class UVoxelWorldGenerator;
@@ -20,9 +19,12 @@ public:
 
 private:
 
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
+
 	int Voxels;
-	int Depth;
 	int Size;
+	int Depth;
 
 	FIntVector		Position;
 	uint8			TransitionSides;
@@ -39,19 +41,17 @@ private:
 
 public:
 
-	TArray<FVector>				Vertices;
-	TArray<int32>				Triangles;
-	TArray<FVector>				Normals;
-	TArray<FLinearColor>		VertexColors;
-	TArray<FProcMeshTangent>	Tangents;
-	TArray<FVector2D>			TextureCoordinates;
-	TArray<FVector>				VerticesTransition;
-	TArray<int32>				TrianglesTransition;
+	TArray<FVector>					Vertices;
+	TArray<int32>					Triangles;
+	TArray<FVector>					Normals;
+	TArray<FLinearColor>			VertexColors;
+	TArray<FVoxelProcMeshTangent>	Tangents;
+	TArray<FVector2D>				TextureCoordinates;
+	TArray<FVector>					VerticesTransition;
+	TArray<int32>					TrianglesTransition;
 
 private:
 
-	AVoxelWorld* World;
-	UVoxelWorldGenerator* WorldGenerator;
 	TArray<FVector> positionSide;
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 
@@ -71,9 +71,9 @@ public:
 
 private:
 
-	FORCEINLINE int PositionToIndices(FIntVector Position)
+	FORCEINLINE int PositionToIndices(FIntVector LocalPosition)
 	{
-		return (Position.X + NORMAL) + (Position.Y + NORMAL) * (Voxels + 1 + NORMALS) + (Position.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
+		return (LocalPosition.X + NORMAL) + (LocalPosition.Y + NORMAL) * (Voxels + 1 + NORMALS) + (LocalPosition.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
 	}
 
 	FORCEINLINE float GetDensity(int x, int y, int z)

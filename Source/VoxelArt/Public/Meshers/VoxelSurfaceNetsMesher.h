@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
 class UVoxelWorldGenerator;
@@ -27,6 +26,11 @@ public:
 	FVector GetGradient(FVector pos);
 	FVector GetInterp(FVector p1, FVector p2, float d1, float d2);
 
+public:
+
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
+
 private:
 
 	int Voxels;
@@ -40,17 +44,6 @@ private:
 	TArray<int> VerticesIndeсes;
 
 public:
-
-	AVoxelWorld* World;
-	UVoxelWorldGenerator* WorldGenerator;
-
-public:
-
-	void GenerateMesh();
-	void GeneratePlane();
-
-	FVector GetGradient(FVector pos);
-	FVector GetInterp(FVector p1, FVector p2, float d1, float d2);
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FVector> GridGrad;
@@ -81,7 +74,7 @@ public:
 	TArray<int32> Triangles;
 	TArray<FVector> Normals;
 	TArray<FLinearColor> VertexColors;
-	TArray<FProcMeshTangent> Tangents;
+	TArray<FVoxelProcMeshTangent> Tangents;
 	TArray<FVector2D> TextureCoordinates;
 
 	TArray<FVector> VerticesTransition;

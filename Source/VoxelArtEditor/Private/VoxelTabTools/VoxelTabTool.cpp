@@ -1,10 +1,9 @@
-#include "VoxelTabTool.h"
+// Voxel Art Plugin © limit 2018
 
+#include "VoxelTabTools/VoxelTabTool.h"
+#include "VoxelTabTools/VoxelTabToolPanel.h"
 #include "VoxelSettings/VoxelCustomSettings.h"
-
 #include "VoxelModuleInterface.h"
-#include "VoxelTabToolPanel.h"
-
 
 void FVoxelTabTool::OnStartupModule()
 {
@@ -15,10 +14,11 @@ void FVoxelTabTool::OnStartupModule()
     if (VoxelCustomMutableSettings && !VoxelCustomMutableSettings->bWelcomeShowed)
     {
         TSharedRef<class FGlobalTabmanager> tm = FGlobalTabmanager::Get();
-        tm->InvokeTab(TabName);
-
-        VoxelCustomMutableSettings->bWelcomeShowed = true;
-        VoxelCustomMutableSettings->SaveConfig();
+        if (tm->TryInvokeTab(TabName))
+        {
+            VoxelCustomMutableSettings->bWelcomeShowed = true;
+            VoxelCustomMutableSettings->SaveConfig();
+        }
     }
 }
 

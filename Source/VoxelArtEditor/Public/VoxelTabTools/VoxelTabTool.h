@@ -1,3 +1,4 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 

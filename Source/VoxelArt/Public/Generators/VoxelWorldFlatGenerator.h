@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelWorldGenerator.h"
+#include "Generators/VoxelWorldGenerator.h"
 #include "VoxelWorldFlatGenerator.generated.h"
 
 class AVoxelWorld;

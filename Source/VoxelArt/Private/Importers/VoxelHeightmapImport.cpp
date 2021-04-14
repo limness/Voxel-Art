@@ -1,7 +1,7 @@
 // Voxel Art Plugin © limit 2018
 
 
-#include "VoxelHeightmapImport.h"
+#include "Importers/VoxelHeightmapImport.h"
 
 
 //void UVoxelHeightmapImport::GenerateDensityMap(AVoxelChunk* chunk)

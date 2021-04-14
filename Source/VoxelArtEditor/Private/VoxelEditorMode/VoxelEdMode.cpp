@@ -1,28 +1,18 @@
 // Voxel Art Plugin © limit 2018
 
-#include "VoxelEdMode.h"
+#include "VoxelEditorMode/VoxelEdMode.h"
+#include "VoxelEditorMode/VoxelEdModeToolkit.h"
 #include "VoxelModuleInterface.h"
 #include "Editor/UnrealEd/Public/Toolkits/ToolkitManager.h"
 #include "ScopedTransaction.h"
-#include "VoxelEdModeToolkit.h"
-
 #include "VoxelWorld.h"
 #include "Editor/VoxelEditorData.h"
 #include "Editor/VoxelEditorTool.h"
 #include "Editor/VoxelModificationWorld.h"
-<<<<<<< HEAD
-=======
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 const FEditorModeID FVoxelEdMode::EM_Example(TEXT("EM_Example"));
 
-#define LOCTEXT_NAMESPACE "PListEditor"
-
-FVoxelEdMode::FVoxelEdMode()
-{
-	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage(), TEXT("VoxelArtEditor"), RF_Transactional);
-}
+//#define LOCTEXT_NAMESPACE "PListEditor"
 
 FVoxelEdMode::FVoxelEdMode()
 {

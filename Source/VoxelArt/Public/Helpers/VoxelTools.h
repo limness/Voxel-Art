@@ -20,7 +20,7 @@ DECLARE_LOG_CATEGORY_EXTERN(VoxelArt, Log, All);
 
 namespace VoxelTools
 {
-	const float Offset = 0.001f;
+	const float VoxelOffset = 0.001f;
 }
 
 #endif VOXELTOOLS_H

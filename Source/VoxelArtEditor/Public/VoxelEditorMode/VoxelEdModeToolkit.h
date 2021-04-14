@@ -1,7 +1,8 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
-#include "BaseToolkit.h"
+#include "Toolkits/BaseToolkit.h"
 #include "VoxelEdMode.h"
 #include "VoxelEdModeWidget.h"
 

@@ -327,21 +327,19 @@ private:
 
 	/** Array of sections of mesh */
 	UPROPERTY()
-		TArray<FVoxelProcMeshSection> ProcMeshSections;
+	TArray<FVoxelProcMeshSection> ProcMeshSections;
 
 	/** Convex shapes used for simple collision */
 	UPROPERTY()
-		TArray<FKConvexElem> CollisionConvexElems;
+	TArray<FKConvexElem> CollisionConvexElems;
 
 	/** Local space bounds of mesh */
 	UPROPERTY()
-		FBoxSphereBounds LocalBounds;
+	FBoxSphereBounds LocalBounds;
 
 	/** Queue for async body setups that are being cooked */
 	UPROPERTY(transient)
-		TArray<UBodySetup*> AsyncBodySetupQueue;
-
-	friend class FProceduralMeshSceneProxy;
+	TArray<UBodySetup*> AsyncBodySetupQueue;
+	
+	friend class FVoxelProceduralMeshSceneProxy;
 };
-
-

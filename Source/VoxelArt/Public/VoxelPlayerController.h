@@ -66,7 +66,7 @@ public:
 	TEnumAsByte<BrushSoftness> BrushSoftness = BrushSoftness::Insert;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<EditorType> EditorType = EditorType::Terrain;
+	TEnumAsByte<EditorType> EditorType = EditorType::TerrainEdit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
 	bool Dig = true;

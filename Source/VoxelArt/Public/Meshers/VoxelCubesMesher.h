@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
 class UVoxelWorldGenerator;
@@ -24,22 +23,20 @@ public:
 	);
 	~FVoxelCubesMesher();
 
-private:
+public:
+
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
 
 	int Voxels;
-	int Depth;
 	int Size;
+	int Depth;
 
 	FIntVector Position;
 	uint8 TransitionSides;
 	TArray<float> DensityMap;
 	TArray<FColor> ColorMap;
 	TArray<int> VerticesIndeсes;
-
-public:
-
-	AVoxelWorld* World;
-	UVoxelWorldGenerator* WorldGenerator;
 
 public:
 
@@ -68,14 +65,14 @@ private:
 
 public:
 
-	TArray<FVector>				Vertices;
-	TArray<int32>				Triangles;
-	TArray<FVector>				Normals;
-	TArray<FLinearColor>		VertexColors;
-	TArray<FProcMeshTangent>	Tangents;
-	TArray<FVector2D>			TextureCoordinates;
-	TArray<FVector>				VerticesTransition;
-	TArray<int32>				TrianglesTransition;
+	TArray<FVector>					Vertices;
+	TArray<int32>					Triangles;
+	TArray<FVector>					Normals;
+	TArray<FLinearColor>			VertexColors;
+	TArray<FVoxelProcMeshTangent>	Tangents;
+	TArray<FVector2D>				TextureCoordinates;
+	TArray<FVector>					VerticesTransition;
+	TArray<int32>					TrianglesTransition;
 
 private:
 

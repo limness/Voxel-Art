@@ -1,9 +1,11 @@
+// Voxel Art Plugin © limit 2018
+
 #pragma once
 
-#include "SDockTab.h"
-#include "SDockableTab.h"
-#include "SDockTabStack.h"
-#include "SlateApplication.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "Widgets/Docking/SDockableTab.h"
+#include "Widgets/Docking/SDockTabStack.h"
+#include "Framework/Application/SlateApplication.h"
 
 class VoxelTabTool;
 

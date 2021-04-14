@@ -11,7 +11,7 @@ AVoxelEditorTool::AVoxelEditorTool()
 
 	auto CubeTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	auto SphereTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	auto MaterialTool = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/MVoxel_Tool.MVoxel_Tool'"));
+	auto MaterialTool = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/VoxelArt/EditorMaterials/MVoxel_Tool.MVoxel_Tool'"));
 
 	if (CubeTool.Succeeded())
 	{

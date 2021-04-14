@@ -1,9 +1,8 @@
+// Voxel Art Plugin © limit 2018
 
-//#include "ToolExampleEditor/ToolExampleEditor.h"
-#include "VoxelEdModeTool.h"
+#include "VoxelEditorMode/VoxelEdModeTool.h"
 #include "VoxelModuleInterface.h"
-#include "VoxelEdMode.h"
-
+#include "VoxelEditorMode/VoxelEdMode.h"
 #include "Interfaces/IPluginManager.h"
 
 #define IMAGE_BRUSH(RelativePath, ...) FSlateImageBrush(StyleSet->RootToContentDir(RelativePath, TEXT(".png")), __VA_ARGS__)
@@ -34,7 +33,7 @@ void FVoxelEdModeTool::RegisterStyleSet()
         return;
     }
 
-    StyleSet = MakeShareable(new FSlateStyleSet("ExampleEdModeToolStyle"));
+    StyleSet = MakeShareable(new FSlateStyleSet("VoxelEdModeToolStyle"));
     StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("/EditorResources"));
     StyleSet->SetCoreContentRoot(IPluginManager::Get().FindPlugin(TEXT("VoxelArt"))->GetContentDir() / TEXT("/EditorResources"));
 
@@ -61,7 +60,7 @@ void FVoxelEdModeTool::RegisterEditorMode()
 {
     FEditorModeRegistry::Get().RegisterMode<FVoxelEdMode>(
         FVoxelEdMode::EM_Example,
-        FText::FromString("Example Fuk it Mode"),
+        FText::FromString("Voxel Art Editor Mode"),
         FSlateIcon(StyleSet->GetStyleSetName(), "VoxelEdMode", "VoxelEdMode.Small"),
         true, 500
         );

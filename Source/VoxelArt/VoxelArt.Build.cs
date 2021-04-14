@@ -1,24 +1,27 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using System.IO;
 
 public class VoxelArt : ModuleRules
 {
 	public VoxelArt(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		//PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		bEnforceIWYU = true;
+		//bLegacyPublicIncludePaths = false;
+
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", 
 			"CoreUObject", 
-			"Engine", 
+			"Engine",
+			"ProceduralMeshComponent",
 			"InputCore", 
 			"RHI", 
-			"RenderCore", 
-			"ShaderCore", 
-			"ProceduralMeshComponent", 
-			"UnrealEd"
+			"RenderCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -29,15 +32,10 @@ public class VoxelArt : ModuleRules
 			"SlateCore"
 		});
 
-		PublicIncludePaths.AddRange(new string[] 
-		{
-		});
-
-
-		PrivateIncludePaths.AddRange(new string[] 
-		{
-		});
-
+		/*if(Target.Type == TargetRules.TargetType.Editor)
+        {
+			PublicDependencyModuleNames.Add("UnrealEd");
+        }*/
 		DynamicallyLoadedModuleNames.AddRange(new string[]
 		{
 		});

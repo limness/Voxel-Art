@@ -4,7 +4,7 @@
 #include "VoxelWorld.h"
 #include "Helpers/VoxelTools.h"
 #include "Editor.h"
-#include "EditorViewportClient.h"
+//#include "EditorViewportClient.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Children"), STAT_AddChildren, STATGROUP_Voxel);
@@ -45,7 +45,7 @@ bool VoxelOctreeManager::Init()
 	UE_LOG(VoxelArt, Log, TEXT("Octree Manager init"));
 	return true;
 }
-
+/*
 FEditorViewportClient* VoxelOctreeManager::GetEditorViewportClient()
 {
 	FEditorViewportClient* EditorViewportClient = nullptr;
@@ -68,13 +68,13 @@ FEditorViewportClient* VoxelOctreeManager::GetEditorViewportClient()
 		}
 	}
 	return EditorViewportClient;
-}
+}*/
 
 uint32 VoxelOctreeManager::Run()
 {
 	FPlatformProcess::Sleep(0.03);
 
-	FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
+	//FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
 
 	while (!m_Kill)
 	{
@@ -92,23 +92,25 @@ uint32 VoxelOctreeManager::Run()
 #if WITH_EDITOR
 			if (World->GetWorld() && (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview))
 			{
-				if (EditorViewportClient)
+				//if (EditorViewportClient)
 				{
-					PlayerPositionToWorld = World->TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
+				//	PlayerPositionToWorld = World->TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
 				}
-				else
+			//	else
 				{
-					EditorViewportClient = GetEditorViewportClient();
+				//	EditorViewportClient = GetEditorViewportClient();
 				}
 			}
 			else
 			{
 				if (PlayerController != nullptr && PlayerController->GetPawn() != nullptr)
 				{
-					PlayerPositionToWorld = World->TransferToVoxelWorld(PlayerController->GetPawn()->GetActorLocation());
+				//	PlayerPositionToWorld = World->TransferToVoxelWorld(PlayerController->GetPawn()->GetActorLocation());
 				}
 			}
 #endif
+			PlayerPositionToWorld = FIntVector(0, 0, 0);
+
 			if (PlayerPositionToWorld != OldPlayerPositionToWorld)
 			{
 				OldPlayerPositionToWorld = PlayerPositionToWorld;

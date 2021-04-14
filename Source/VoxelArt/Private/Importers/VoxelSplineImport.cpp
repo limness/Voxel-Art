@@ -1,6 +1,6 @@
 // Voxel Art Plugin © limit 2018
 
-#include "VoxelSplineImport.h"
+#include "Importers/VoxelSplineImport.h"
 
 // Sets default values
 AVoxelSplineImport::AVoxelSplineImport()

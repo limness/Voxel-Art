@@ -28,7 +28,7 @@ AVoxelChunkTransvoxels::AVoxelChunkTransvoxels(const class FObjectInitializer& O
 
 	FString string = "Voxel_" + FString::FromInt(x_chunk) + "_" + FString::FromInt(y_chunk) + "_" + FString::FromInt(z_chunk);
 	FName name = FName(*string);
-	RootComponent = mesh = ObjectInitializer.CreateDefaultSubobject<UProceduralMeshComponent>(this, TEXT("RootComponent"));
+	RootComponent = mesh = ObjectInitializer.CreateDefaultSubobject<UVoxelProceduralMeshComponent>(this, TEXT("RootComponent"));
 
 	CollisionMesh = CreateDefaultSubobject<UBoxComponent>(TEXT("BVox"));
 	CollisionMesh->bDynamicObstacle = true;
@@ -319,7 +319,7 @@ void AVoxelChunkTransvoxels::GenerateVertexCube(bool regenerate)
 	}
 	if (!regenerate)
 	{
-		mesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TextureCoordinates, VertexColors, TArray<FProcMeshTangent>(), true);
+		mesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TextureCoordinates, VertexColors, TArray<FVoxelProcMeshTangent>(), true);
 		mesh->SetMaterial(0, material);
 	}
 	else
@@ -693,7 +693,7 @@ void AVoxelChunkTransvoxels::UpdateMesh(TArray<FVector> Vert, TArray<int32> Tri,
 
 	if (Vert.Num() > 0)
 	{
-		mesh->CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FProcMeshTangent>(), true);
+		mesh->CreateMeshSection_LinearColor(0, Vert, Tri, Norm, TArray<FVector2D>(), Cols, TArray<FVoxelProcMeshTangent>(), true);
 	}
 }
 

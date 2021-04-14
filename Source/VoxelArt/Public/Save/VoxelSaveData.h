@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelOctreeData.h"
+#include "Octree/VoxelOctreeData.h"
 #include "VoxelSaveData.generated.h"
 
 class AVoxelWorld;

@@ -12,6 +12,7 @@
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Octree/VoxelOctreeData.h"
 #include "Save/VoxelSaveData.h"
+#include "VoxelDelegatesInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,7 +52,7 @@ class FVoxelCollisionBox;
 * Voxel World Main class
 */
 UCLASS(Blueprintable, HideCategories = ("Input", "Actor", "LOD"))
-class VOXELART_API AVoxelWorld : public AActor
+class VOXELART_API AVoxelWorld : public AActor, public IVoxelDelegatesInterface
 {
 	GENERATED_BODY()
 	
@@ -86,10 +87,10 @@ public:
 #if WITH_EDITOR
 
 	/*Called before the editor tries to begin PIE*/
-	void OnPreBeginPIE(bool bIsSimulating);
+	virtual void OnPreBeginPIE(bool bIsSimulating) override;
 
 	/*Called as PIE ends*/
-	void OnEndPIE(bool bIsSimulating);
+	virtual void OnEndPIE(bool bIsSimulating) override;
 
 	/*If true, actor is ticked*/
 	virtual bool ShouldTickIfViewportsOnly() const override;
@@ -200,11 +201,14 @@ private:
 	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
 	void SpawnChunk(FVoxelChunkData* ChunkData);
 	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
-	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
 	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
-	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
-	FEditorViewportClient* GetEditorViewportClient();
+//	FEditorViewportClient* GetEditorViewportClient();
 	void UpdateOctree();
+
+public:
+
+	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
+	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
 
 public:	
 
@@ -218,7 +222,7 @@ public:
 	FORCEINLINE int GetIndex(FIntVector P);
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
+	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
 
 public:
 
@@ -244,7 +248,7 @@ public:
 	*/
 	void SetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 
-private:
+public:
 
 	//An array of all changes that must be made to the Octree with the next tick of the game
 	TQueue<TSharedPtr<FChunksRenderInfo>>	ChangesOctree;

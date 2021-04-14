@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
 #include "Octree/VoxelOctreeData.h"
 
 class AVoxelWorld;

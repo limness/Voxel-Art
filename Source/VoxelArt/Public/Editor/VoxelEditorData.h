@@ -16,8 +16,8 @@ enum BrushType
 UENUM()
 enum EditorType
 {
-	Terrain	UMETA(DisplayName = "Terrain"),
-	Color	UMETA(DisplayName = "Color")
+	TerrainEdit	UMETA(DisplayName = "Terrain"),
+	ColorEdit	UMETA(DisplayName = "Color")
 };
 
 UENUM()
@@ -43,8 +43,8 @@ public:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Editor Type"))
-	TEnumAsByte<EditorType> EditorType = EditorType::Terrain;
+	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Edit"))
+	TEnumAsByte<EditorType> EditorType = EditorType::TerrainEdit;
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Brush Type"))
 	TEnumAsByte<BrushType> BrushType = BrushType::Sphere;

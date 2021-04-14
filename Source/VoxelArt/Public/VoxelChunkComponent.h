@@ -3,51 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Helpers/VoxelProceduralMeshComponent.h"
+//#include "Helpers/VoxelProceduralMeshComponent.h"
+#include "ProceduralMeshComponent.h"
 #include "Helpers/VoxelTools.h"
 #include "VoxelChunkComponent.generated.h"
 
-<<<<<<< HEAD
 class AVoxelWorld;
 class UVoxelWorldGenerator;
 class FVoxelOctreeData;
 class FVoxelChunkData;
 class FVoxelMarchingCubesMesher;
-=======
-
-class AVoxelWorld;
-
-class UVoxelWorldGenerator;
-
-class FVoxelOctreeData;
-class FVoxelChunkData;
-class FVoxelMarchingCubesMesher;
-
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 /*
 * Voxel Chunk Component class
 */
 UCLASS()
-class VOXELART_API UVoxelChunkComponent : public UVoxelProceduralMeshComponent
+class VOXELART_API UVoxelChunkComponent : public UProceduralMeshComponent
 {
 	GENERATED_BODY()
 
 public:
 
-	UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer);
+//	UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer);
 
 public:
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 	UVoxelWorldGenerator* WorldGenerator;
-<<<<<<< HEAD
 	UMaterialInterface* Material;
-=======
-
-	bool PoolActive = false;
-	//bool HasOwnDensity =	false;
->>>>>>> a2345974b4b7176ad71078f0c17d0c65937f892d
 
 public:
 

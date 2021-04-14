@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "Voxel Art Plus+",
+	"FriendlyName": "Voxel Art Free",
 	"Description": "Create huge worlds for real-time editing",
 	"Category": "Other",
 	"CreatedBy": "limit",
@@ -12,12 +12,17 @@
 	"SupportURL": "",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
-	"Installed": false,
+	"IsExperimentalVersion": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "VoxelArt",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
 		},
 		{
 			"Name": "VoxelArtEditor",

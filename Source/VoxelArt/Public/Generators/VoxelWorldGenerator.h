@@ -25,6 +25,11 @@ public:
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings Density")
+	float Height = 0.f;
+
+public:
+
 	// ~ Begin Import Texture Interface
 
 	//It is necessary to specify in any case, when the import occurs, otherwise it does not work.

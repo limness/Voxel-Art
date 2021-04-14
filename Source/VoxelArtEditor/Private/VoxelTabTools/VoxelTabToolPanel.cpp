@@ -1,9 +1,10 @@
-﻿
-#include "VoxelTabToolPanel.h"
-#include "VoxelTabTool.h"
+﻿// Voxel Art Plugin © limit 2018
+
+#include "VoxelTabTools/VoxelTabToolPanel.h"
+#include "VoxelTabTools/VoxelTabTool.h"
 #include "VoxelModuleInterface.h"
 
-#define LOCTEXT_NAMESPACE "SStandardSlateWidget"
+//#define LOCTEXT_NAMESPACE "SStandardSlateWidget"
 
 void FVoxelTabToolPanel::Construct(const FArguments& InArgs)
 {

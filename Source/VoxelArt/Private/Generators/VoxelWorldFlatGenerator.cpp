@@ -1,6 +1,6 @@
 // Voxel Art Plugin © limit 2018
 
-#include "VoxelWorldFlatGenerator.h"
+#include "Generators/VoxelWorldFlatGenerator.h"
 #include "Helpers/VoxelTools.h"
 
 
@@ -24,7 +24,7 @@ float UVoxelWorldFlatGenerator::GetDensityMap(const FIntVector& CellPosition)
 	*
 	*/
 
-	float Value = CellPosition.Z + Height + VoxelTools::Offset;
+	float Value = CellPosition.Z + Height + VoxelTools::VoxelOffset;
 
 	return Value;
 }

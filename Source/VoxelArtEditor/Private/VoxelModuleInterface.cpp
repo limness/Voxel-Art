@@ -1,14 +1,14 @@
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelModuleInterface.h"
-#include "VoxelWorldDetails.h"
-#include "VoxelEdModeTool.h"
-
-#include "ISettingsModule.h"
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "VoxelSettings/VoxelCustomSettings.h"
-
+#include "VoxelDetailsCustomization/VoxelWorldDetails.h"
+#include "VoxelEditorMode/VoxelEdModeTool.h"
+#include "ISettingsModule.h"
 #include "VoxelWorld.h"
-#include "VoxelTabTool.h"
+//#include "VoxelDelegatesInterface.h"
+#include "VoxelTabTools/VoxelTabTool.h"
 
 //#include "CustomAssetEditorModule.h"
 
@@ -19,6 +19,19 @@ IMPLEMENT_GAME_MODULE(IVoxelModuleInterface, VoxelArtEditor);
 
 TSharedRef<FWorkspaceItem> IVoxelModuleInterface::MenuRoot = FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
 
+static void BindEditorDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
+{
+    if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(Object))
+    {
+        FEditorDelegates::PreBeginPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnPreBeginPIE(bIsSimulating); });
+       // FEditorDelegates::PreBeginPIE.AddUObject(Object, &AVoxelWorld::OnPreBeginPIE);
+    }
+    if (!FEditorDelegates::EndPIE.IsBoundToObject(Object))
+    {
+        FEditorDelegates::EndPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnEndPIE(bIsSimulating); });
+       // FEditorDelegates::EndPIE.AddUObject(Object, &AVoxelWorld::OnEndPIE);
+    }
+}
 
 void IVoxelModuleInterface::AddMenuExtension(const FMenuExtensionDelegate& extensionDelegate, FName extensionHook, const TSharedPtr<FUICommandList>& CommandList, EExtensionHook::Position position)
 {
@@ -73,6 +86,9 @@ void IVoxelModuleInterface::StartupModule()
             );
         }
     }
+
+
+    IVoxelDelegatesInterface::BindEditorDelegatesDelegate.AddStatic(&BindEditorDelegates);
 
     ModuleListeners.Add(MakeShareable(new FVoxelEdModeTool));
     ModuleListeners.Add(MakeShareable(new FVoxelTabTool));

@@ -1,6 +1,6 @@
 // Voxel Art Plugin © limit 2018
 
-#include "VoxelWorldPlanetGenerator.h"
+#include "Generators/VoxelWorldPlanetGenerator.h"
 #include "Helpers/VoxelTools.h"
 
 
@@ -21,7 +21,7 @@ float UVoxelWorldPlanetGenerator::GetDensityMap(const FIntVector& CellPosition)
 	*
 	*/
 
-	float Value = SphereSDF(CellPosition.X, CellPosition.Y, CellPosition.Z, 1526.f) + VoxelTools::Offset;
+	float Value = SphereSDF(CellPosition.X, CellPosition.Y, CellPosition.Z, 1526.f) + VoxelTools::VoxelOffset;
 
 	Value += FractalNoise(CellPosition.X, CellPosition.Y, CellPosition.Z);
 

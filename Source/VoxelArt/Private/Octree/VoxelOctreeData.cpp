@@ -1,17 +1,17 @@
 // Voxel Art Plugin © limit 2018
 
 
-#include "VoxelOctreeData.h"
+#include "Octree/VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
 #include "Generators/VoxelWorldGenerator.h"
 #include "VoxelWorld.h"
 #include "DrawDebugHelpers.h"
 
-FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Radius, FIntVector _Position)
+FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Size, FIntVector _Position)
 	: ParentChunk(_Parent)
 	, NodeID(_NodeID)
 	, Depth(_Depth)
-	, Size(_Radius)
+	, Size(_Size)
 	, Position(_Position)
 	, Data(nullptr)
 {
@@ -50,14 +50,6 @@ TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> FVoxelOctreeData::GetCh
 	return ChildrenChunks;
 }
 
-void FVoxelOctreeData::CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> children)
-{
-	for (auto& it : children)
-	{
-		ChildrenChunks.Add(it);
-	}
-}
-
 FIntVector FVoxelOctreeData::GetMinimumCorner()
 {
 	return this->Position - FIntVector(1, 1, 1) * this->Size / 2;
@@ -82,7 +74,7 @@ void FVoxelOctreeData::AddChildren()
 	ChildrenChunks.Add(TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(AsShared(), (NodeID << 3) | 7, Depth + 1, Size >> 1, Position + FIntVector(+P, +P, +P))));
 }
 
-TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
+TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector GlobalPosition)
 {
 	if (!HasChildren())
 	{
@@ -90,16 +82,16 @@ TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetLeaf(FVector Position)
 	}
 	else
 	{
-		return GetChildByPosition(Position).Pin()->GetLeaf(Position);
+		return GetChildByPosition(GlobalPosition).Pin()->GetLeaf(GlobalPosition);
 	}
 	return AsShared();
 }
 
-TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChildByPosition(FVector Position)
+TWeakPtr<FVoxelOctreeData> FVoxelOctreeData::GetChildByPosition(FVector GlobalPosition)
 {
 	check(HasChildren());
 
-	return ChildrenChunks[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
+	return ChildrenChunks[(GlobalPosition.X > this->Position.X) + (GlobalPosition.Y > this->Position.Y) * 2 + (GlobalPosition.Z > this->Position.Z) * 4];
 }
 
 
@@ -128,7 +120,7 @@ void FVoxelOctreeDensity::AddChildren()
 	ChildrenOctants.Add(new FVoxelOctreeDensity(WorldGenerator, Depth + 1, Size >> 1, Voxels, Position + FIntVector(+P, +P, +P)));
 }
 
-FVoxelOctreeDensity* FVoxelOctreeDensity::GetLeaf(FIntVector Position)
+FVoxelOctreeDensity* FVoxelOctreeDensity::GetLeaf(FIntVector LocalPosition)
 {
 	if (!HasChildren())
 	{
@@ -136,16 +128,16 @@ FVoxelOctreeDensity* FVoxelOctreeDensity::GetLeaf(FIntVector Position)
 	}
 	else
 	{
-		return GetChildByPosition(Position)->GetLeaf(Position);
+		return GetChildByPosition(LocalPosition)->GetLeaf(LocalPosition);
 	}
 	return this;
 }
 
-FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector Position)
+FVoxelOctreeDensity* FVoxelOctreeDensity::GetChildByPosition(FIntVector LocalPosition)
 {
 	check(HasChildren());
 
-	return ChildrenOctants[(Position.X > this->Position.X) + (Position.Y > this->Position.Y) * 2 + (Position.Z > this->Position.Z) * 4];
+	return ChildrenOctants[(LocalPosition.X > this->Position.X) + (LocalPosition.Y > this->Position.Y) * 2 + (LocalPosition.Z > this->Position.Z) * 4];
 }
 
 TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> FVoxelOctreeDensity::GetChildren()
@@ -153,11 +145,11 @@ TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> FVoxelOctreeDensity::GetChildre
 	return ChildrenOctants;
 }
 
-bool FVoxelOctreeDensity::IsInside(FIntVector Position)
+bool FVoxelOctreeDensity::IsInside(FIntVector LocalPosition)
 {
-	return  (GetMinimumCorner().X <= Position.X && GetMaximumCorner().X >= Position.X) &&
-			(GetMinimumCorner().Y <= Position.Y && GetMaximumCorner().Y >= Position.Y) &&
-			(GetMinimumCorner().Z <= Position.Z && GetMaximumCorner().Z >= Position.Z);
+	return  (GetMinimumCorner().X <= LocalPosition.X && GetMaximumCorner().X >= LocalPosition.X) &&
+			(GetMinimumCorner().Y <= LocalPosition.Y && GetMaximumCorner().Y >= LocalPosition.Y) &&
+			(GetMinimumCorner().Z <= LocalPosition.Z && GetMaximumCorner().Z >= LocalPosition.Z);
 }
 
 FIntVector FVoxelOctreeDensity::GetMinimumCorner()
@@ -253,9 +245,9 @@ void FVoxelOctreeDensity::SetDefaultMap(AVoxelWorld* World)
 	}
 }
 
-FIntVector FVoxelOctreeDensity::TransferToLocal(AVoxelWorld* World, FIntVector Position)
+FIntVector FVoxelOctreeDensity::TransferToLocal(AVoxelWorld* World, FIntVector CurrentPosition)
 {
-	return Position - this->Position + FIntVector(1, 1, 1) * Size / 2;
+	return CurrentPosition - this->Position + FIntVector(1, 1, 1) * Size / 2;
 }
 
 FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint8 _Depth, FIntVector _Position, int _Size, int _Voxels, int _Priority)

@@ -1,10 +1,10 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
 #include "Input/Reply.h"
-
 #include "VoxelWorld.h"
 
 class IVoxelWorldDetails : public IDetailCustomization

@@ -1,17 +1,15 @@
+// Voxel Art Plugin © limit 2018
 
 #pragma once
 
-#include "EdMode.h"
+#include "CoreMinimal.h"
 #include "EditorModes.h"
-
+#include "EdMode.h"
 #include "GameFramework/Actor.h"
-
 
 class AVoxelWorld;
 class AVoxelEditorTool;
-
 class UVoxelEditorData;
-
 
 class FVoxelEdMode : public FEdMode
 {

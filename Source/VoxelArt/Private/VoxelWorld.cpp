@@ -111,33 +111,16 @@ void AVoxelWorld::CreateVoxelWorldInEditor()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
-	if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(this))
+	BindEditorDelegates(this);
+	//IVoxelModuleInterface::StartupDelegates(this);
+/*	if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(this))
 	{
 		FEditorDelegates::PreBeginPIE.AddUObject(this, &AVoxelWorld::OnPreBeginPIE);
 	}
 	if (!FEditorDelegates::EndPIE.IsBoundToObject(this))
 	{
 		FEditorDelegates::EndPIE.AddUObject(this, &AVoxelWorld::OnEndPIE);
-	}
-	if (bWorldCreated)
-	{
-		DestroyVoxelWorld();
-	}
-	CreateVoxelWorld();
-}
-
-void AVoxelWorld::CreateVoxelWorld()
-{
-	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
-
-	if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(this))
-	{
-		FEditorDelegates::PreBeginPIE.AddUObject(this, &AVoxelWorld::OnPreBeginPIE);
-	}
-	if (!FEditorDelegates::EndPIE.IsBoundToObject(this))
-	{
-		FEditorDelegates::EndPIE.AddUObject(this, &AVoxelWorld::OnEndPIE);
-	}
+	}*/
 	if (bWorldCreated)
 	{
 		DestroyVoxelWorld();
@@ -230,52 +213,7 @@ UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 		FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
 		AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
 
-		UPackage* Package = CreatePackage(nullptr, *PackageName);
-		UPackage* OuterPack = Package->GetOutermost();
-		Package->FullyLoad();
-
-		UVoxelSaveData* NewSave = NewObject<UVoxelSaveData>(OuterPack, *ObjectName, RF_Public | RF_Standalone);
-		
-		NewSave->SetVoxelWorld(this);
-		NewSave->SaveData();
-
-		FAssetRegistryModule::AssetCreated(NewSave);
-
-		NewSave->MarkPackageDirty();
-		NewSave->PostEditChange();
-		NewSave->AddToRoot();
-
-		FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
-
-		bool bSaveSuccess = UPackage::SavePackage(
-			Package,
-			NewSave,
-			EObjectFlags::RF_Public | EObjectFlags::RF_Standalone,
-			*PackageFileName,
-			GError, nullptr, true, true, SAVE_NoError);
-
-		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSaveSuccess ? TEXT("True") : TEXT("False"));
-
-		if (bSaveSuccess)
-		{
-			return NewSave;
-		}
-	}
-	return nullptr;
-}
-
-UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
-{
-	if (bWorldCreated)
-	{
-		FString ObjectName = TEXT("WorldSave");
-
-		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-
-		FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
-		AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
-
-		UPackage* Package = CreatePackage(nullptr, *PackageName);
+		UPackage* Package = CreatePackage(*PackageName);
 		UPackage* OuterPack = Package->GetOutermost();
 		Package->FullyLoad();
 
@@ -375,7 +313,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 }
 
 void AVoxelWorld::OnPreBeginPIE(bool isSimulating) 
-{ 
+{
 	if (bWorldCreated)
 	{
 		SaveWorldUtility();
@@ -402,7 +340,7 @@ void AVoxelWorld::OnConstruction(const FTransform& Transform)
 #endif
 }
 
-FEditorViewportClient* AVoxelWorld::GetEditorViewportClient()
+/*EditorViewportClient* AVoxelWorld::GetEditorViewportClient()
 {
 	FEditorViewportClient* EditorViewportClient = nullptr;
 
@@ -424,7 +362,7 @@ FEditorViewportClient* AVoxelWorld::GetEditorViewportClient()
 		}
 	}
 	return EditorViewportClient;
-}
+}*/
 
 void AVoxelWorld::UpdateOctree()
 {
@@ -458,12 +396,13 @@ void AVoxelWorld::UpdateOctree()
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
 
-		FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
+		//FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
 		FIntVector PlayerPositionToWorld;
 
 		if (GetWorld() && (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview))
 		{
-			if (EditorViewportClient == nullptr)
+//			if (EditorViewportClient == nullptr)
+			if(false)
 			{
 				/*
 				* Our editor in this tick turned out to be empty
@@ -477,7 +416,8 @@ void AVoxelWorld::UpdateOctree()
 #if WITH_EDITOR
 			if (GetWorld() && (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview))
 			{
-				PlayerPositionToWorld = TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
+				PlayerPositionToWorld = FIntVector(0, 0, 0);
+			//	PlayerPositionToWorld = TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
 			}
 			else
 			{
@@ -652,6 +592,8 @@ void AVoxelWorld::GenerateLandscape()
 
 void AVoxelWorld::CreateTextureDensityMap()
 {
+	//TODO: Check texture import work :)
+
 	if (WorldGenerator)
 	{
 		FString FileName = MapName;
@@ -698,26 +640,26 @@ void AVoxelWorld::CreateTextureDensityMap()
 
 		FPackageName::RegisterMountPoint(*pathPackage, *absolutePathPackage);
 
-		UPackage* Package = CreatePackage(nullptr, *pathPackage);
+		UPackage* Package = CreatePackage(*pathPackage);
 		FName TextureName = MakeUniqueObjectName(Package, UTexture2D::StaticClass(), FName(*FileName));
 
-		UTexture2D* Texture = NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone);
+		UTexture2D* Texture = UTexture2D::CreateTransient(width, height);//NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone);
 
 		// Texture Settings
-		Texture->PlatformData = new FTexturePlatformData();
-		Texture->PlatformData->SizeX = width;
-		Texture->PlatformData->SizeY = height;
-		Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
+	//	Texture->PlatformData = new FTexturePlatformData();
+		//Texture->PlatformData->SizeX = width;
+		//Texture->PlatformData->SizeY = height;
+	//	Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
 
 		// Passing the pixels information to the texture
-		FTexture2DMipMap* Mip = new(Texture->PlatformData->Mips) FTexture2DMipMap();
-		Mip->SizeX = width;
-		Mip->SizeY = height;
+		FTexture2DMipMap& Mip = Texture->PlatformData->Mips[0];
+		Mip.SizeX = width;
+		Mip.SizeY = height;
 
-		Mip->BulkData.Lock(LOCK_READ_WRITE);
-		uint8* TextureData = (uint8*)Mip->BulkData.Realloc(height * width * sizeof(uint8) * 4);
+		Mip.BulkData.Lock(LOCK_READ_WRITE);
+		uint8* TextureData = (uint8*)Mip.BulkData.Realloc(height * width * sizeof(uint8) * 4);
 		FMemory::Memcpy(TextureData, pixels, sizeof(uint8) * height * width * 4);
-		Mip->BulkData.Unlock();
+		Mip.BulkData.Unlock();
 
 		// Updating Texture & mark it as unsaved
 		Texture->AddToRoot();
@@ -932,3 +874,6 @@ bool AVoxelWorld::ShouldTickIfViewportsOnly() const
 	return true;
 }
 #endif
+
+
+IVoxelDelegatesInterface::FBindEditorDelegates IVoxelDelegatesInterface::BindEditorDelegatesDelegate;

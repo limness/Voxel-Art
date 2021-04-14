@@ -1,15 +1,14 @@
-
-//#include "ToolExampleEditor/ToolExampleEditor.h"
-//#include "ToolExampleEditor/IExampleModuleInterface.h"
+// Voxel Art Plugin © limit 2018
 
 #include "VoxelModuleInterface.h"
-
-#include "TabManager.h"
-#include "SDockTab.h"
+#include "Framework/Docking/TabManager.h"
+#include "Widgets/Docking/SDockTab.h"
 
 class FVoxelTabToolBase : public IVoxelModuleListenerInterface, public TSharedFromThis< FVoxelTabToolBase >
 {
 public:
+    virtual ~FVoxelTabToolBase() {}
+
     // IPixelopusToolBase
     virtual void OnStartupModule() override
     {

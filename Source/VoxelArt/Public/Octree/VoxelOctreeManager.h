@@ -57,7 +57,7 @@ private:
 
 	TArray<TSharedPtr<FVoxelOctreeData>> GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk);
 
-	FEditorViewportClient* GetEditorViewportClient();
+//	FEditorViewportClient* GetEditorViewportClient();
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant);
 };

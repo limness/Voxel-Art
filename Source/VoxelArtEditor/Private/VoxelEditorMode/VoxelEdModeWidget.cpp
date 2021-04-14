@@ -1,13 +1,14 @@
+// Voxel Art Plugin © limit 2018
 
-#include "VoxelEdModeWidget.h"
+#include "VoxelEditorMode/VoxelEdModeWidget.h"
+#include "VoxelEditorMode/VoxelEdMode.h"
 #include "VoxelModuleInterface.h"
-#include "VoxelEdMode.h"
 #include "EngineUtils.h"
 #include "Editor/VoxelEditorData.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 
-#define LOCTEXT_NAMESPACE "PListEditor"
+//#define LOCTEXT_NAMESPACE "PListEditor"
 
 void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 {

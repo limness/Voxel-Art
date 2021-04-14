@@ -1,18 +1,14 @@
 // Voxel Art Plugin © limit 2018
 
-
-#include "VoxelCollisionBox.h"
-/*#include "Helpers/VoxelTools.h"
-#include "Renders/VoxelLandscapeGenerator.h"
-#include "VoxelLandscape.h"*/
+#include "Helpers/VoxelCollisionBox.h"
+#include "Octree/VoxelOctreeData.h"
 #include "VoxelWorld.h"
-#include "VoxelOctreeData.h"
 #include "DrawDebugHelpers.h"
 
 FVoxelCollisionBox::FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, int _Size)
-	: Position(_Position)
+	: World(_World)
+	, Position(_Position)
 	, Size(_Size)
-	, World(_World)
 {
 //	World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Green);
 }
@@ -42,9 +38,6 @@ bool FVoxelCollisionBox::IsInside(TSharedPtr<FVoxelOctreeData> CurrentOctant)
 
 bool FVoxelCollisionBox::BoxOverlapOctree(TSharedPtr<FVoxelOctreeData> CurrentOctant)
 {
-	//DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(GetMaximumCorner()), 30, FColor::Red, false, 25);
-//	DrawDebugPoint(World->GetWorld(), World->TransferToGameWorld(GetMinimumCorner()), 30, FColor::Red, false, 25);
-
 	/*if (IsInside(CurrentOctant))
 	{
 		return true;
@@ -65,9 +58,5 @@ bool FVoxelCollisionBox::BoxOverlapOctree(TSharedPtr<FVoxelOctreeData> CurrentOc
 	{
 		CorenerZ = 1;
 	}
-	/*if (CurrentOctant->GetMinimumCorner().Z > GetMaximumCorner().Z || CurrentOctant->GetMaximumCorner().Z > GetMinimumCorner().Z)
-	{
-		CorenerZ = true;
-	}*/
 	return CorenerX + CorenerY + CorenerZ == 3;
 }

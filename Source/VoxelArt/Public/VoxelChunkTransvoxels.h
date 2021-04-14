@@ -4,7 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
-#include "ProceduralMeshComponent.h"
+#include "Helpers/VoxelProceduralMeshComponent.h"
 #include "VoxelChunkTransvoxels.generated.h"
 
 
@@ -28,10 +28,10 @@ public:
 		int32 z_chunk = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class UProceduralMeshComponent* mesh;
+		class UVoxelProceduralMeshComponent* mesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class UProceduralMeshComponent* mesh1;
+		class UVoxelProceduralMeshComponent* mesh1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UBoxComponent* CollisionMesh;
@@ -163,7 +163,7 @@ public:
 		TArray<FLinearColor> VertexColors;
 
 	UPROPERTY()
-		TArray<FProcMeshTangent> Tangents;
+		TArray<FVoxelProcMeshTangent> Tangents;
 
 	UPROPERTY()
 		TArray<FVector2D> TextureCoordinates;

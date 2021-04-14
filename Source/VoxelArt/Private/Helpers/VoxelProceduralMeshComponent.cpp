@@ -1,6 +1,7 @@
-// Voxel Art Plugin © limit 2018
+// Copyright Epic Games, Inc. All Rights Reserved. 
+// Modified Voxel Art Plugin © limit 2018
 
-#include "VoxelProceduralMeshComponent.h"
+#include "Helpers/VoxelProceduralMeshComponent.h"
 #include "PrimitiveViewRelevance.h"
 #include "RenderResource.h"
 #include "RenderingThread.h"
@@ -14,6 +15,7 @@
 #include "Engine/Engine.h"
 #include "SceneManagement.h"
 #include "PhysicsEngine/BodySetup.h"
+//#include "ProceduralMeshComponentPluginPrivate.h"
 #include "DynamicMeshBuilder.h"
 #include "PhysicsEngine/PhysicsSettings.h"
 #include "StaticMeshResources.h"
@@ -25,6 +27,8 @@ DECLARE_CYCLE_STAT(TEXT("Voxel ~ UpdateSection RT"), STAT_ProcMesh_UpdateSection
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Get ProcMesh Elements"), STAT_ProcMesh_GetMeshElements, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Update Collision"), STAT_ProcMesh_UpdateCollision, STATGROUP_Voxel);
 
+
+#include "Helpers/VoxelTools.h"
 
 /** Resource array to pass  */
 class FProcMeshVertexResourceArray : public FResourceArrayInterface
@@ -97,7 +101,7 @@ static void ConvertProcMeshToDynMeshVertex(FDynamicMeshVertex& Vert, const FVoxe
 }
 
 /** Procedural mesh scene proxy */
-class FProceduralMeshSceneProxy final : public FPrimitiveSceneProxy
+class FVoxelProceduralMeshSceneProxy final : public FPrimitiveSceneProxy
 {
 public:
 	SIZE_T GetTypeHash() const override
@@ -106,7 +110,7 @@ public:
 		return reinterpret_cast<size_t>(&UniquePointer);
 	}
 
-	FProceduralMeshSceneProxy(UVoxelProceduralMeshComponent* Component)
+	FVoxelProceduralMeshSceneProxy(UVoxelProceduralMeshComponent* Component)
 		: FPrimitiveSceneProxy(Component)
 		, BodySetup(Component->GetBodySetup())
 		, MaterialRelevance(Component->GetMaterialRelevance(GetScene().GetFeatureLevel()))
@@ -164,7 +168,7 @@ public:
 		}
 	}
 
-	virtual ~FProceduralMeshSceneProxy()
+	virtual ~FVoxelProceduralMeshSceneProxy()
 	{
 		for (FVoxelProcMeshProxySection* Section : Sections)
 		{
@@ -262,7 +266,7 @@ public:
 
 	virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override
 	{
-		SCOPE_CYCLE_COUNTER(STAT_ProcMesh_GetMeshElements);
+	SCOPE_CYCLE_COUNTER(STAT_ProcMesh_GetMeshElements);
 
 
 		// Set up wireframe material (if needed)
@@ -272,7 +276,7 @@ public:
 		if (bWireframe)
 		{
 			WireframeMaterialInstance = new FColoredMaterialRenderProxy(
-				GEngine->WireframeMaterial ? GEngine->WireframeMaterial->GetRenderProxy(IsSelected()) : NULL,
+				GEngine->WireframeMaterial ? GEngine->WireframeMaterial->GetRenderProxy() : NULL,
 				FLinearColor(0.2, 0.36f, 1.f)
 			);
 
@@ -280,11 +284,11 @@ public:
 		}
 
 		// Iterate over sections
-		for (const FVoxelProcMeshProxySection* Section : Sections)
+			for (const FVoxelProcMeshProxySection* Section : Sections)
 		{
 			if (Section != nullptr && Section->bSectionVisible)
 			{
-				FMaterialRenderProxy* MaterialProxy = bWireframe ? WireframeMaterialInstance : Section->Material->GetRenderProxy(IsSelected());
+				FMaterialRenderProxy* MaterialProxy = bWireframe ? WireframeMaterialInstance : Section->Material->GetRenderProxy();
 
 				// For each view..
 				for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
@@ -299,7 +303,17 @@ public:
 						Mesh.bWireframe = bWireframe;
 						Mesh.VertexFactory = &Section->VertexFactory;
 						Mesh.MaterialRenderProxy = MaterialProxy;
-						BatchElement.PrimitiveUniformBuffer = CreatePrimitiveUniformBufferImmediate(GetLocalToWorld(), GetBounds(), GetLocalBounds(), true, UseEditorDepthTest());
+
+						bool bHasPrecomputedVolumetricLightmap;
+						FMatrix PreviousLocalToWorld;
+						int32 SingleCaptureIndex;
+						bool bOutputVelocity;
+						GetScene().GetPrimitiveUniformShaderParameters_RenderThread(GetPrimitiveSceneInfo(), bHasPrecomputedVolumetricLightmap, PreviousLocalToWorld, SingleCaptureIndex, bOutputVelocity);
+
+						FDynamicPrimitiveUniformBuffer& DynamicPrimitiveUniformBuffer = Collector.AllocateOneFrameResource<FDynamicPrimitiveUniformBuffer>();
+						DynamicPrimitiveUniformBuffer.Set(GetLocalToWorld(), PreviousLocalToWorld, GetBounds(), GetLocalBounds(), true, bHasPrecomputedVolumetricLightmap, DrawsVelocity(), bOutputVelocity);
+						BatchElement.PrimitiveUniformBufferResource = &DynamicPrimitiveUniformBuffer.UniformBuffer;
+						
 						BatchElement.FirstIndex = 0;
 						BatchElement.NumPrimitives = Section->IndexBuffer.Indices.Num() / 3;
 						BatchElement.MinVertexIndex = 0;
@@ -308,19 +322,12 @@ public:
 						Mesh.Type = PT_TriangleList;
 						Mesh.DepthPriorityGroup = SDPG_World;
 						Mesh.bCanApplyViewModeOverrides = false;
-
-						if (bWireframe)
-						{
-							Mesh.bWireframe = true;
-							Mesh.bDisableBackfaceCulling = true;
-						}
-
 						Collector.AddMesh(ViewIndex, Mesh);
 					}
 				}
 			}
 		}
-
+		
 		// Draw bounds
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 		for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
@@ -328,10 +335,10 @@ public:
 			if (VisibilityMap & (1 << ViewIndex))
 			{
 				// Draw simple collision as wireframe if 'show collision', and collision is enabled, and we are not using the complex as the simple
-				if (ViewFamily.EngineShowFlags.Collision && IsCollisionEnabled() && BodySetup->GetCollisionTraceFlag() != ECollisionTraceFlag::CTF_UseComplexAsSimple)
+				if (ViewFamily.EngineShowFlags.Collision && IsCollisionEnabled()/* && BodySetup->GetCollisionTraceFlag() != ECollisionTraceFlag::CTF_UseComplexAsSimple*/)
 				{
 					FTransform GeomTransform(GetLocalToWorld());
-					BodySetup->AggGeom.GetAggGeom(GeomTransform, GetSelectionColor(FColor(157, 149, 223, 255), IsSelected(), IsHovered()).ToFColor(true), NULL, false, false, UseEditorDepthTest(), ViewIndex, Collector);
+					BodySetup->AggGeom.GetAggGeom(GeomTransform, GetSelectionColor(FColor(157, 149, 223, 255), IsSelected(), IsHovered()).ToFColor(true), NULL, false, false, DrawsVelocity(), ViewIndex, Collector);
 				}
 
 				// Render bounds
@@ -491,117 +498,110 @@ void UVoxelProceduralMeshComponent::UpdateMeshSection(int32 SectionIndex, const 
 	if (SectionIndex < ProcMeshSections.Num())
 	{
 		FVoxelProcMeshSection& Section = ProcMeshSections[SectionIndex];
-		const int32 NumVerts = Section.ProcVertexBuffer.Num();
+		const int32 NumVerts = Vertices.Num();
+		const int32 PreviousNumVerts = Section.ProcVertexBuffer.Num();
 
 		// See if positions are changing
-		const bool bPositionsChanging = (Vertices.Num() == NumVerts);
+		const bool bSameVertexCount = PreviousNumVerts == NumVerts;
 
 		// Update bounds, if we are getting new position data
-		if (bPositionsChanging)
+		if (bSameVertexCount)
 		{
-			Section.SectionLocalBox.Init();
-		}
+			Section.SectionLocalBox = FBox(Vertices);
 
-		// Iterate through vertex data, copying in new info
-		for (int32 VertIdx = 0; VertIdx < NumVerts; VertIdx++)
-		{
-			FVoxelProcMeshVertex& ModifyVert = Section.ProcVertexBuffer[VertIdx];
+			// Iterate through vertex data, copying in new info
+			for (int32 VertIdx = 0; VertIdx < NumVerts; VertIdx++)
+			{
+				FVoxelProcMeshVertex& ModifyVert = Section.ProcVertexBuffer[VertIdx];
 
-			// Position data
-			if (Vertices.Num() == NumVerts)
-			{
-				ModifyVert.Position = Vertices[VertIdx];
-				Section.SectionLocalBox += ModifyVert.Position;
-			}
-
-			// Normal data
-			if (Normals.Num() == NumVerts)
-			{
-				ModifyVert.Normal = Normals[VertIdx];
-			}
-
-			// Tangent data 
-			if (Tangents.Num() == NumVerts)
-			{
-				ModifyVert.Tangent = Tangents[VertIdx];
-			}
-
-			// UV0 data
-			if (UV0.Num() == NumVerts)
-			{
-				ModifyVert.UV0 = UV0[VertIdx];
-			}
-			// UV1 data
-			if (UV1.Num() == NumVerts)
-			{
-				ModifyVert.UV1 = UV1[VertIdx];
-			}
-			// UV2 data
-			if (UV2.Num() == NumVerts)
-			{
-				ModifyVert.UV2 = UV2[VertIdx];
-			}
-			// UV3 data
-			if (UV3.Num() == NumVerts)
-			{
-				ModifyVert.UV3 = UV3[VertIdx];
-			}
-
-			// Color data
-			if (VertexColors.Num() == NumVerts)
-			{
-				ModifyVert.Color = VertexColors[VertIdx];
-			}
-		}
-
-		if (bPositionsChanging)
-		{
-			MarkRenderStateDirty();
-		}
-		else if (SceneProxy)
-		{
-			// Create data to update section
-			FVoxelProcMeshSectionUpdateData* SectionData = new FVoxelProcMeshSectionUpdateData;
-			SectionData->TargetSection = SectionIndex;
-			SectionData->NewVertexBuffer = Section.ProcVertexBuffer;
-
-			// Enqueue command to send to render thread
-			ENQUEUE_UNIQUE_RENDER_COMMAND_TWOPARAMETER(
-				FVoxelProcMeshSectionUpdateData,
-				FProceduralMeshSceneProxy*, ProcMeshSceneProxy, (FProceduralMeshSceneProxy*)SceneProxy,
-				FVoxelProcMeshSectionUpdateData*, SectionData, SectionData,
+				// Position data
+				if (Vertices.Num() == NumVerts)
 				{
-					ProcMeshSceneProxy->UpdateSection_RenderThread(SectionData);
+					ModifyVert.Position = Vertices[VertIdx];
 				}
-			);
-		}
 
-		// If we have collision enabled on this section, update that too
-		if (bPositionsChanging && Section.bEnableCollision)
-		{
-			TArray<FVector> CollisionPositions;
-
-			// We have one collision mesh for all sections, so need to build array of _all_ positions
-			for (const FVoxelProcMeshSection& CollisionSection : ProcMeshSections)
-			{
-				// If section has collision, copy it
-				if (CollisionSection.bEnableCollision)
+				// Normal data
+				if (Normals.Num() == NumVerts)
 				{
-					for (int32 VertIdx = 0; VertIdx < CollisionSection.ProcVertexBuffer.Num(); VertIdx++)
+					ModifyVert.Normal = Normals[VertIdx];
+				}
+
+				// Tangent data
+				if (Tangents.Num() == NumVerts)
+				{
+					ModifyVert.Tangent = Tangents[VertIdx];
+				}
+
+				// UV0 data
+				if (UV0.Num() == NumVerts)
+				{
+					ModifyVert.UV0 = UV0[VertIdx];
+				}
+				// UV1 data
+				if (UV1.Num() == NumVerts)
+				{
+					ModifyVert.UV1 = UV1[VertIdx];
+				}
+				// UV2 data
+				if (UV2.Num() == NumVerts)
+				{
+					ModifyVert.UV2 = UV2[VertIdx];
+				}
+				// UV3 data
+				if (UV3.Num() == NumVerts)
+				{
+					ModifyVert.UV3 = UV3[VertIdx];
+				}
+
+				// Color data
+				if (VertexColors.Num() == NumVerts)
+				{
+					ModifyVert.Color = VertexColors[VertIdx];
+				}
+			}
+
+			// If we have collision enabled on this section, update that too
+			if (Section.bEnableCollision)
+			{
+				TArray<FVector> CollisionPositions;
+
+				// We have one collision mesh for all sections, so need to build array of _all_ positions
+				for (const FVoxelProcMeshSection& CollisionSection : ProcMeshSections)
+				{
+					// If section has collision, copy it
+					if (CollisionSection.bEnableCollision)
 					{
-						CollisionPositions.Add(CollisionSection.ProcVertexBuffer[VertIdx].Position);
+						for (int32 VertIdx = 0; VertIdx < CollisionSection.ProcVertexBuffer.Num(); VertIdx++)
+						{
+							CollisionPositions.Add(CollisionSection.ProcVertexBuffer[VertIdx].Position);
+						}
 					}
 				}
+
+				// Pass new positions to trimesh
+				BodyInstance.UpdateTriMeshVertices(CollisionPositions);
 			}
 
-			// Pass new positions to trimesh
-			BodyInstance.UpdateTriMeshVertices(CollisionPositions);
-		}
+			// If we have a valid proxy and it is not pending recreation
+			if (SceneProxy && !IsRenderStateDirty())
+			{
+				// Create data to update section
+				FVoxelProcMeshSectionUpdateData* SectionData = new FVoxelProcMeshSectionUpdateData;
+				SectionData->TargetSection = SectionIndex;
+				SectionData->NewVertexBuffer = Section.ProcVertexBuffer;
 
-		if (bPositionsChanging)
+				// Enqueue command to send to render thread
+				FVoxelProceduralMeshSceneProxy* ProcMeshSceneProxy = (FVoxelProceduralMeshSceneProxy*)SceneProxy;
+				ENQUEUE_RENDER_COMMAND(FProcMeshSectionUpdate)
+					([ProcMeshSceneProxy, SectionData](FRHICommandListImmediate& RHICmdList) { ProcMeshSceneProxy->UpdateSection_RenderThread(SectionData); });
+			}
+
+			UpdateLocalBounds();		 // Update overall bounds
+			MarkRenderTransformDirty();  // Need to send new bounds to render thread
+		}
+		else
 		{
-			UpdateLocalBounds(); // Update overall bounds
-			MarkRenderTransformDirty(); // Need to send new bounds to render thread
+			UE_LOG(VoxelArt, Error, TEXT("Trying to update a procedural mesh component section with a different number of vertices [Previous: %i, New: %i] (clear and recreate mesh section instead)"), PreviousNumVerts, NumVerts);
 		}
 	}
 }
@@ -635,15 +635,23 @@ void UVoxelProceduralMeshComponent::SetMeshSectionVisible(int32 SectionIndex, bo
 		if (SceneProxy)
 		{
 			// Enqueue command to modify render thread info
-			ENQUEUE_UNIQUE_RENDER_COMMAND_THREEPARAMETER(
+			FVoxelProceduralMeshSceneProxy* ProcMeshSceneProxy = (FVoxelProceduralMeshSceneProxy*)SceneProxy;
+			ENQUEUE_RENDER_COMMAND(FProcMeshSectionVisibilityUpdate)(
+				[ProcMeshSceneProxy, SectionIndex, bNewVisibility](FRHICommandListImmediate& RHICmdList)
+				{
+					ProcMeshSceneProxy->SetSectionVisibility_RenderThread(SectionIndex, bNewVisibility);
+				});
+
+			// Enqueue command to modify render thread info
+		/*	ENQUEUE_UNIQUE_RENDER_COMMAND_THREEPARAMETER(
 				FProcMeshSectionVisibilityUpdate,
-				FProceduralMeshSceneProxy*, ProcMeshSceneProxy, (FProceduralMeshSceneProxy*)SceneProxy,
+				FVoxelProceduralMeshSceneProxy*, ProcMeshSceneProxy, (FVoxelProceduralMeshSceneProxy*)SceneProxy,
 				int32, SectionIndex, SectionIndex,
 				bool, bNewVisibility, bNewVisibility,
 				{
 					ProcMeshSceneProxy->SetSectionVisibility_RenderThread(SectionIndex, bNewVisibility);
 				}
-			);
+			);*/
 		}
 	}
 }
@@ -710,6 +718,8 @@ void UVoxelProceduralMeshComponent::UpdateLocalBounds()
 		LocalBox += Section.SectionLocalBox;
 	}
 
+//	int cccc = dddd;
+
 	LocalBounds = LocalBox.IsValid ? FBoxSphereBounds(LocalBox) : FBoxSphereBounds(FVector(0, 0, 0), FVector(0, 0, 0), 0); // fallback to reset box sphere bounds
 
 	// Update global bounds
@@ -722,7 +732,7 @@ FPrimitiveSceneProxy* UVoxelProceduralMeshComponent::CreateSceneProxy()
 {
 	SCOPE_CYCLE_COUNTER(STAT_ProcMesh_CreateSceneProxy);
 
-	return new FProceduralMeshSceneProxy(this);
+	return new FVoxelProceduralMeshSceneProxy(this);
 }
 
 int32 UVoxelProceduralMeshComponent::GetNumMaterials() const

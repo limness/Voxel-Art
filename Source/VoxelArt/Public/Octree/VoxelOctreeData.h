@@ -17,11 +17,16 @@ public:
 	FVoxelOctreeData(
 		TWeakPtr<FVoxelOctreeData> _Parent,
 		uint64 _NodeID,
-		uint8 _Depth, float
-		_Radius, FIntVector
-		_Position
+		uint8 _Depth, 
+		float _Size, 
+		FIntVector _Position
 	);
 	~FVoxelOctreeData();
+
+public:
+
+	TWeakPtr<FVoxelOctreeData> ParentChunk;
+	TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> ChildrenChunks;
 
 public:
 
@@ -36,23 +41,17 @@ public:
 
 public:
 
-	TWeakPtr<FVoxelOctreeData> ParentChunk;
-	TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> ChildrenChunks;
-
-public:
-
 	void AddChildren();
 
 	FORCEINLINE bool HasChildren();
 	FORCEINLINE void DestroyChildren();
-	FORCEINLINE void CreateChildren(TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> children);
 
 	FORCEINLINE FIntVector GetMinimumCorner();
 	FORCEINLINE FIntVector GetMaximumCorner();
 
 	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetParent();
-	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetChildByPosition(FVector Position);
-	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetLeaf(FVector Position);
+	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetChildByPosition(FVector GlobalPosition);
+	FORCEINLINE TWeakPtr<FVoxelOctreeData> GetLeaf(FVector GlobalPosition);
 	FORCEINLINE TArray<TSharedPtr<FVoxelOctreeData>, TFixedAllocator<8>> GetChildren();
 };
 
@@ -76,19 +75,19 @@ public:
 
 public:
 
-	int Voxels = 32;
-	int Size = 0;
-	int Priority = 0;
+	UVoxelChunkComponent* Chunk = nullptr;
+	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+
+public:
 
 	uint8 Depth = 0;
 	uint8 TransitionSides = 0x00;
 
 	FIntVector Position = FIntVector(0, 0, 0);
 
-public:
-
-	UVoxelChunkComponent* Chunk = nullptr;
-	TWeakPtr<FVoxelOctreeData> CurrentOctree;
+	int Size = 0;
+	int Voxels = 32;
+	int Priority = 0;
 };
 
 //using ArrayChildrenDensity = TArray<FVoxelOctreeDensity*, TFixedAllocator<8>>;
@@ -113,6 +112,11 @@ public:
 
 public:
 
+	UVoxelWorldGenerator* WorldGenerator;
+	TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> ChildrenOctants;
+
+public:
+
 	uint8 Depth = 0;
 
 	int Size = 0;
@@ -129,11 +133,6 @@ private:
 
 public:
 
-	UVoxelWorldGenerator* WorldGenerator;
-	TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> ChildrenOctants;
-
-public:
-
 	FORCEINLINE TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> GetChildren();
 
 	FORCEINLINE void SetVoxelValue(AVoxelWorld* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
@@ -142,17 +141,18 @@ public:
 	FORCEINLINE bool HasChildren() { return ChildrenOctants.Num() == 8; }
 	FORCEINLINE bool HasOwnDensity() { return OwnDensity; }
 	FORCEINLINE bool HasOwnColor() { return OwnColor; }
-	FORCEINLINE bool IsInside(FIntVector Position);
+	FORCEINLINE bool IsInside(FIntVector LocalPosition);
 
 	FORCEINLINE FIntVector GetMinimumCorner();
 	FORCEINLINE FIntVector GetMaximumCorner();
-	FORCEINLINE FIntVector TransferToLocal(AVoxelWorld* World, FIntVector Position);
+	FORCEINLINE FIntVector TransferToLocal(AVoxelWorld* World, FIntVector CurrentPosition);
 
-	FVoxelOctreeDensity* GetLeaf(FIntVector Position);
-	FVoxelOctreeDensity* GetChildByPosition(FIntVector Position);
+	FVoxelOctreeDensity* GetLeaf(FIntVector LocalPosition);
+	FVoxelOctreeDensity* GetChildByPosition(FIntVector LocalPosition);
 
 public:
 
+	void AddChildren();
 	void SetDefaultMap(AVoxelWorld* World);
 };
 
