@@ -148,7 +148,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12"))
 	int32 MinimumLOD = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12", EditCondition = bMaximumLOD))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12"))
 	int32 MaximumLOD = 8;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")

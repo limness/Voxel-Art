@@ -17,8 +17,8 @@ public:
 	FVoxelOctreeData(
 		TWeakPtr<FVoxelOctreeData> _Parent,
 		uint64 _NodeID,
-		uint8 _Depth, 
-		float _Size, 
+		uint8 _Depth,
+		float _Size,
 		FIntVector _Position
 	);
 	~FVoxelOctreeData();
@@ -102,10 +102,10 @@ class VOXELART_API FVoxelOctreeDensity
 public:
 
 	FVoxelOctreeDensity(
-		UVoxelWorldGenerator* _WorldGenerator, 
-		uint8 _Depth, 
-		int _Size, 
-		int _Voxels, 
+		UVoxelWorldGenerator* _WorldGenerator,
+		uint8 _Depth,
+		int _Size,
+		int _Voxels,
 		FIntVector _Position
 	);
 	~FVoxelOctreeDensity() {}
@@ -162,8 +162,8 @@ struct FChunksRenderInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	//Chunks which has to be created
-	TArray<FVoxelChunkData*> ChunksCreation;
+		//Chunks which has to be created
+		TArray<FVoxelChunkData*> ChunksCreation;
 
 	//Chunks which has to be generated
 	TArray<FVoxelChunkData*> ChunksGeneration;

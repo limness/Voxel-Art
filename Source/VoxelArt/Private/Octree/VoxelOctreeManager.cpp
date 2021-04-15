@@ -111,7 +111,7 @@ uint32 VoxelOctreeManager::Run()
 #endif
 			PlayerPositionToWorld = FIntVector(0, 0, 0);
 
-			if (PlayerPositionToWorld != OldPlayerPositionToWorld)
+		//	if (PlayerPositionToWorld != OldPlayerPositionToWorld)
 			{
 				OldPlayerPositionToWorld = PlayerPositionToWorld;
 

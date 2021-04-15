@@ -7,13 +7,13 @@
 class VOXELART_API IVoxelDelegatesInterface
 {
 public:
-//#if WITH_EDITOR
-	DECLARE_MULTICAST_DELEGATE_TwoParams(FBindEditorDelegates, IVoxelDelegatesInterface*, UObject*);
-	static FBindEditorDelegates BindEditorDelegatesDelegate;
 
-	void BindEditorDelegates(UObject* Self)
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FStartupDelegates, IVoxelDelegatesInterface*, UObject*);
+	static FStartupDelegates BindStartupDelegates;
+
+	void StartupDelegates(UObject* Self)
 	{
-		BindEditorDelegatesDelegate.Broadcast(this, Self);
+		BindStartupDelegates.Broadcast(this, Self);
 	}
 
 	virtual ~IVoxelDelegatesInterface() = default;
@@ -21,5 +21,4 @@ public:
 	virtual void OnPreBeginPIE(bool bIsSimulating) {}
 
 	virtual void OnEndPIE(bool bIsSimulating) {}
-//#endif
 };

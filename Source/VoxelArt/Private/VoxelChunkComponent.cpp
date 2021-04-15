@@ -5,11 +5,9 @@
 #include "Helpers/MarchingCubes.h"
 #include "Octree/VoxelOctreeData.h"
 #include "VoxelWorld.h"
-
 #include "Meshers/VoxelMarchingCubesMesher.h"
 #include "Meshers/VoxelSurfaceNetsMesher.h"
 #include "Meshers/VoxelCubesMesher.h"
-
 #include "Noise/SimplexNoiseBPLibrary.h"
 #include "DrawDebugHelpers.h"
 
@@ -98,6 +96,7 @@ void FMesherAsyncTask::DoWork()
 
 		AsyncTask(ENamedThreads::GameThread, [=]()
 			{
+			//	UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());
 				/*One more check active before we will create mesh*/
 				if (Data->Chunk->IsPoolActive())
 				{

@@ -111,16 +111,8 @@ void AVoxelWorld::CreateVoxelWorldInEditor()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
-	BindEditorDelegates(this);
-	//IVoxelModuleInterface::StartupDelegates(this);
-/*	if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(this))
-	{
-		FEditorDelegates::PreBeginPIE.AddUObject(this, &AVoxelWorld::OnPreBeginPIE);
-	}
-	if (!FEditorDelegates::EndPIE.IsBoundToObject(this))
-	{
-		FEditorDelegates::EndPIE.AddUObject(this, &AVoxelWorld::OnEndPIE);
-	}*/
+	StartupDelegates(this);
+
 	if (bWorldCreated)
 	{
 		DestroyVoxelWorld();
@@ -369,7 +361,7 @@ void AVoxelWorld::UpdateOctree()
 	SCOPE_CYCLE_COUNTER(STAT_UpdateOctree);
 	{
 		SCOPE_CYCLE_COUNTER(STAT_EnqueueOctree);
-
+		
 		TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
 		while (ChangesOctree.Peek(ChunksChangesArray))
 		{
@@ -584,8 +576,8 @@ void AVoxelWorld::GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Oct
 
 void AVoxelWorld::GenerateLandscape()
 {
-	OctreeDensity = new FVoxelOctreeDensity(WorldGenerator, 0, WorldSize, VoxelsPerChunk, TransferToVoxelWorld(FVector(0, 0, 0)));
-	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, TransferToVoxelWorld(FVector(0, 0, 0))));
+	OctreeDensity = new FVoxelOctreeDensity(WorldGenerator, 0, WorldSize, VoxelsPerChunk, FIntVector(0, 0, 0));
+	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, FIntVector(0, 0, 0)));
 
 	GenerateOctree(MainOctree);
 }
@@ -875,5 +867,4 @@ bool AVoxelWorld::ShouldTickIfViewportsOnly() const
 }
 #endif
 
-
-IVoxelDelegatesInterface::FBindEditorDelegates IVoxelDelegatesInterface::BindEditorDelegatesDelegate;
+IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;

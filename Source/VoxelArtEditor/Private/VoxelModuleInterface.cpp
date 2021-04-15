@@ -19,17 +19,15 @@ IMPLEMENT_GAME_MODULE(IVoxelModuleInterface, VoxelArtEditor);
 
 TSharedRef<FWorkspaceItem> IVoxelModuleInterface::MenuRoot = FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
 
-static void BindEditorDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
+static void StartupDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
 {
     if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(Object))
     {
         FEditorDelegates::PreBeginPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnPreBeginPIE(bIsSimulating); });
-       // FEditorDelegates::PreBeginPIE.AddUObject(Object, &AVoxelWorld::OnPreBeginPIE);
     }
     if (!FEditorDelegates::EndPIE.IsBoundToObject(Object))
     {
         FEditorDelegates::EndPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnEndPIE(bIsSimulating); });
-       // FEditorDelegates::EndPIE.AddUObject(Object, &AVoxelWorld::OnEndPIE);
     }
 }
 
@@ -88,7 +86,7 @@ void IVoxelModuleInterface::StartupModule()
     }
 
 
-    IVoxelDelegatesInterface::BindEditorDelegatesDelegate.AddStatic(&BindEditorDelegates);
+    IVoxelDelegatesInterface::BindStartupDelegates.AddStatic(&StartupDelegates);
 
     ModuleListeners.Add(MakeShareable(new FVoxelEdModeTool));
     ModuleListeners.Add(MakeShareable(new FVoxelTabTool));

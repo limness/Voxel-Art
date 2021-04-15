@@ -1,6 +1,5 @@
 // Voxel Art Plugin © limit 2018
 
-
 #include "Octree/VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
 #include "Generators/VoxelWorldGenerator.h"
@@ -148,8 +147,8 @@ TArray<FVoxelOctreeDensity*, TFixedAllocator<8>> FVoxelOctreeDensity::GetChildre
 bool FVoxelOctreeDensity::IsInside(FIntVector LocalPosition)
 {
 	return  (GetMinimumCorner().X <= LocalPosition.X && GetMaximumCorner().X >= LocalPosition.X) &&
-			(GetMinimumCorner().Y <= LocalPosition.Y && GetMaximumCorner().Y >= LocalPosition.Y) &&
-			(GetMinimumCorner().Z <= LocalPosition.Z && GetMaximumCorner().Z >= LocalPosition.Z);
+		(GetMinimumCorner().Y <= LocalPosition.Y && GetMaximumCorner().Y >= LocalPosition.Y) &&
+		(GetMinimumCorner().Z <= LocalPosition.Z && GetMaximumCorner().Z >= LocalPosition.Z);
 }
 
 FIntVector FVoxelOctreeDensity::GetMinimumCorner()
@@ -258,8 +257,8 @@ FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint
 	, Voxels(_Voxels)
 	, Priority(_Priority)
 {
-//	DensityMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
-//	ColorMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
+	//	DensityMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
+	//	ColorMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
 }
 
 FVoxelChunkData::~FVoxelChunkData()

@@ -9,19 +9,21 @@ public class VoxelArt : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		//PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-		bEnforceIWYU = true;
+		//	bEnforceIWYU = true;
 		//bLegacyPublicIncludePaths = false;
 
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core", 
-			"CoreUObject", 
+			"Core",
+			"CoreUObject",
 			"Engine",
+			"InputCore",
+			"RHI",
+			"RenderCore",
+		//	"ShaderCore",
 			"ProceduralMeshComponent",
-			"InputCore", 
-			"RHI", 
-			"RenderCore"
+			"UnrealEd"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

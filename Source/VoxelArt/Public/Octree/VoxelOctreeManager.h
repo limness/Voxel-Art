@@ -6,7 +6,7 @@
 #include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
-class AVoxelLandscape;
+class AVoxelWorld;
 
 /*
 * Voxel Octree Manager class

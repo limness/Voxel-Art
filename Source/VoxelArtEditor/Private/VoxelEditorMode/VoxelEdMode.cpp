@@ -146,15 +146,17 @@ bool FVoxelEdMode::DisallowMouseDeltaTracking() const
 {
 	return EditorRemovePressed;
 }
+		
+/*AsyncTask(ENamedThreads::GameThread, [=]()
+	{
 
-/*
-DrawDebugPoint
-(
-	GetWorld(),
-	Hit.ImpactPoint,
-	15.f,
-	FColor::Red,
-	false,
-	5.f
-);
-*/
+		DrawDebugPoint
+		(
+			World->GetWorld(),
+			(FVector)DensityLocation,
+			25.f,
+			FColor::Red,
+			false,
+			25.f
+		);
+	});*/
