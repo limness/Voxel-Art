@@ -5,8 +5,8 @@
 #include "TimerManager.h"
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
-#include "Misc/MessageDialog.h"
 #include "AssetRegistryModule.h"
+#include "VoxelLogInterface.h"
 #include "AssetToolsModule.h"
 #include "VoxelPlayerGame.h"
 #include "Editor.h"
@@ -140,57 +140,55 @@ void AVoxelWorld::CreateVoxelWorld()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
-	if (WorldGenerator)
+	if (!WorldGenerator)
 	{
-		if (MinimumLOD < 0)
-		{
-			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be less then zero!"));
-			return;
-		}
-		if (MinimumLOD > MaximumLOD)
-		{
-			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be greater then Maximum LOD!"));
-			return;
-		}
+		IVoxelLogInterface::LogMessage(INVTEXT("World Generator is not exist! (Select: Voxel World -> Main -> World Generator)"), "Error");
+		return;
+	}
+	if (MinimumLOD < 0)
+	{
+		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be less then zero!"), "Error");
+		return;
+	}
+	if (MinimumLOD > MaximumLOD)
+	{
+		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be greater then Maximum LOD!"), "Error");
+		return;
+	}
 
-		TimeForWorldGenerate = FDateTime::Now().GetTicks();
-		//ThreadPool->Create(4, 128 * 1024);
+	TimeForWorldGenerate = FDateTime::Now().GetTicks();
+	//ThreadPool->Create(4, 128 * 1024);
 
-		SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
-		WorldGenerator->GeneratorInit();
-		GenerateLandscape();
+	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
+	WorldGenerator->GeneratorInit();
+	GenerateLandscape();
 
-		if (SaveFile)
+	if (SaveFile)
+	{
+		if (SaveFile->IsDataSaved())
 		{
-			if (SaveFile->IsDataSaved())
-			{
-				SaveFile->SetVoxelWorld(this);
-				SaveFile->LoadSavedData();
-			}
-			else
-			{
-				UE_LOG(VoxelArt, Error, TEXT("World has not been saved!"));
-			}
-		}
-		if (EnabledLOD)
-		{
-			OctreeManagerThread = new VoxelOctreeManager(this, DrawingRange, MaximumLOD);
-
-			if (TransitionMesh && MesherType == Meshers::MarchingCubes)
-			{
-				OctreeNeighborsCheckerThread = new VoxelOctreeNeighborsChecker(this);
-			}
+			SaveFile->SetVoxelWorld(this);
+			SaveFile->LoadSavedData();
 		}
 		else
 		{
-			bEnableUpdateOctree = true;
+			IVoxelLogInterface::LogMessage(INVTEXT("World has not been saved!"), "Error");
 		}
-		bWorldCreated = true;
+	}
+	if (EnabledLOD)
+	{
+		OctreeManagerThread = new VoxelOctreeManager(this, DrawingRange, MaximumLOD);
+
+		if (TransitionMesh && MesherType == Meshers::MarchingCubes)
+		{
+			OctreeNeighborsCheckerThread = new VoxelOctreeNeighborsChecker(this);
+		}
 	}
 	else
 	{
-		UE_LOG(VoxelArt, Error, TEXT("World Generator is not exist! (Select: Voxel World -> Main -> World Generator)"));
+		bEnableUpdateOctree = true;
 	}
+	bWorldCreated = true;
 }
 
 void AVoxelWorld::SaveWorldUtility()
@@ -250,11 +248,14 @@ UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 			*PackageFileName,
 			GError, nullptr, true, true, SAVE_NoError);
 
-		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSaveSuccess ? TEXT("True") : TEXT("False"));
-
 		if (bSaveSuccess)
 		{
+			IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has been successfully saved"), "Log");
 			return NewSave;
+		}
+		else
+		{
+			IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has not been saved"), "Error");
 		}
 	}
 	return nullptr;
@@ -505,7 +506,7 @@ void AVoxelWorld::UpdateWorld()
 {
 	if (!bWorldCreated)
 	{
-		UE_LOG(VoxelArt, Error, TEXT("World has not been created!"));
+		IVoxelLogInterface::LogMessage(INVTEXT("MWorld has not been created!"), "Error");
 		return;
 	}
 	OctreeMutex.Lock();
@@ -622,8 +623,7 @@ void AVoxelWorld::CreateTextureDensityMap()
 		Texture->UpdateResource();
 		Package->MarkPackageDirty();
 
-		UE_LOG(VoxelArt, Log, TEXT("Density Map Texture was created!"));
-		UE_LOG(VoxelArt, Log, TEXT("Check your directory to find it"));
+		IVoxelLogInterface::LogMessage(INVTEXT("Density Map Texture was created! Check your directory to find it"), "Log");
 
 		free(pixels);
 		pixels = NULL;
@@ -631,7 +631,7 @@ void AVoxelWorld::CreateTextureDensityMap()
 	}
 	else
 	{
-		UE_LOG(VoxelArt, Error, TEXT("World Generator is not exist! (Voxel World -> Main -> World Generator)"));
+		IVoxelLogInterface::LogMessage(INVTEXT("World Generator is not exist! (Voxel World -> Main -> World Generator)"), "Error");
 	}
 }
 
