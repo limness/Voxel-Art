@@ -12,6 +12,7 @@
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Octree/VoxelOctreeData.h"
 #include "Save/VoxelSaveData.h"
+#include "VoxelPlayerInterface.h"
 #include "VoxelDelegatesInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
@@ -183,6 +184,11 @@ public:
 
 public:
 
+	UPROPERTY(BlueprintReadOnly)
+	AVoxelPlayerInterface* VoxelScenePlayer;
+
+	TSubclassOf<AVoxelPlayerInterface> VoxelScenePlayerClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* WorldComponent;
 
@@ -211,6 +217,9 @@ public:
 	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
 
 public:	
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE AVoxelPlayerInterface* GetVoxelScenePlayer();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE FIntVector TransferToVoxelWorld(FVector P);

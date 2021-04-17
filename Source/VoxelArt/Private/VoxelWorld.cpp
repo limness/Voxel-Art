@@ -8,6 +8,7 @@
 #include "Misc/MessageDialog.h"
 #include "AssetRegistryModule.h"
 #include "AssetToolsModule.h"
+#include "VoxelPlayerGame.h"
 #include "Editor.h"
 #include "EditorViewportClient.h"
 
@@ -54,9 +55,17 @@ void AVoxelWorld::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 	if (EnabledWorldInGame)
 	{
+		VoxelScenePlayer = nullptr;
+
+		FActorSpawnParameters Transient = FActorSpawnParameters();
+		Transient.ObjectFlags = RF_Transient;
+
+		VoxelScenePlayerClass = AVoxelPlayerGame::StaticClass();
+		VoxelScenePlayer = GetWorld()->SpawnActor<AVoxelPlayerInterface>(VoxelScenePlayerClass, Transient);
+		VoxelScenePlayer->SetVoxelWorld(this);
+
 		CreateVoxelWorld();
 	}
 }
@@ -117,6 +126,13 @@ void AVoxelWorld::CreateVoxelWorldInEditor()
 	{
 		DestroyVoxelWorld();
 	}
+	if (!VoxelScenePlayer)
+	{
+		FActorSpawnParameters Transient = FActorSpawnParameters();
+		Transient.ObjectFlags = RF_Transient;
+
+		VoxelScenePlayer = GetWorld()->SpawnActor<AVoxelPlayerInterface>(VoxelScenePlayerClass, Transient);
+	}
 	CreateVoxelWorld();
 }
 
@@ -129,47 +145,47 @@ void AVoxelWorld::CreateVoxelWorld()
 		if (MinimumLOD < 0)
 		{
 			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be less then zero!"));
+			return;
 		}
-		else if (MinimumLOD > MaximumLOD)
+		if (MinimumLOD > MaximumLOD)
 		{
 			UE_LOG(VoxelArt, Error, TEXT("Minimum LOD cannot be greater then Maximum LOD!"));
+			return;
 		}
-		else
+
+		TimeForWorldGenerate = FDateTime::Now().GetTicks();
+		//ThreadPool->Create(4, 128 * 1024);
+
+		SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
+		WorldGenerator->GeneratorInit();
+		GenerateLandscape();
+
+		if (SaveFile)
 		{
-			TimeForWorldGenerate = FDateTime::Now().GetTicks();
-			//ThreadPool->Create(4, 128 * 1024);
-
-			SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
-			WorldGenerator->GeneratorInit();
-			GenerateLandscape();
-
-			if (SaveFile)
+			if (SaveFile->IsDataSaved())
 			{
-				if (SaveFile->IsDataSaved())
-				{
-					SaveFile->SetVoxelWorld(this);
-					SaveFile->LoadSavedData();
-				}
-				else
-				{
-					UE_LOG(VoxelArt, Error, TEXT("Ooops SaveFile %p"), SaveFile);
-				}
-			}
-			if (EnabledLOD)
-			{
-				OctreeManagerThread = new VoxelOctreeManager(this, UGameplayStatics::GetPlayerController(GetWorld(), 0), DrawingRange, MaximumLOD);
-
-				if (TransitionMesh && MesherType == Meshers::MarchingCubes)
-				{
-					OctreeNeighborsCheckerThread = new VoxelOctreeNeighborsChecker(this);
-				}
+				SaveFile->SetVoxelWorld(this);
+				SaveFile->LoadSavedData();
 			}
 			else
 			{
-				bEnableUpdateOctree = true;
+				UE_LOG(VoxelArt, Error, TEXT("World has not been saved!"));
 			}
-			bWorldCreated = true;
 		}
+		if (EnabledLOD)
+		{
+			OctreeManagerThread = new VoxelOctreeManager(this, DrawingRange, MaximumLOD);
+
+			if (TransitionMesh && MesherType == Meshers::MarchingCubes)
+			{
+				OctreeNeighborsCheckerThread = new VoxelOctreeNeighborsChecker(this);
+			}
+		}
+		else
+		{
+			bEnableUpdateOctree = true;
+		}
+		bWorldCreated = true;
 	}
 	else
 	{
@@ -192,6 +208,11 @@ void AVoxelWorld::SaveWorldUtility()
 	{
 		SaveFile = SaveWorldToFile();
 	}
+}
+
+AVoxelPlayerInterface* AVoxelWorld::GetVoxelScenePlayer()
+{
+	return VoxelScenePlayer;
 }
 
 UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
@@ -324,37 +345,7 @@ void AVoxelWorld::OnEndPIE(bool bIsSimulating)
 void AVoxelWorld::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
-#if WITH_EDITOR
-	if (GetWorld()->WorldType == EWorldType::EditorPreview || GetWorld()->WorldType == EWorldType::GamePreview || GetWorld()->WorldType == EWorldType::Editor)
-	{
-	}
-#endif
 }
-
-/*EditorViewportClient* AVoxelWorld::GetEditorViewportClient()
-{
-	FEditorViewportClient* EditorViewportClient = nullptr;
-
-	if (GEditor)
-	{
-		if (FViewport* Viewport = GEditor->GetActiveViewport())
-		{
-			if (FViewportClient* CurrentClient = Viewport->GetClient())
-			{
-				for (FEditorViewportClient* Client : GEditor->AllViewportClients)
-				{
-					if (Client == CurrentClient)
-					{
-						EditorViewportClient = Client;
-						break;
-					}
-				}
-			}
-		}
-	}
-	return EditorViewportClient;
-}*/
 
 void AVoxelWorld::UpdateOctree()
 {
@@ -384,47 +375,21 @@ void AVoxelWorld::UpdateOctree()
 			ChunksChangesArray->ChunksGeneration.Empty();
 		}
 	}
-	bool bUpdateNextTick = false;
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
 
-		//FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
-		FIntVector PlayerPositionToWorld;
+		check(GetVoxelScenePlayer() != nullptr);
 
-		if (GetWorld() && (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview))
+		FIntVector PlayerPositionToWorld = TransferToVoxelWorld(GetVoxelScenePlayer()->GetActorLocation());
+
+		for (auto& ChunkData : ChunksCreation)
 		{
-//			if (EditorViewportClient == nullptr)
-			if(false)
-			{
-				/*
-				* Our editor in this tick turned out to be empty
-				* So we update the priority and create new chunks in the new tick
-				*/
-				bUpdateNextTick = true;
-			}
+			ChunkData->Priority = (PlayerPositionToWorld - ChunkData->Position).Size();
 		}
-		if (!bUpdateNextTick)
-		{
-#if WITH_EDITOR
-			if (GetWorld() && (GetWorld()->WorldType == EWorldType::Editor || GetWorld()->WorldType == EWorldType::EditorPreview))
+		ChunksCreation.Sort([](const FVoxelChunkData& A, const FVoxelChunkData& B)
 			{
-				PlayerPositionToWorld = FIntVector(0, 0, 0);
-			//	PlayerPositionToWorld = TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
-			}
-			else
-			{
-				PlayerPositionToWorld = TransferToVoxelWorld(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation());
-			}
-#endif
-			for (auto& ChunkData : ChunksCreation)
-			{
-				ChunkData->Priority = (PlayerPositionToWorld - ChunkData->Position).Size();
-			}
-			ChunksCreation.Sort([](const FVoxelChunkData& A, const FVoxelChunkData& B)
-				{
-					return A.Priority > B.Priority;
-				});
-		}
+				return A.Priority > B.Priority;
+			});
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
@@ -432,7 +397,7 @@ void AVoxelWorld::UpdateOctree()
 		int32 Index = 0;
 		while (Index < ChunksPerFrame)
 		{
-			if (!bUpdateNextTick && ChunksCreation.Num() > 0)
+			if (ChunksCreation.Num() > 0)
 			{
 				FVoxelChunkData* ChunkData = ChunksCreation.Pop();
 				TSharedPtr<FVoxelOctreeData> Octant;
@@ -517,7 +482,6 @@ void AVoxelWorld::UpdateOctree()
 			}
 		}
 	}
-	//if(false)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
 

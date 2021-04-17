@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "VoxelPlayerInterface.generated.h"
 
+class AVoxelWorld;
+
 UCLASS()
 class VOXELART_API AVoxelPlayerInterface : public AActor
 {
@@ -19,8 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
 
+	virtual void SetVoxelWorld(AVoxelWorld* _World);
 };

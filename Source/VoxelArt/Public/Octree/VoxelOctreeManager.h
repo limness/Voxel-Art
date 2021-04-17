@@ -14,7 +14,7 @@ class AVoxelWorld;
 class VOXELART_API VoxelOctreeManager : public FRunnable
 {
 public:
-	VoxelOctreeManager(AVoxelWorld* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD);
+	VoxelOctreeManager(AVoxelWorld* _World, uint8 _DrawingRange, int _MaximumLOD);
 	~VoxelOctreeManager();
 
 	void EnsureCompletion();
@@ -30,7 +30,6 @@ public:
 private:
 
 	AVoxelWorld* World;
-	APlayerController* PlayerController;
 	TSharedPtr<FChunksRenderInfo> ChangesOctree;
 
 	FIntVector PlayerPositionToWorld;

@@ -14,9 +14,8 @@ DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Create Data"), STA
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Remove Chunk"), STAT_AddRemoveChunk, STATGROUP_Voxel);
 
 
-VoxelOctreeManager::VoxelOctreeManager(AVoxelWorld* _World, APlayerController* _PlayerController, uint8 _DrawingRange, int _MaximumLOD)
+VoxelOctreeManager::VoxelOctreeManager(AVoxelWorld* _World, uint8 _DrawingRange, int _MaximumLOD)
 	: World(_World)
-	, PlayerController(_PlayerController)
 	, DrawingRange(_DrawingRange)
 	, MaximumLOD(_MaximumLOD)
 {
@@ -45,36 +44,10 @@ bool VoxelOctreeManager::Init()
 	UE_LOG(VoxelArt, Log, TEXT("Octree Manager init"));
 	return true;
 }
-/*
-FEditorViewportClient* VoxelOctreeManager::GetEditorViewportClient()
-{
-	FEditorViewportClient* EditorViewportClient = nullptr;
-
-	if (GEditor)
-	{
-		if (FViewport* Viewport = GEditor->GetActiveViewport())
-		{
-			if (FViewportClient* CurrentClient = Viewport->GetClient())
-			{
-				for (FEditorViewportClient* Client : GEditor->AllViewportClients)
-				{
-					if (Client == CurrentClient)
-					{
-						EditorViewportClient = Client;
-						break;
-					}
-				}
-			}
-		}
-	}
-	return EditorViewportClient;
-}*/
 
 uint32 VoxelOctreeManager::Run()
 {
 	FPlatformProcess::Sleep(0.03);
-
-	//FEditorViewportClient* EditorViewportClient = GetEditorViewportClient();
 
 	while (!m_Kill)
 	{
@@ -89,29 +62,11 @@ uint32 VoxelOctreeManager::Run()
 		}
 		else
 		{
-#if WITH_EDITOR
-			if (World->GetWorld() && (World->GetWorld()->WorldType == EWorldType::Editor || World->GetWorld()->WorldType == EWorldType::EditorPreview))
+			if (World->GetVoxelScenePlayer())
 			{
-				//if (EditorViewportClient)
-				{
-				//	PlayerPositionToWorld = World->TransferToVoxelWorld(EditorViewportClient->GetViewLocation());
-				}
-			//	else
-				{
-				//	EditorViewportClient = GetEditorViewportClient();
-				}
+				PlayerPositionToWorld = World->TransferToVoxelWorld(World->GetVoxelScenePlayer()->GetActorLocation());
 			}
-			else
-			{
-				if (PlayerController != nullptr && PlayerController->GetPawn() != nullptr)
-				{
-				//	PlayerPositionToWorld = World->TransferToVoxelWorld(PlayerController->GetPawn()->GetActorLocation());
-				}
-			}
-#endif
-			PlayerPositionToWorld = FIntVector(0, 0, 0);
-
-		//	if (PlayerPositionToWorld != OldPlayerPositionToWorld)
+			if (PlayerPositionToWorld != OldPlayerPositionToWorld)
 			{
 				OldPlayerPositionToWorld = PlayerPositionToWorld;
 

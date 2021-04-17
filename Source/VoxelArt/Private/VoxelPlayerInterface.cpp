@@ -1,6 +1,5 @@
 // Voxel Art Plugin © limit 2018
 
-
 #include "VoxelPlayerInterface.h"
 
 // Sets default values
@@ -18,10 +17,8 @@ void AVoxelPlayerInterface::BeginPlay()
 	
 }
 
-// Called every frame
-void AVoxelPlayerInterface::Tick(float DeltaTime)
+void AVoxelPlayerInterface::SetVoxelWorld(AVoxelWorld* _World)
 {
-	Super::Tick(DeltaTime);
-
+	// Override from example classes
 }
 

@@ -2,6 +2,7 @@
 
 #include "VoxelDetailsCustomization/VoxelWorldDetails.h"
 #include "VoxelModuleInterface.h"
+#include "VoxelPlayerEditor.h"
 #include "Helpers/VoxelTools.h"
 
 TSharedRef<IDetailCustomization> IVoxelWorldDetails::MakeInstance()
@@ -120,6 +121,7 @@ FReply IVoxelWorldDetails::CreateWorldInEditor()
     if (World.IsValid())
     {
         World->bCreatedInEditor = true;
+        World->VoxelScenePlayerClass = AVoxelPlayerEditor::StaticClass();
         World->CreateVoxelWorldInEditor();
     }
     else
