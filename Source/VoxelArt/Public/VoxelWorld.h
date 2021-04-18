@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -13,9 +12,10 @@
 #include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Save/VoxelSaveData.h"
-#include "VoxelChunkComponent.h"
-#include "VoxelDelegatesInterface.h"
+#include "Save/VoxelSaveUtilities.h"
 #include "VoxelPlayerInterface.h"
+#include "VoxelDelegatesInterface.h"
+#include "VoxelChunkComponent.h"
 #include "VoxelPoolComponent.h"
 #include "VoxelWorld.generated.h"
 
@@ -93,6 +93,9 @@ public:
 	/*Called as PIE ends*/
 	virtual void OnEndPIE(bool bIsSimulating) override;
 
+	/*Called as PIE ends*/
+	virtual void OnPreExit() override;
+
 	/*If true, actor is ticked*/
 	virtual bool ShouldTickIfViewportsOnly() const override;
 
@@ -134,13 +137,13 @@ public:
 
 public:	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Transient)
 	bool bWorldCreated = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	bool EnabledLOD = true;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	bool bEnableUpdateOctree = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
@@ -328,12 +331,12 @@ public:
 
 	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
 	
-private:
+public:
 
 	UPROPERTY(BlueprintReadOnly)
-	int WorldGenerateTimeBegin = 0;
+	double WorldGenerateTimeBegin;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Transient)
 	bool bStatsShowed = false;
 	
 	UPROPERTY(BlueprintReadOnly)

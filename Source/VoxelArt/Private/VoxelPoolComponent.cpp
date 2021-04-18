@@ -2,6 +2,7 @@
 
 #include "VoxelPoolComponent.h"
 #include "Helpers/VoxelTools.h"
+#include "VoxelChunkComponent.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Getting from Pool"), STAT_GettingFromPool, STATGROUP_Voxel);
 

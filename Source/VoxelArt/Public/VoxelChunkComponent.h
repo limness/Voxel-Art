@@ -3,16 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Helpers/VoxelProceduralMeshComponent.h"
 #include "ProceduralMeshComponent.h"
-#include "Helpers/VoxelTools.h"
 #include "VoxelChunkComponent.generated.h"
 
 class AVoxelWorld;
 class UVoxelWorldGenerator;
 class FVoxelOctreeData;
 class FVoxelChunkData;
-class FVoxelMarchingCubesMesher;
 
 /*
 * Voxel Chunk Component class

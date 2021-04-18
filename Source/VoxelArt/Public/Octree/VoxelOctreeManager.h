@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Octree/VoxelOctreeData.h"
+//#include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
 class AVoxelWorld;
+class FVoxelOctreeData;
+struct FChunksRenderInfo;
 
 /*
 * Voxel Octree Manager class
@@ -14,6 +16,7 @@ class AVoxelWorld;
 class VOXELART_API VoxelOctreeManager : public FRunnable
 {
 public:
+
 	VoxelOctreeManager(AVoxelWorld* _World, uint8 _DrawingRange, int _MaximumLOD);
 	~VoxelOctreeManager();
 
@@ -55,8 +58,6 @@ private:
 private:
 
 	TArray<TSharedPtr<FVoxelOctreeData>> GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk);
-
-//	FEditorViewportClient* GetEditorViewportClient();
 
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant);
 };

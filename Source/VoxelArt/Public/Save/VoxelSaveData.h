@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Octree/VoxelOctreeData.h"
 #include "VoxelSaveData.generated.h"
 
 class AVoxelWorld;
+class FVoxelOctreeDensity;
 
 /*
 * Voxel Save Data in memory class

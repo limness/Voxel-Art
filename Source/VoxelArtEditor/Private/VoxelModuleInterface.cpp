@@ -7,29 +7,12 @@
 #include "VoxelEditorMode/VoxelEdModeTool.h"
 #include "ISettingsModule.h"
 #include "VoxelWorld.h"
-//#include "VoxelDelegatesInterface.h"
 #include "VoxelTabTools/VoxelTabTool.h"
-
-//#include "CustomAssetEditorModule.h"
 
 IMPLEMENT_GAME_MODULE(IVoxelModuleInterface, VoxelArtEditor);
 
+
 #define LOCTEXT_NAMESPACE "IVoxelModuleInterface"
-
-
-TSharedRef<FWorkspaceItem> IVoxelModuleInterface::MenuRoot = FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
-
-static void StartupDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
-{
-    if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(Object))
-    {
-        FEditorDelegates::PreBeginPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnPreBeginPIE(bIsSimulating); });
-    }
-    if (!FEditorDelegates::EndPIE.IsBoundToObject(Object))
-    {
-        FEditorDelegates::EndPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnEndPIE(bIsSimulating); });
-    }
-}
 
 void IVoxelModuleInterface::AddMenuExtension(const FMenuExtensionDelegate& extensionDelegate, FName extensionHook, const TSharedPtr<FUICommandList>& CommandList, EExtensionHook::Position position)
 {
@@ -52,6 +35,24 @@ void IVoxelModuleInterface::FillPulldownMenu(FMenuBuilder& menuBuilder)
     menuBuilder.BeginSection("Unable", FText::FromString("Unable"));
     menuBuilder.AddMenuSeparator(FName("Section_2"));
     menuBuilder.EndSection();
+}
+
+TSharedRef<FWorkspaceItem> IVoxelModuleInterface::MenuRoot = FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
+
+static void StartupDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
+{
+    if (!FCoreDelegates::OnPreExit.IsBoundToObject(Object))
+    {
+        FCoreDelegates::OnPreExit.AddWeakLambda(Object, [=]() { Interface->OnPreExit(); });
+    }
+    if (!FEditorDelegates::EndPIE.IsBoundToObject(Object))
+    {
+        FEditorDelegates::EndPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnEndPIE(bIsSimulating); });
+    }
+    if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(Object))
+    {
+        FEditorDelegates::PreBeginPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnPreBeginPIE(bIsSimulating); });
+    }
 }
 
 void IVoxelModuleInterface::StartupModule()

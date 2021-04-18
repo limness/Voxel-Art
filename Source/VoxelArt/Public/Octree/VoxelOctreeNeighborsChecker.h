@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
 class AVoxelWorld;
+class FVoxelOctreeData;
+struct FChunksRenderInfo;
 
 /*
 * Voxel Octree Neighbors Checker class (Need to rewrite and destroy)

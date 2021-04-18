@@ -6,8 +6,10 @@
 #include "VoxelOctreeData.generated.h"
 
 class AVoxelWorld;
+class FVoxelChunkData;
 class UVoxelChunkComponent;
 class UVoxelWorldGenerator;
+
 /*
 * Parent Voxel Octree Data
 */
@@ -138,9 +140,9 @@ public:
 	FORCEINLINE void SetVoxelValue(AVoxelWorld* World, FIntVector P, float Density, FColor Color, bool bSetDensity, bool bSetColor);
 	FORCEINLINE void GetVoxelDensity(AVoxelWorld* World, FIntVector P, float& Value, FColor& Color);
 
-	FORCEINLINE bool HasChildren() { return ChildrenOctants.Num() == 8; }
-	FORCEINLINE bool HasOwnDensity() { return OwnDensity; }
-	FORCEINLINE bool HasOwnColor() { return OwnColor; }
+	FORCEINLINE bool HasChildren()		{ return ChildrenOctants.Num() == 8;	}
+	FORCEINLINE bool HasOwnDensity()	{ return OwnDensity;					}
+	FORCEINLINE bool HasOwnColor()		{ return OwnColor;						}
 	FORCEINLINE bool IsInside(FIntVector LocalPosition);
 
 	FORCEINLINE FIntVector GetMinimumCorner();
@@ -162,8 +164,8 @@ struct FChunksRenderInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-		//Chunks which has to be created
-		TArray<FVoxelChunkData*> ChunksCreation;
+	//Chunks which has to be created
+	TArray<FVoxelChunkData*> ChunksCreation;
 
 	//Chunks which has to be generated
 	TArray<FVoxelChunkData*> ChunksGeneration;

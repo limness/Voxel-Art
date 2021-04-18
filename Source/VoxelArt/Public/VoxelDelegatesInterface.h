@@ -21,4 +21,6 @@ public:
 	virtual void OnPreBeginPIE(bool bIsSimulating) {}
 
 	virtual void OnEndPIE(bool bIsSimulating) {}
+
+	virtual void OnPreExit() {}
 };

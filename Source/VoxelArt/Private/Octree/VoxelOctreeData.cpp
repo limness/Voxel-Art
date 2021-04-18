@@ -4,7 +4,7 @@
 #include "Helpers/VoxelTools.h"
 #include "Generators/VoxelWorldGenerator.h"
 #include "VoxelWorld.h"
-#include "DrawDebugHelpers.h"
+
 
 FVoxelOctreeData::FVoxelOctreeData(TWeakPtr<FVoxelOctreeData> _Parent, uint64 _NodeID, uint8 _Depth, float _Size, FIntVector _Position)
 	: ParentChunk(_Parent)

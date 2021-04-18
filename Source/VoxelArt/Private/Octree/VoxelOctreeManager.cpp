@@ -1,10 +1,10 @@
 ﻿// Voxel Art Plugin © limit 2018
 
 #include "Octree/VoxelOctreeManager.h"
-#include "VoxelWorld.h"
+#include "Octree/VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
+#include "VoxelWorld.h"
 #include "Editor.h"
-//#include "EditorViewportClient.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Children"), STAT_AddChildren, STATGROUP_Voxel);

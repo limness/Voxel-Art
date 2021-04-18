@@ -1,14 +1,17 @@
 // Voxel Art Plugin © limit 2018
 
 #include "VoxelWorld.h"
-#include "TimerManager.h"
+#include "Helpers/VoxelTools.h"
+#include "Helpers/VoxelCollisionBox.h"
+#include "Importers/VoxelHeightmapImport.h"
+#include "VoxelLogInterface.h"
+#include "VoxelPlayerGame.h"
+
+#include "TimerManager.h"	
+//#include "Unix/UnixPlatformTime.h"
 #include "DrawDebugHelpers.h"
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
-#include "Helpers/VoxelTools.h"
-#include "Helpers/VoxelCollisionBox.h"
-#include "VoxelLogInterface.h"
-#include "VoxelPlayerGame.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -134,7 +137,7 @@ void AVoxelWorld::CreateVoxelWorld()
 
 	if (!WorldGenerator)
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("World Generator is not exist! (Select: Voxel World -> Main -> World Generator)"), "Error");
+		IVoxelLogInterface::LogMessage(INVTEXT("No World Generator! (Select: Voxel World -> Main -> World Generator)"), "Error");
 		return;
 	}
 	if (MinimumLOD < 0)
@@ -147,13 +150,13 @@ void AVoxelWorld::CreateVoxelWorld()
 		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be greater then Maximum LOD!"), "Error");
 		return;
 	}
-	WorldGenerateTimeBegin = FDateTime::Now().GetTicks();
+	WorldGenerateTimeBegin = FPlatformTime::Seconds();
 
 	// Allocate the number of tasks for the pool.
 	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 
 	// Allocate the number of tasks for the pool.
-	ThreadPool->Create(4, 128 * 1024);
+	ThreadPool->Create(4, 64 * 1024);
 
 	// Initialize the World generator in order to get information about the import textures.
 	WorldGenerator->GeneratorInit();
@@ -195,6 +198,11 @@ void AVoxelWorld::SaveWorldUtility()
 {
 	if (SaveFile)
 	{
+		if (!bWorldCreated)
+		{
+			IVoxelLogInterface::LogMessage(INVTEXT("You should create Voxel World before!"), "Error");
+			return;
+		}
 		SaveFile->SetVoxelWorld(this);
 		SaveFile->SaveData();
 
@@ -217,46 +225,7 @@ UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 {
 	if (bWorldCreated)
 	{
-		FString ObjectName = TEXT("WorldSave");
-
-		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-
-		FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
-		AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
-
-		UPackage* Package = CreatePackage(*PackageName);
-		UPackage* OuterPack = Package->GetOutermost();
-		Package->FullyLoad();
-
-		UVoxelSaveData* NewSave = NewObject<UVoxelSaveData>(OuterPack, *ObjectName, RF_Public | RF_Standalone);
-		
-		NewSave->SetVoxelWorld(this);
-		NewSave->SaveData();
-
-		FAssetRegistryModule::AssetCreated(NewSave);
-
-		NewSave->MarkPackageDirty();
-		NewSave->PostEditChange();
-		NewSave->AddToRoot();
-
-		FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
-
-		bool bSaveSuccess = UPackage::SavePackage(
-			Package,
-			NewSave,
-			EObjectFlags::RF_Public | EObjectFlags::RF_Standalone,
-			*PackageFileName,
-			GError, nullptr, true, true, SAVE_NoError);
-
-		if (bSaveSuccess)
-		{
-			IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has been successfully saved"), "Log");
-			return NewSave;
-		}
-		else
-		{
-			IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has not been saved"), "Error");
-		}
+		SaveFile = IVoxelSaveUtilities::CreateVoxelStorageFile(this);
 	}
 	return nullptr;
 }
@@ -340,6 +309,15 @@ void AVoxelWorld::OnEndPIE(bool bIsSimulating)
 	if (bCreatedInEditor)
 	{
 		CreateVoxelWorldInEditor();
+	}
+}
+
+void AVoxelWorld::OnPreExit()
+{
+	if (bWorldCreated)
+	{
+		SaveWorldUtility();
+		DestroyVoxelWorld();
 	}
 }
 
@@ -457,8 +435,17 @@ void AVoxelWorld::UpdateOctree()
 				{
 					if (!bStatsShowed)
 					{
-						float WorldGenerateTimeEnd = (FDateTime::Now().GetTicks() - WorldGenerateTimeBegin) / 1000.f / 10000.f;
-						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), WorldGenerateTimeEnd, ChunkPoolComponent->PoolChunks.Num());
+						/*https://forums.unrealengine.com/t/measure-time-a-function-has-taken/37472/8
+						double start = FPlatformTime::Seconds();
+
+						// put code you want to time here.
+
+						double end = FPlatformTime::Seconds();
+						UE_LOG(LogTemp, Warning, TEXT("code executed in %f seconds."), end-start);
+						
+						*/
+						double WorldGenerateTimeEnd = FPlatformTime::Seconds() - WorldGenerateTimeBegin;
+						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %fs s. (%d chunks)"), WorldGenerateTimeEnd, ChunkPoolComponent->PoolChunks.Num());
 						bStatsShowed = true;
 					}
 					{
@@ -506,89 +493,7 @@ void AVoxelWorld::InitializeWorld()
 void AVoxelWorld::CreateTextureDensityMap()
 {
 	//TODO: Check texture import work :)
-
-	if (WorldGenerator)
-	{
-		FString FileName = MapName;
-		int width = MapSize;
-		int height = MapSize;
-		uint8* pixels = (uint8*)malloc(width * height * 4);
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				uint8 PixelColorWB = (uint8)(FMath::Clamp(WorldGenerator->GetDensityMap(FIntVector(
-					(x - width / 2)  * VoxelMin,
-					(y - height / 2) * VoxelMin,
-					0)
-				), -1.f, 1.0f) * 63.f + 128);
-
-				if (PixelColorWB == 191 && RenderType == RenderTexture::RedGreenBlue)
-				{
-					FColor PixelColorRGB = WorldGenerator->GetColorMap(FIntVector(
-						(x - width / 2) * VoxelMin,
-						(y - height / 2) * VoxelMin,
-						0)
-					);
-
-					pixels[y * 4 * width + x * 4 + 0] = PixelColorRGB.R; // R
-					pixels[y * 4 * width + x * 4 + 1] = PixelColorRGB.G; // G
-					pixels[y * 4 * width + x * 4 + 2] = PixelColorRGB.B; // B
-					pixels[y * 4 * width + x * 4 + 3] = PixelColorRGB.A; // A
-				}
-				else
-				{
-					pixels[y * 4 * width + x * 4 + 0] = PixelColorWB; // R
-					pixels[y * 4 * width + x * 4 + 1] = PixelColorWB; // G
-					pixels[y * 4 * width + x * 4 + 2] = PixelColorWB; // B
-					pixels[y * 4 * width + x * 4 + 3] = 255;
-				}
-			}
-		}
-		
-		// Create Package
-		FString pathPackage = FString("/Game/" + DirectoryName);
-		FString absolutePathPackage = FPaths::ProjectContentDir() + "/" + DirectoryName + "/";
-
-		FPackageName::RegisterMountPoint(*pathPackage, *absolutePathPackage);
-
-		UPackage* Package = CreatePackage(*pathPackage);
-		FName TextureName = MakeUniqueObjectName(Package, UTexture2D::StaticClass(), FName(*FileName));
-
-		UTexture2D* Texture = UTexture2D::CreateTransient(width, height);//NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone);
-
-		// Texture Settings
-	//	Texture->PlatformData = new FTexturePlatformData();
-		//Texture->PlatformData->SizeX = width;
-		//Texture->PlatformData->SizeY = height;
-	//	Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
-
-		// Passing the pixels information to the texture
-		FTexture2DMipMap& Mip = Texture->PlatformData->Mips[0];
-		Mip.SizeX = width;
-		Mip.SizeY = height;
-
-		Mip.BulkData.Lock(LOCK_READ_WRITE);
-		uint8* TextureData = (uint8*)Mip.BulkData.Realloc(height * width * sizeof(uint8) * 4);
-		FMemory::Memcpy(TextureData, pixels, sizeof(uint8) * height * width * 4);
-		Mip.BulkData.Unlock();
-
-		// Updating Texture & mark it as unsaved
-		Texture->AddToRoot();
-		Texture->UpdateResource();
-		Package->MarkPackageDirty();
-
-		IVoxelLogInterface::LogMessage(INVTEXT("Density Map Texture was created! Check your directory to find it"), "Log");
-
-		free(pixels);
-		pixels = NULL;
-
-	}
-	else
-	{
-		IVoxelLogInterface::LogMessage(INVTEXT("World Generator is not exist! (Voxel World -> Main -> World Generator)"), "Error");
-	}
+	UVoxelHeightmapImport::ExportHeightmap(this, WorldGenerator);
 }
 
 void AVoxelWorld::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant)

@@ -1,10 +1,9 @@
 // Voxel Art Plugin © limit 2018
 
 #include "Octree/VoxelOctreeNeighborsChecker.h"
+#include "Octree/VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
-
 #include "VoxelWorld.h"
-#include "DrawDebugHelpers.h"
 
 namespace DirectionOctree
 {

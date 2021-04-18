@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoxelChunkComponent.h"
-#include "Kismet/GameplayStatics.h"
+//#include "Kismet/GameplayStatics.h"
 #include "Components/ActorComponent.h"
+//#include "VoxelChunkComponent.h"
 #include "VoxelPoolComponent.generated.h"
+
+class UVoxelChunkComponent;
 
 /*
 * Voxel Main Pool Component class

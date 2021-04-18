@@ -1,21 +1,13 @@
 // Voxel Art Plugin © limit 2018
 
 #include "VoxelChunkComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Helpers/MarchingCubes.h"
-#include "Octree/VoxelOctreeData.h"
-#include "VoxelWorld.h"
+#include "Helpers/VoxelTools.h"
 #include "Meshers/VoxelMarchingCubesMesher.h"
 #include "Meshers/VoxelSurfaceNetsMesher.h"
 #include "Meshers/VoxelCubesMesher.h"
-#include "Noise/SimplexNoiseBPLibrary.h"
-#include "DrawDebugHelpers.h"
+#include "Octree/VoxelOctreeData.h"
+#include "VoxelWorld.h"
 
-
-/*UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
-{
-	PrimaryComponentTick.bCanEverTick = false;
-}*/
 
 bool UVoxelChunkComponent::IsPoolActive()
 {

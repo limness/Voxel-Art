@@ -1,9 +1,9 @@
 // Voxel Art Plugin © limit 2018
 
 #include "Save/VoxelSaveData.h"
-#include "VoxelWorld.h"
-#include "Misc/MessageDialog.h"
 #include "Helpers/VoxelTools.h"
+#include "Octree/VoxelOctreeData.h"
+#include "VoxelWorld.h"
 
 void UVoxelSaveData::Init()
 {
