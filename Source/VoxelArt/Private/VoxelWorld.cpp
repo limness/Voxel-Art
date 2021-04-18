@@ -1,17 +1,14 @@
 // Voxel Art Plugin © limit 2018
 
 #include "VoxelWorld.h"
-#include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "DrawDebugHelpers.h"
+#include "AssetToolsModule.h"
+#include "AssetRegistryModule.h"
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
-#include "AssetRegistryModule.h"
 #include "VoxelLogInterface.h"
-#include "AssetToolsModule.h"
 #include "VoxelPlayerGame.h"
-#include "Editor.h"
-#include "EditorViewportClient.h"
-
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -28,7 +25,7 @@ DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks"), STAT_CreateC
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Remove Old Chunk"), STAT_RemoveOldChunk, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Init"), STAT_OctantInit, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Data Init"), STAT_OctantDataInit, STATGROUP_Voxel);
-DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Spawn Chunk"), STAT_SpawnChunk, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Create Chunk"), STAT_CreateChunk, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
 
@@ -38,16 +35,19 @@ DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Adding to Pool"), STAT_AddChunkTo
 
 DEFINE_LOG_CATEGORY(VoxelArt);
 
+
 AVoxelWorld::AVoxelWorld()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	WorldComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	/* Root world component */
+	WorldComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	RootComponent = WorldComponent;
 
-	/* Object pooler component */
-	PoolChunks = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("PoolChunks"));
+	/* Object pool component */
+	ChunkPoolComponent = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
 
+	/* Object pool thread */
 	ThreadPool = FQueuedThreadPool::Allocate();
 }
 
@@ -94,14 +94,6 @@ void AVoxelWorld::Tick(float DeltaTime)
 		if (bWorldCreated && bEnableUpdateOctree)
 		{
 			UpdateOctree();
-
-			TimeToCallGarbageCollection += 0.01f;
-			if (TimeToCallGarbageCollection > 15.f)
-			{
-				TimeToCallGarbageCollection = 0.f;
-
-				UE_LOG(VoxelArt, Log, TEXT("GC called"));
-			}
 		}
 #endif
 	}
@@ -155,14 +147,21 @@ void AVoxelWorld::CreateVoxelWorld()
 		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be greater then Maximum LOD!"), "Error");
 		return;
 	}
+	WorldGenerateTimeBegin = FDateTime::Now().GetTicks();
 
-	TimeForWorldGenerate = FDateTime::Now().GetTicks();
-	//ThreadPool->Create(4, 128 * 1024);
-
+	// Allocate the number of tasks for the pool.
 	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
-	WorldGenerator->GeneratorInit();
-	GenerateLandscape();
 
+	// Allocate the number of tasks for the pool.
+	ThreadPool->Create(4, 128 * 1024);
+
+	// Initialize the World generator in order to get information about the import textures.
+	WorldGenerator->GeneratorInit();
+
+	// Generate World itself and it's Octree data.
+	InitializeWorld();
+
+	// Load the world if there are any saved.
 	if (SaveFile)
 	{
 		if (SaveFile->IsDataSaved())
@@ -175,6 +174,7 @@ void AVoxelWorld::CreateVoxelWorld()
 			IVoxelLogInterface::LogMessage(INVTEXT("World has not been saved!"), "Error");
 		}
 	}
+	// Create Octree thread and Transvoxel
 	if (EnabledLOD)
 	{
 		OctreeManagerThread = new VoxelOctreeManager(this, DrawingRange, MaximumLOD);
@@ -303,20 +303,20 @@ void AVoxelWorld::DestroyVoxelWorld()
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyChunks);
 
-			TotalChunks = PoolChunks->PoolChunks.Num();
-			for (auto& Chunk : PoolChunks->PoolChunks)
+			TotalChunks = ChunkPoolComponent->PoolChunks.Num();
+			for (auto& Chunk : ChunkPoolComponent->PoolChunks)
 			{
 				Chunk->DestroyComponent();
 				Chunk = nullptr;
 			}
-			PoolChunks->PoolChunks.Empty();
-			PoolChunks->FreeChunks.Empty();
+			ChunkPoolComponent->PoolChunks.Empty();
+			ChunkPoolComponent->FreeChunks.Empty();
 		}
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
 
 			//GEngine->ForceGarbageCollection(true);
-			//ThreadPool->Destroy();
+			ThreadPool->Destroy();
 			bWorldCreated = false;
 			bStatsShowed = false;
 			bEnableUpdateOctree = false;
@@ -434,9 +434,9 @@ void AVoxelWorld::UpdateOctree()
 						}
 						/* Spawn new chunk for octant */
 						{
-							SCOPE_CYCLE_COUNTER(STAT_SpawnChunk);
+							SCOPE_CYCLE_COUNTER(STAT_CreateChunk);
 
-							SpawnChunk(ChunkData);
+							CreateChunk(ChunkData);
 						}
 						Index++;
 					}
@@ -457,20 +457,17 @@ void AVoxelWorld::UpdateOctree()
 				{
 					if (!bStatsShowed)
 					{
-						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), 
-							(FDateTime::Now().GetTicks() - TimeForWorldGenerate) / 1000.f / 10000.f, 
-							PoolChunks->PoolChunks.Num()
-						);
+						float WorldGenerateTimeEnd = (FDateTime::Now().GetTicks() - WorldGenerateTimeBegin) / 1000.f / 10000.f;
+						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %f s. (%d chunks)"), WorldGenerateTimeEnd, ChunkPoolComponent->PoolChunks.Num());
 						bStatsShowed = true;
 					}
-					//while (ChunksRemoving.Num() > 0)
 					{
 						FVoxelChunkData* ChunkData = ChunksRemoving.Pop();
 
 						if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
 						{
 							ChunkData->Chunk->SetPoolActive(false);
-							PoolChunks->FreeChunks.Add(ChunkData->Chunk);
+							ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
 
 							delete ChunkData;
 							ChunkData = nullptr;
@@ -498,48 +495,7 @@ void AVoxelWorld::UpdateOctree()
 	}
 }
 
-/*
-* UpdateWorld doesn't support the Priorities
-* because its not needed
-*/
-void AVoxelWorld::UpdateWorld()
-{
-	if (!bWorldCreated)
-	{
-		IVoxelLogInterface::LogMessage(INVTEXT("MWorld has not been created!"), "Error");
-		return;
-	}
-	OctreeMutex.Lock();
-	for (auto& Chunk : PoolChunks->PoolChunks)
-	{
-		Chunk->ClearAllMeshSections();
-	}
-	GetLeavesAndQueueToGeneration(MainOctree);
-	OctreeMutex.Unlock();
-}
-
-void AVoxelWorld::GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant)
-{
-	if (!Octant->HasChildren())
-	{
-		if (Octant->Data != nullptr)
-		{
-			if (IsValid(Octant->Data->Chunk))
-			{
-				ChunksGeneration.Add(Octant->Data);
-			}
-		}
-	}
-	else
-	{
-		for (auto& ChildOctant : Octant->GetChildren())
-		{
-			GetLeavesAndQueueToGeneration(ChildOctant);
-		}
-	}
-}
-
-void AVoxelWorld::GenerateLandscape()
+void AVoxelWorld::InitializeWorld()
 {
 	OctreeDensity = new FVoxelOctreeDensity(WorldGenerator, 0, WorldSize, VoxelsPerChunk, FIntVector(0, 0, 0));
 	MainOctree = TSharedPtr<FVoxelOctreeData>(new FVoxelOctreeData(nullptr, (1 << 3) | 0x00, 0, WorldSize, FIntVector(0, 0, 0)));
@@ -713,21 +669,21 @@ void AVoxelWorld::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
-void AVoxelWorld::SpawnChunk(FVoxelChunkData* ChunkData)
+void AVoxelWorld::CreateChunk(FVoxelChunkData* ChunkData)
 {
-	UVoxelChunkComponent* PoolChunk = PoolChunks->GetChunkFromPool();
+	UVoxelChunkComponent* PoolChunk = ChunkPoolComponent->GetChunkFromPool();
 	{
 		SCOPE_CYCLE_COUNTER(STAT_AddChunkToPool);
 
 		if (!IsValid(PoolChunk))
 		{
-			PoolChunk = PoolChunks->AddChunkToPool();
+			PoolChunk = ChunkPoolComponent->AddChunkToPool();
 		}
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ChunkInitialize);
 
-		ChunkInit(PoolChunk, ChunkData);
+		ChunkInitialize(PoolChunk, ChunkData);
 	} 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_AddChunkToTask);
@@ -740,12 +696,12 @@ void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
 	TaskWorkGlobalCounter.Increment();
 	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
-	MesherTask->StartBackgroundTask(/*ThreadPool*/);
+	MesherTask->StartBackgroundTask(ThreadPool);
 
 	PoolThreads.Add(MesherTask);
 }
 
-void AVoxelWorld::ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
+void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
 {
 	if (Chunk)
 	{

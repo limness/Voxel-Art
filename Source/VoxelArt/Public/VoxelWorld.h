@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/World.h"
 #include "GameFramework/Actor.h"
-#include "VoxelChunkComponent.h"
-#include "VoxelPoolComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Editor/VoxelEditorData.h"
 #include "Generators/VoxelWorldGenerator.h"
+#include "Octree/VoxelOctreeData.h"
 #include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
-#include "Octree/VoxelOctreeData.h"
 #include "Save/VoxelSaveData.h"
-#include "VoxelPlayerInterface.h"
+#include "VoxelChunkComponent.h"
 #include "VoxelDelegatesInterface.h"
-#include "Materials/MaterialInstanceDynamic.h"
-#include "Engine/World.h"
-#include "Kismet/GameplayStatics.h"
+#include "VoxelPlayerInterface.h"
+#include "VoxelPoolComponent.h"
 #include "VoxelWorld.generated.h"
 
 namespace EVoxelDirection
@@ -185,58 +185,101 @@ public:
 public:
 
 	UPROPERTY(BlueprintReadOnly)
-	AVoxelPlayerInterface* VoxelScenePlayer;
+	AVoxelPlayerInterface*				VoxelScenePlayer;
 
-	TSubclassOf<AVoxelPlayerInterface> VoxelScenePlayerClass;
+	UPROPERTY(BlueprintReadOnly)
+	TSubclassOf<AVoxelPlayerInterface>	VoxelScenePlayerClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USceneComponent* WorldComponent;
+	UPROPERTY(BlueprintReadOnly)
+	USceneComponent*					WorldComponent;
 
 public:
 
 	void CreateVoxelWorld();
 	void CreateVoxelWorldInEditor();
 	void DestroyVoxelWorld();
-	void UpdateWorld();
 	void SaveWorldUtility();
 	UVoxelSaveData* SaveWorldToFile();
 
 private:
 
-	void GenerateLandscape();
-	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
-	void SpawnChunk(FVoxelChunkData* ChunkData);
-	void ChunkInit(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
-	void GetLeavesAndQueueToGeneration(TSharedPtr<FVoxelOctreeData> Octant);
-//	FEditorViewportClient* GetEditorViewportClient();
 	void UpdateOctree();
+	void InitializeWorld();
+	void CreateChunk(FVoxelChunkData* ChunkData);
+	void GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant);
+	void ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData);
 
 public:
-
+	/*
+	* Queues the chunk for generation.
+	*
+	* @return	ChunkData		Chunk Data for generation
+	*/
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
+
+	/*
+	* Gets all octants of the Octree that intersect with the box
+	*
+	* @param	Box					Collision box
+	* @param	CurrentOctree		Current octant to start (Use the Main octree of the world)
+	* @return	OverlapingOctree	An array of received chunks
+	*/
 	void GetOverlapingOctree(FVoxelCollisionBox Box, TSharedPtr<FVoxelOctreeData> CurrentOctree, TArray<TSharedPtr<FVoxelOctreeData>>& OverlapingOctree);
 
 public:	
-
+	/*
+	* Gets the existing player who controls the World Octree.
+	* Do not use this to get an existing controller on scene, it's a separate actor.
+	*
+	* @return	VoxelPlayer		A pawn that rules the world Octree
+	*/
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE AVoxelPlayerInterface* GetVoxelScenePlayer();
-
+	
+	/*
+	* Transfer any position in voxel units.
+	* Do not reuse this after the first transfering.
+	*
+	* @param	P				Float position in world units
+	* @return	P				Integer position in voxels
+	*/
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE FIntVector TransferToVoxelWorld(FVector P);
-
+	
+	/*
+	* Transfer voxel position in world units.
+	* Do not reuse this after the first transfering.
+	*
+	* @param	P				Integer position in voxels
+	* @return	P				Float position in world units
+	*/
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE FVector TransferToGameWorld(FIntVector P);
 
+	/*
+	* Get Index using size of the chunk, in other words we simulate 3D array using 1D.
+	*
+	* @param	P				Index 1, Index 2, Index 3
+	* @return	Index			Index in 1D array from 3D
+	*/
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int GetIndex(FIntVector P);
-
+	
+	/*
+	* Spawn new Debug Box in the Game World. Use for any tests, for example to see the visible chunks.
+	*
+	* @param	Position		Position of the box
+	* @param	Radius			Radius of the box
+	* @param	Width			Border width of the box
+	* @param	Color			Border color
+	*/
 	UFUNCTION(BlueprintCallable)
 	void VoxelDebugBox(FVector Position, float Radius, float Width, FColor Color);
 
 public:
 
 	/*
-	* Get the Voxel Value of density and color at the given world position
+	* Get the Voxel Value of density and color at the given world position.
 	*
 	* @param	OutOctant		Saved octant from the last integration
 	* @param	Position		Local World Position
@@ -246,7 +289,7 @@ public:
 	void GetVoxelValue(FVoxelOctreeDensity*& OutOctant, FIntVector Position, float& Value, FColor& Color);
 
 	/*
-	* Set the Voxel Value of density and color at the given world position
+	* Set the Voxel Value of density and color at the given world position.
 	*
 	* @param	OutOctant		Saved octant from the last integration
 	* @param	Position		Local World Position
@@ -259,32 +302,23 @@ public:
 
 public:
 
-	//An array of all changes that must be made to the Octree with the next tick of the game
+	//An array of all changes that must be made to the Octree with the next tick of the game.
 	TQueue<TSharedPtr<FChunksRenderInfo>>	ChangesOctree;
 
 	TArray<FVoxelChunkData*>				ChunksCreation;
 	TArray<FVoxelChunkData*>				ChunksGeneration;
 	TArray<FVoxelChunkData*>				ChunksRemoving;
-
-public:
-
-	VoxelOctreeManager*						OctreeManagerThread;
-	VoxelOctreeNeighborsChecker*			OctreeNeighborsCheckerThread;
-
-public:
-
-	TSharedPtr<FVoxelOctreeData>			MainOctree;
-	FVoxelOctreeDensity*					OctreeDensity;
-
-private:
-
-	UVoxelPoolComponent*					PoolChunks;
 	TArray<UVoxelChunkComponent*>			ChunkComponents;
 
 public:
 
-	float TimeToCallGarbageCollection = 0.f;
-	int TotalTasksCounter = 0;
+	TSharedPtr<FVoxelOctreeData>			MainOctree;
+	VoxelOctreeManager*						OctreeManagerThread;
+	VoxelOctreeNeighborsChecker*			OctreeNeighborsCheckerThread;
+	FVoxelOctreeDensity*					OctreeDensity;
+	UVoxelPoolComponent*					ChunkPoolComponent;
+
+public:
 
 	FQueuedThreadPool* ThreadPool;
 	FThreadSafeCounter TaskWorkGlobalCounter;
@@ -296,10 +330,12 @@ public:
 	
 private:
 
-	int32 TimeForWorldGenerate = 0;
+	UPROPERTY(BlueprintReadOnly)
+	int WorldGenerateTimeBegin = 0;
 
+	UPROPERTY(BlueprintReadOnly)
 	bool bStatsShowed = false;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly)
 	bool bMaximumLOD = false;
 };
