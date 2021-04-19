@@ -3,31 +3,38 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
+#include "Helpers/VoxelProceduralMeshComponent.h"
 #include "VoxelWorld.h"
 
 
 class UVoxelWorldGenerator;
 class FVoxelOctreeDensity;
 
+/*
+* Marching Cubes Mesher class
+*/
 class VOXELART_API FVoxelMarchingCubesMesher
 {
 public:
+
 	FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap);
 	~FVoxelMarchingCubesMesher();
 
 private:
 
+	AVoxelWorld* World;
+	UVoxelWorldGenerator* WorldGenerator;
+
 	int Voxels;
-	int Depth;
 	int Size;
+	int VoxelSteps;
 
 	FIntVector Position;
 	uint8 TransitionSides;
+
 	TArray<float> DensityMap;
 	TArray<FColor> ColorMap;
-
-	int VoxelSteps;
+	TArray<FVector> positionSide;
 
 private:
 
@@ -44,7 +51,7 @@ public:
 	TArray<int32> Triangles;
 	TArray<FVector> Normals;
 	TArray<FLinearColor> VertexColors;
-	TArray<FProcMeshTangent> Tangents;
+	TArray<FVoxelProcMeshTangent> Tangents;
 	TArray<FVector2D> TextureCoordinates;
 
 	TArray<FVector> VerticesTransition;
@@ -52,17 +59,17 @@ public:
 
 public:
 
-	void GenerateMesh();
-
-	void MarchingCubes(int x, int y, int z);
-
 	FVector GetGradient(int x, int y, int z);
 	FVector GetGradient(FIntVector map);
 
-	float GetVoxelSize();
-	float GetVoxelSizeHalf();
-
+	void GenerateMesh();
+	void MarchingCubes(int x, int y, int z);
 	void ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color);
+
+	FORCEINLINE int PositionToIndices(FIntVector P);
+	FORCEINLINE float GetDensity(int x, int y, int z);
+
+private:
 
 	template<uint8 Direction>
 	void GeometryTransitionCubes(float radius);
@@ -75,14 +82,4 @@ public:
 
 	template<uint8 Direction>
 	FVector GetPosition(int X, int Y, int Size, int Steps);
-
-	AVoxelWorld* World;
-	UVoxelWorldGenerator* WorldGenerator;
-
-	TArray<FVector> positionSide;
-
-	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-
-	FORCEINLINE int PositionToIndices(FIntVector P);
-	FORCEINLINE float GetDensity(int x, int y, int z);
 };

@@ -8,9 +8,7 @@ public class VoxelArt : ModuleRules
 	public VoxelArt(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		//PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-		//	bEnforceIWYU = true;
-		//bLegacyPublicIncludePaths = false;
+		bEnforceIWYU = true;
 
 
 		PublicDependencyModuleNames.AddRange(new string[]
@@ -20,10 +18,7 @@ public class VoxelArt : ModuleRules
 			"Engine",
 			"InputCore",
 			"RHI",
-			"RenderCore",
-		//	"ShaderCore",
-			"ProceduralMeshComponent",
-			"UnrealEd"
+			"RenderCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -34,10 +29,6 @@ public class VoxelArt : ModuleRules
 			"SlateCore"
 		});
 
-		/*if(Target.Type == TargetRules.TargetType.Editor)
-        {
-			PublicDependencyModuleNames.Add("UnrealEd");
-        }*/
 		DynamicallyLoadedModuleNames.AddRange(new string[]
 		{
 		});

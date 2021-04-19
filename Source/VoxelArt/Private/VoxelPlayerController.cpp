@@ -78,6 +78,7 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 	}
 }
 
+#if WITH_EDITOR
 void AVoxelPlayerController::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	EditorData->EditorType = EditorType;
@@ -89,6 +90,7 @@ void AVoxelPlayerController::PostEditChangeProperty(FPropertyChangedEvent& Prope
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+#endif
 
 void AVoxelPlayerController::ChangeWorld(AVoxelWorld* World, FVector HitPosition)
 {

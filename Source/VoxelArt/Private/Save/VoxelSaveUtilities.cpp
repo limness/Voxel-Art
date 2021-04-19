@@ -5,10 +5,12 @@
 #include "VoxelLogInterface.h"
 #include "VoxelWorld.h"
 
+#if WITH_EDITOR
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
+#endif
 
-
+#if WITH_EDITOR
 UVoxelSaveData* IVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World)
 {
 	FString ObjectName = TEXT("WorldSave");
@@ -18,7 +20,12 @@ UVoxelSaveData* IVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World)
 	FString PackageName = FString(TEXT("/Game/VoxelSaves/"));
 	AssetTools.CreateUniqueAssetName(PackageName, ObjectName, PackageName, ObjectName);
 
+#if ENGINE_MINOR_VERSION < 26
+	UPackage* Package = CreatePackage(nullptr, *PackageName);
+#else
 	UPackage* Package = CreatePackage(*PackageName);
+#endif
+
 	UPackage* OuterPack = Package->GetOutermost();
 	Package->FullyLoad();
 
@@ -53,3 +60,4 @@ UVoxelSaveData* IVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World)
 	}
 	return nullptr;
 }
+#endif

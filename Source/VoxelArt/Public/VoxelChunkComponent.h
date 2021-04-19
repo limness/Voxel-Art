@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProceduralMeshComponent.h"
+#include "Helpers/VoxelProceduralMeshComponent.h"
 #include "VoxelChunkComponent.generated.h"
 
 class AVoxelWorld;
@@ -15,7 +15,7 @@ class FVoxelChunkData;
 * Voxel Chunk Component class
 */
 UCLASS()
-class VOXELART_API UVoxelChunkComponent : public UProceduralMeshComponent
+class VOXELART_API UVoxelChunkComponent : public UVoxelProceduralMeshComponent
 {
 	GENERATED_BODY()
 

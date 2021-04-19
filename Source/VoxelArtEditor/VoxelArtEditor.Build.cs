@@ -7,17 +7,10 @@ public class VoxelArtEditor : ModuleRules
     public VoxelArtEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         bEnforceIWYU = true;
 
         PublicDependencyModuleNames.AddRange(new string[] { "VoxelArt" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Projects" });
-
-        PrivateIncludePaths.AddRange(
-            new string[]
-            {
-           //     "VoxelArtEditor/Private"
-            });
 
         PublicDependencyModuleNames.AddRange(
             new string[] {

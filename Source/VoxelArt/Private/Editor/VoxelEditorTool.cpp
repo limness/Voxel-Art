@@ -1,17 +1,21 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin ~ Copyright limit 2018
 
 #include "Editor/VoxelEditorTool.h"
 #include "Editor/VoxelEditorData.h"
+
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/StaticMesh.h"
+//#include "Materials/MaterialInstanceDynamic.h"
+
 
 AVoxelEditorTool::AVoxelEditorTool()
 {
 	Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
 	RootComponent = Marker;
 
-	auto CubeTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-	auto SphereTool = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	auto MaterialTool = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/VoxelArt/EditorMaterials/MVoxel_Tool.MVoxel_Tool'"));
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh>	CubeTool(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	SphereTool(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+	static ConstructorHelpers::FObjectFinder<UMaterial>		MaterialTool(TEXT("/VoxelArt/EditorMaterials/MVoxel_Tool.MVoxel_Tool"));
 
 	if (CubeTool.Succeeded())
 	{
@@ -26,7 +30,7 @@ AVoxelEditorTool::AVoxelEditorTool()
 		MaterialPath = MaterialTool.Object;
 	}
 	Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Marker->SetStaticMesh(SphereToolMesh);
+	Marker->SetStaticMesh(SphereToolMesh);*/
 }
 
 void AVoxelEditorTool::ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition)

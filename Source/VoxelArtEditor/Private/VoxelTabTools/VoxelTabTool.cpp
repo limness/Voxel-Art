@@ -14,11 +14,20 @@ void FVoxelTabTool::OnStartupModule()
     if (VoxelCustomMutableSettings && !VoxelCustomMutableSettings->bWelcomeShowed)
     {
         TSharedRef<class FGlobalTabmanager> tm = FGlobalTabmanager::Get();
+
+
+#if ENGINE_MINOR_VERSION < 26
+        tm->InvokeTab(TabName);
+
+        VoxelCustomMutableSettings->bWelcomeShowed = true;
+        VoxelCustomMutableSettings->SaveConfig();
+#else
         if (tm->TryInvokeTab(TabName))
         {
             VoxelCustomMutableSettings->bWelcomeShowed = true;
             VoxelCustomMutableSettings->SaveConfig();
         }
+#endif
     }
 }
 

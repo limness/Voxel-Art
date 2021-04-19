@@ -34,8 +34,10 @@ protected:
 	/*Overridable function called whenever this actor is being removed from a level*/
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+#if WITH_EDITOR
 	/*Called when a property on this object has been modified externally*/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+#endif
 
 	/*Handles a key press*/
 	virtual bool InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad);

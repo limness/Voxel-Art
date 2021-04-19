@@ -2,7 +2,11 @@
 
 #include "Generators/VoxelWorldGenerator.h"
 #include "Noise/SimplexNoiseBPLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
+//#include "Kismet/KismetMathLibrary.h"
+
+//#include "Engine/Texture2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+
 #include "Helpers/VoxelTools.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Heightmap"), STAT_GeneratorHeightmap, STATGROUP_Voxel);
@@ -13,6 +17,7 @@ void UVoxelWorldGenerator::GeneratorInit()
 {
 	if (HeightmapTexture && World)
 	{
+#if WITH_EDITORONLY_DATA
 		SCOPE_CYCLE_COUNTER(STAT_GeneratorHeightmap);
 
 		FTexture2DMipMap* MyMipMap = &HeightmapTexture->PlatformData->Mips[0];
@@ -48,9 +53,11 @@ void UVoxelWorldGenerator::GeneratorInit()
 		HeightmapTexture->MipGenSettings = OldMipGenSettings;
 		HeightmapTexture->SRGB = OldSRGB;
 		HeightmapTexture->UpdateResource();
+#endif
 	}
 	if (ColormapTexture && World)
 	{
+#if WITH_EDITORONLY_DATA
 		SCOPE_CYCLE_COUNTER(STAT_GeneratorColormap);
 
 		FTexture2DMipMap* MyMipMap = &ColormapTexture->PlatformData->Mips[0];
@@ -86,6 +93,7 @@ void UVoxelWorldGenerator::GeneratorInit()
 		ColormapTexture->MipGenSettings = OldMipGenSettings;
 		ColormapTexture->SRGB = OldSRGB;
 		ColormapTexture->UpdateResource();
+#endif
 	}
 }
 
@@ -141,11 +149,11 @@ float UVoxelWorldGenerator::FlatSDF(int A)
 
 	if (A >= 0)
 	{
-		Value = (-1) * UKismetMathLibrary::FMax(1.f, A);
+	//	Value = (-1) * UKismetMathLibrary::FMax(1.f, A);
 	}
 	else if (A < 0)
 	{
-		Value = (-1) * UKismetMathLibrary::FMin(-1.f, A);
+	//	Value = (-1) * UKismetMathLibrary::FMin(-1.f, A);
 	}
 	return Value;
 }
@@ -190,14 +198,14 @@ float UVoxelWorldGenerator::ConeSDF(FVector p, FVector2D c, float h)
 
 	FVector2D w = FVector2D(length, p.Y);
 
-	FVector2D a = w - q * UKismetMathLibrary::Clamp(FVector2D::DotProduct(w, q) / FVector2D::DotProduct(q, q), 0.0, 1.0);
-	FVector2D b = w - q * FVector2D(UKismetMathLibrary::Clamp(w.X / q.X, 0.0, 1.0), 1.0);
+	//FVector2D a = w - q * UKismetMathLibrary::Clamp(FVector2D::DotProduct(w, q) / FVector2D::DotProduct(q, q), 0.0, 1.0);
+	//FVector2D b = w - q * FVector2D(UKismetMathLibrary::Clamp(w.X / q.X, 0.0, 1.0), 1.0);
 
-	float k = FMath::Sign(q.Y);
-	float d = FMath::Min(FVector2D::DotProduct(a, a), FVector2D::DotProduct(b, b));
-	float s = FMath::Max(k * (w.X * q.Y - w.Y * q.X), k * (w.Y - q.Y));
+	//float k = FMath::Sign(q.Y);
+	//float d = FMath::Min(FVector2D::DotProduct(a, a), FVector2D::DotProduct(b, b));
+	//float s = FMath::Max(k * (w.X * q.Y - w.Y * q.X), k * (w.Y - q.Y));
 
-	return sqrt(d) * FMath::Sign(s);
+	return 0.f;//return sqrt(d) * FMath::Sign(s);
 }
 
 float UVoxelWorldGenerator::IQNoise(FVector p)

@@ -1,8 +1,9 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin ~ Copyright limit 2018
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Stats/Stats.h"
 
 #ifndef VOXELTOOLS_H
 #define VOXELTOOLS_H
@@ -14,9 +15,9 @@
 #define NORMAL			1
 
 
-DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);
-
 DECLARE_LOG_CATEGORY_EXTERN(VoxelArt, Log, All);
+
+DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);
 
 namespace VoxelTools
 {

@@ -1,4 +1,4 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin ~ Copyright limit 2018
 
 #pragma once
 
@@ -13,7 +13,6 @@ class AVoxelWorld;
 /*
 * Default class of the World Generator
 */
-
 UCLASS(Blueprintable, BlueprintType, EditInlineNew)
 class VOXELART_API UVoxelWorldGenerator : public UObject
 {
@@ -26,7 +25,7 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings Density")
-	float Height = 0.f;
+	float Height = 40.f;
 
 public:
 

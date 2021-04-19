@@ -35,12 +35,11 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 			if (!VoxelWorld->bWorldCreated)
 			{
 				VoxelWorld->CreateVoxelWorldInEditor();
-
-				// Do not show the tools if world is not e
-				if (!VoxelWorld->bWorldCreated)
-				{
-					bShowTools = false;
-				}
+			}
+			// Do not show the tools if world is not created
+			if (!VoxelWorld->bWorldCreated)
+			{
+				bShowTools = false;
 			}
 			break;
 		}
@@ -156,7 +155,14 @@ void SVoxelEdModeWidget::Tick(const FGeometry& AllottedGeometry, const double In
 			{
 				EditorObject->SetVisibility(EVisibility::Visible);
 			}
-			bShowError = false;
+			if (!VoxelWorld->bWorldCreated)
+			{
+				bShowError = true;
+			}
+			else
+			{
+				bShowError = false;
+			}
 			break;
 		}
 	}

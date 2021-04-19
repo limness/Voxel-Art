@@ -42,9 +42,9 @@ enum RenderTexture
 UENUM()
 enum Meshers
 {
-	Cubes			UMETA(DisplayName = "Cubes"),
 	MarchingCubes	UMETA(DisplayName = "Marching Cubes"),
-	SurfaceNets		UMETA(DisplayName = "Surface Nets")
+	SurfaceNets		UMETA(DisplayName = "Surface Nets (Experimental)"),
+	Cubes			UMETA(DisplayName = "Cubes (Experimental)")
 };
 
 class FVoxelCollisionBox;
@@ -82,10 +82,10 @@ public:
 	/*Called when an instance of this class is placed (in editor) or spawned*/
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+#if WITH_EDITOR
+
 	/*Called when a property on this object has been modified externally*/
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
-
-#if WITH_EDITOR
 
 	/*Called before the editor tries to begin PIE*/
 	virtual void OnPreBeginPIE(bool bIsSimulating) override;
@@ -152,7 +152,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12"))
 	int32 MinimumLOD = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail", meta = (ClampMin = "0", ClampMax = "12", UIMin = "0", UIMax = "12", EditCondition = bMaximumLOD))
 	int32 MaximumLOD = 8;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")

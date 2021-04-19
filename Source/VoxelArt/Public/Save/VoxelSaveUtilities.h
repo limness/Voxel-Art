@@ -14,5 +14,7 @@ class VOXELART_API IVoxelSaveUtilities
 {
 public:
 
+#if WITH_EDITOR
 	static UVoxelSaveData* CreateVoxelStorageFile(AVoxelWorld* World);
+#endif
 };

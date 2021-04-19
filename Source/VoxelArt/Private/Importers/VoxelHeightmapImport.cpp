@@ -49,12 +49,17 @@ void UVoxelHeightmapImport::ExportHeightmap(AVoxelWorld* World, UVoxelWorldGener
 		}
 
 		// Create Package
-		FString pathPackage = FString("/Game/" + World->DirectoryName);
+		FString PackageName = FString("/Game/" + World->DirectoryName);
 		FString absolutePathPackage = FPaths::ProjectContentDir() + "/" + World->DirectoryName + "/";
 
-		FPackageName::RegisterMountPoint(*pathPackage, *absolutePathPackage);
+		FPackageName::RegisterMountPoint(*PackageName, *absolutePathPackage);
 
-		UPackage* Package = CreatePackage(*pathPackage);
+#if ENGINE_MINOR_VERSION < 26
+		UPackage* Package = CreatePackage(nullptr, *PackageName);
+#else
+		UPackage* Package = CreatePackage(*PackageName);
+#endif
+
 		FName TextureName = MakeUniqueObjectName(Package, UTexture2D::StaticClass(), FName(*FileName));
 
 		UTexture2D* Texture = NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone); // UTexture2D::CreateTransient(width, height);//

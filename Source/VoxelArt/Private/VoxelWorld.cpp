@@ -9,8 +9,6 @@
 
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
-#include "AssetToolsModule.h"
-#include "AssetRegistryModule.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -205,9 +203,11 @@ void AVoxelWorld::SaveWorldUtility()
 		SaveFile->SetVoxelWorld(this);
 		SaveFile->SaveData();
 
+#if WITH_EDITOR
 		SaveFile->MarkPackageDirty();
 		SaveFile->PostEditChange();
 		SaveFile->AddToRoot();
+#endif
 	}
 	else
 	{
@@ -224,7 +224,9 @@ UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
 {
 	if (bWorldCreated)
 	{
+#if WITH_EDITOR
 		SaveFile = IVoxelSaveUtilities::CreateVoxelStorageFile(this);
+#endif
 	}
 	return nullptr;
 }
@@ -293,6 +295,8 @@ void AVoxelWorld::DestroyVoxelWorld()
 	}
 }
 
+#if WITH_EDITOR
+
 void AVoxelWorld::OnPreBeginPIE(bool isSimulating) 
 {
 	if (bWorldCreated)
@@ -318,6 +322,8 @@ void AVoxelWorld::OnPreExit()
 		DestroyVoxelWorld();
 	}
 }
+
+#endif
 
 void AVoxelWorld::OnConstruction(const FTransform& Transform)
 {
@@ -516,6 +522,7 @@ void AVoxelWorld::GenerateOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	}
 }
 
+#if WITH_EDITOR
 void AVoxelWorld::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	if (auto* Property = PropertyChangedEvent.MemberProperty)
@@ -571,6 +578,7 @@ void AVoxelWorld::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+#endif
 
 void AVoxelWorld::CreateChunk(FVoxelChunkData* ChunkData)
 {

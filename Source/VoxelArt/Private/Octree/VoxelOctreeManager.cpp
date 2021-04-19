@@ -4,7 +4,6 @@
 #include "Octree/VoxelOctreeData.h"
 #include "Helpers/VoxelTools.h"
 #include "VoxelWorld.h"
-#include "Editor.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Children"), STAT_AddChildren, STATGROUP_Voxel);
