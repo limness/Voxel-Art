@@ -8,7 +8,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "VoxelEditorTool.generated.h"
 
-
 class UVoxelEditorData;
 
 

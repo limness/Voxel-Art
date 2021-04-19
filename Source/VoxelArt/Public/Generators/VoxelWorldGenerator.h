@@ -111,7 +111,7 @@ protected:
 	* @param	A			The point in a three-dimensional coordinate (X, Y, Z, -X, -Y, -Z)
 	* @return	Density		Density of the flat at the position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float FlatSDF(int A);
 
 	/*
@@ -121,7 +121,7 @@ protected:
 	* @param	Radius		Radius of your sphere
 	* @return	Density		Density of the sphere at the position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float SphereSDF(int X = 0, int Y = 0, int Z = 0, float Radius = 50.f);
 
 	/*
@@ -132,13 +132,13 @@ protected:
 	* @param	RadiusInside	Radius of your sphere inside
 	* @return	Density			Density of the torus at the position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float TorusSDF(int X = 0, int Y = 0, int Z = 0, float Radius = 77.f, float RadiusInside = 37.f);
 
 	/*
 	* Doesn't work.
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float ConeSDF(FVector p, FVector2D c, float h);
 
 protected:
@@ -152,7 +152,7 @@ protected:
 	* @param	Frequency		Frequency of the noise
 	* @return	Density			Density of the World at the position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float FractalNoise(int X = 0, int Y = 0, int Z = 0, int Octaves = 3, float Amplitude = 50.f, float Frequency = 0.003f);
 
 	/*
@@ -161,12 +161,12 @@ protected:
 	* @param	X, Y, Z			Position of your position
 	* @return	Density			Density of the World at the position
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float SimplexNoise(int X, int Y, int Z);
 
 	/*
 	* Doesn't work.
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
 	float IQNoise(FVector p);
 };

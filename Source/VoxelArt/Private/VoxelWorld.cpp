@@ -8,7 +8,6 @@
 #include "VoxelPlayerGame.h"
 
 #include "TimerManager.h"	
-//#include "Unix/UnixPlatformTime.h"
 #include "DrawDebugHelpers.h"
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
@@ -283,8 +282,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 		}
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
-
-			//GEngine->ForceGarbageCollection(true);
+			
 			ThreadPool->Destroy();
 			bWorldCreated = false;
 			bStatsShowed = false;

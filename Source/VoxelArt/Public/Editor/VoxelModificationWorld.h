@@ -24,10 +24,10 @@ public:
 
 public:
 
-	//UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	static void SpherePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius);
 
-	//UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	static void CubePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius);
 
 	UFUNCTION(BlueprintCallable)

@@ -333,7 +333,6 @@ public:
 	
 public:
 
-	UPROPERTY(BlueprintReadOnly)
 	double WorldGenerateTimeBegin;
 
 	UPROPERTY(BlueprintReadOnly, Transient)

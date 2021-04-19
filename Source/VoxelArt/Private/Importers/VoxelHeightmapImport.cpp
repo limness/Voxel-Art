@@ -57,13 +57,13 @@ void UVoxelHeightmapImport::ExportHeightmap(AVoxelWorld* World, UVoxelWorldGener
 		UPackage* Package = CreatePackage(*pathPackage);
 		FName TextureName = MakeUniqueObjectName(Package, UTexture2D::StaticClass(), FName(*FileName));
 
-		UTexture2D* Texture = UTexture2D::CreateTransient(width, height);//NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone);
+		UTexture2D* Texture = NewObject<UTexture2D>(Package, TextureName, RF_Public | RF_Standalone); // UTexture2D::CreateTransient(width, height);//
 
 		// Texture Settings
-	//	Texture->PlatformData = new FTexturePlatformData();
-		//Texture->PlatformData->SizeX = width;
-		//Texture->PlatformData->SizeY = height;
-	//	Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
+		Texture->PlatformData = new FTexturePlatformData();
+		Texture->PlatformData->SizeX = width;
+		Texture->PlatformData->SizeY = height;
+		Texture->PlatformData->PixelFormat = PF_R8G8B8A8;
 
 		// Passing the pixels information to the texture
 		FTexture2DMipMap& Mip = Texture->PlatformData->Mips[0];
@@ -71,7 +71,7 @@ void UVoxelHeightmapImport::ExportHeightmap(AVoxelWorld* World, UVoxelWorldGener
 		Mip.SizeY = height;
 
 		Mip.BulkData.Lock(LOCK_READ_WRITE);
-		uint8* TextureData = (uint8*)Mip.BulkData.Realloc(height * width * sizeof(uint8) * 4);
+		uint8* TextureData = (uint8*)Mip.BulkData.Realloc(sizeof(uint8) * height * width * 4);
 		FMemory::Memcpy(TextureData, pixels, sizeof(uint8) * height * width * 4);
 		Mip.BulkData.Unlock();
 

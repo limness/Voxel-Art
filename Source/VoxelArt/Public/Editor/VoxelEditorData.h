@@ -31,7 +31,7 @@ enum BrushSoftness
 /*
 * Voxel Editor Data class
 */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class VOXELART_API UVoxelEditorData : public UObject
 {
 	GENERATED_BODY()

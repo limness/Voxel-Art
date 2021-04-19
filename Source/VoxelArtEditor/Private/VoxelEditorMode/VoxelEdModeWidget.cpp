@@ -35,6 +35,12 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 			if (!VoxelWorld->bWorldCreated)
 			{
 				VoxelWorld->CreateVoxelWorldInEditor();
+
+				// Do not show the tools if world is not e
+				if (!VoxelWorld->bWorldCreated)
+				{
+					bShowTools = false;
+				}
 			}
 			break;
 		}
