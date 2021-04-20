@@ -13,7 +13,7 @@ AVoxelEditorTool::AVoxelEditorTool()
 	Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
 	RootComponent = Marker;
 
-	/*static ConstructorHelpers::FObjectFinder<UStaticMesh>	CubeTool(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	CubeTool(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>	SphereTool(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
 	static ConstructorHelpers::FObjectFinder<UMaterial>		MaterialTool(TEXT("/VoxelArt/EditorMaterials/MVoxel_Tool.MVoxel_Tool"));
 
@@ -30,7 +30,7 @@ AVoxelEditorTool::AVoxelEditorTool()
 		MaterialPath = MaterialTool.Object;
 	}
 	Marker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Marker->SetStaticMesh(SphereToolMesh);*/
+	Marker->SetStaticMesh(SphereToolMesh);
 }
 
 void AVoxelEditorTool::ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition)

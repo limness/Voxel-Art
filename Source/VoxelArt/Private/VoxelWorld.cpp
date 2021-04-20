@@ -4,11 +4,13 @@
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
 #include "Importers/VoxelHeightmapImport.h"
-#include "VoxelLogInterface.h"
+#include "VoxelLoggingInterface.h"
 #include "VoxelPlayerGame.h"
 
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
+
+IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -48,7 +50,7 @@ AVoxelWorld::AVoxelWorld()
 	ChunkPoolComponent = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
 
 	/* Object pool thread */
-	ThreadPool = FQueuedThreadPool::Allocate();
+	//ThreadPool = FQueuedThreadPool::Allocate();
 }
 
 void AVoxelWorld::BeginPlay()
@@ -134,17 +136,17 @@ void AVoxelWorld::CreateVoxelWorld()
 
 	if (!WorldGenerator)
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("No World Generator! (Select: Voxel World -> Main -> World Generator)"), "Error");
+		IVoxelLoggingInterface::LogMessage(INVTEXT("No World Generator! (Select: Voxel World -> Main -> World Generator)"), "Error");
 		return;
 	}
 	if (MinimumLOD < 0)
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be less then zero!"), "Error");
+		IVoxelLoggingInterface::LogMessage(INVTEXT("Minimum LOD cannot be less then zero!"), "Error");
 		return;
 	}
 	if (MinimumLOD > MaximumLOD)
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("Minimum LOD cannot be greater then Maximum LOD!"), "Error");
+		IVoxelLoggingInterface::LogMessage(INVTEXT("Minimum LOD cannot be greater then Maximum LOD!"), "Error");
 		return;
 	}
 	WorldGenerateTimeBegin = FPlatformTime::Seconds();
@@ -153,7 +155,7 @@ void AVoxelWorld::CreateVoxelWorld()
 	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 
 	// Allocate the number of tasks for the pool.
-	ThreadPool->Create(4, 64 * 1024);
+	//ThreadPool->Create(4, 64 * 1024);
 
 	// Initialize the World generator in order to get information about the import textures.
 	WorldGenerator->GeneratorInit();
@@ -171,7 +173,7 @@ void AVoxelWorld::CreateVoxelWorld()
 		}
 		else
 		{
-			IVoxelLogInterface::LogMessage(INVTEXT("World has not been saved!"), "Error");
+			IVoxelLoggingInterface::LogMessage(INVTEXT("World has not been saved!"), "Error");
 		}
 	}
 	// Create Octree thread and Transvoxel
@@ -197,7 +199,7 @@ void AVoxelWorld::SaveWorldUtility()
 	{
 		if (!bWorldCreated)
 		{
-			IVoxelLogInterface::LogMessage(INVTEXT("You should create Voxel World before!"), "Error");
+			IVoxelLoggingInterface::LogMessage(INVTEXT("You should create Voxel World before!"), "Error");
 			return;
 		}
 		SaveFile->SetVoxelWorld(this);
@@ -211,24 +213,18 @@ void AVoxelWorld::SaveWorldUtility()
 	}
 	else
 	{
-		SaveFile = SaveWorldToFile();
+		if (!bWorldCreated)
+		{
+			IVoxelLoggingInterface::LogMessage(INVTEXT("You should create Voxel World before!"), "Error");
+			return;
+		}
+		IVoxelSaveInterface::CreateVoxelStorageFile(this, SaveFile);
 	}
 }
 
 AVoxelPlayerInterface* AVoxelWorld::GetVoxelScenePlayer()
 {
 	return VoxelScenePlayer;
-}
-
-UVoxelSaveData* AVoxelWorld::SaveWorldToFile()
-{
-	if (bWorldCreated)
-	{
-#if WITH_EDITOR
-		SaveFile = IVoxelSaveUtilities::CreateVoxelStorageFile(this);
-#endif
-	}
-	return nullptr;
 }
 
 void AVoxelWorld::DestroyVoxelWorld()
@@ -285,7 +281,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
 			
-			ThreadPool->Destroy();
+			//ThreadPool->Destroy();
 			bWorldCreated = false;
 			bStatsShowed = false;
 			bEnableUpdateOctree = false;
@@ -574,6 +570,13 @@ void AVoxelWorld::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 				CreateVoxelWorld();
 			}
 		}
+		else if (Name == GET_MEMBER_NAME_STRING_CHECKED(AVoxelWorld, SaveFile))
+		{
+			if (bWorldCreated)
+			{
+				CreateVoxelWorld();
+			}
+		}
 	}
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -607,7 +610,7 @@ void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
 	TaskWorkGlobalCounter.Increment();
 	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
-	MesherTask->StartBackgroundTask(ThreadPool);
+	MesherTask->StartBackgroundTask(/*ThreadPool*/);
 
 	PoolThreads.Add(MesherTask);
 }
@@ -697,5 +700,3 @@ bool AVoxelWorld::ShouldTickIfViewportsOnly() const
 	return true;
 }
 #endif
-
-IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;

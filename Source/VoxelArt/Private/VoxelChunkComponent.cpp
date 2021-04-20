@@ -9,6 +9,11 @@
 #include "VoxelWorld.h"
 
 
+UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
+{
+	bUseAsyncCooking = true;
+}
+
 bool UVoxelChunkComponent::IsPoolActive()
 {
 	return PoolActive;

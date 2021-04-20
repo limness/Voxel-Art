@@ -120,9 +120,14 @@ FReply IVoxelWorldDetails::CreateWorldInEditor()
 {
     if (World.IsValid())
     {
-        World->bCreatedInEditor = true;
         World->VoxelScenePlayerClass = AVoxelPlayerEditor::StaticClass();
         World->CreateVoxelWorldInEditor();
+
+        // Check if the world was successfully created
+        if (World->bWorldCreated)
+        {
+            World->bCreatedInEditor = true;
+        }
     }
     else
     {
@@ -135,8 +140,13 @@ FReply IVoxelWorldDetails::DestroyWorldInEditor()
 {
     if (World.IsValid())
     {
-        World->bCreatedInEditor = false;
         World->DestroyVoxelWorld();
+
+        // Check if the world was successfully destroyed
+        if (!World->bWorldCreated)
+        {
+            World->bCreatedInEditor = false;
+        }
     }
     else
     {

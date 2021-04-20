@@ -21,7 +21,7 @@ class VOXELART_API UVoxelChunkComponent : public UVoxelProceduralMeshComponent
 
 public:
 
-//	UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer);
+	UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer);
 
 public:
 

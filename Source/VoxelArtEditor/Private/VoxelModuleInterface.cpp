@@ -6,8 +6,14 @@
 #include "VoxelDetailsCustomization/VoxelWorldDetails.h"
 #include "VoxelEditorMode/VoxelEdModeTool.h"
 #include "ISettingsModule.h"
-#include "VoxelWorld.h"
+
 #include "VoxelTabTools/VoxelTabTool.h"
+#include "VoxelSaveUtilities.h"
+#include "VoxelLoggingEditor.h"
+
+#include "Save/VoxelSaveInterface.h"
+#include "VoxelLoggingInterface.h"
+#include "VoxelWorld.h"
 
 IMPLEMENT_GAME_MODULE(IVoxelModuleInterface, VoxelArtEditor);
 
@@ -86,8 +92,20 @@ void IVoxelModuleInterface::StartupModule()
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /* Delegates startup */
+
+    IVoxelSaveInterface::VoxelSaveDelegates.AddStatic(&FVoxelSaveUtilities::CreateVoxelStorageFile);
+
+    IVoxelLoggingInterface::VoxelDialogLogging.AddStatic(&FVoxelLoggingEditor::DialogMessage);
+    IVoxelLoggingInterface::VoxelMessageLogging.AddStatic(&FVoxelLoggingEditor::LogMessage);
 
     IVoxelDelegatesInterface::BindStartupDelegates.AddStatic(&StartupDelegates);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ModuleListeners.Add(MakeShareable(new FVoxelEdModeTool));
     ModuleListeners.Add(MakeShareable(new FVoxelTabTool));

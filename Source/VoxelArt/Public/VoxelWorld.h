@@ -12,7 +12,7 @@
 #include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Save/VoxelSaveData.h"
-#include "Save/VoxelSaveUtilities.h"
+#include "Save/VoxelSaveInterface.h"
 #include "VoxelPlayerInterface.h"
 #include "VoxelDelegatesInterface.h"
 #include "VoxelChunkComponent.h"
@@ -202,7 +202,6 @@ public:
 	void CreateVoxelWorldInEditor();
 	void DestroyVoxelWorld();
 	void SaveWorldUtility();
-	UVoxelSaveData* SaveWorldToFile();
 
 private:
 
@@ -338,6 +337,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Transient)
 	bool bStatsShowed = false;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	bool bMaximumLOD = false;
 };

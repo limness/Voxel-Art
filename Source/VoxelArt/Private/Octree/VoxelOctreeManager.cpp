@@ -172,6 +172,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 
 					if (Octant->Data != nullptr)
 					{
+						//FScopeLock Lock(&World->OctreeMutex);
 						ChangesOctree->ChunksRemoving.Add(Octant->Data);
 						Octant->Data = nullptr;
 					}
@@ -210,6 +211,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 				{
 					if (Leaf->Data != nullptr)
 					{
+						//FScopeLock Lock(&World->OctreeMutex);
 						ChangesOctree->ChunksRemoving.Add(Leaf->Data);
 						Octant->Data = nullptr;
 					}
@@ -219,7 +221,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 			{
 				SCOPE_CYCLE_COUNTER(STAT_DestroyChildren);
 
-			//	FScopeLock Lock(&World->OctreeMutex);
+				//FScopeLock Lock(&World->OctreeMutex);
 				Octant->DestroyChildren();
 			}
 		}

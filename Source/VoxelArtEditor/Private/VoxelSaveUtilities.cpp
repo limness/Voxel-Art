@@ -1,17 +1,12 @@
 // Voxel Art Plugin © limit 2018
 
-#include "Save/VoxelSaveUtilities.h"
+#include "VoxelSaveUtilities.h"
 #include "Save/VoxelSaveData.h"
-#include "VoxelLogInterface.h"
+#include "VoxelLoggingInterface.h"
 #include "VoxelWorld.h"
 
-#if WITH_EDITOR
-#include "AssetToolsModule.h"
-#include "AssetRegistryModule.h"
-#endif
 
-#if WITH_EDITOR
-UVoxelSaveData* IVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World)
+void FVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World, UVoxelSaveData*& SaveFile)
 {
 	FString ObjectName = TEXT("WorldSave");
 
@@ -51,13 +46,11 @@ UVoxelSaveData* IVoxelSaveUtilities::CreateVoxelStorageFile(AVoxelWorld* World)
 
 	if (bSaveSuccess)
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has been successfully saved"), "Log");
-		return NewSave;
+		IVoxelLoggingInterface::LogMessage(INVTEXT("Voxel World has been successfully saved"), "Log");
+		SaveFile = NewSave;
 	}
 	else
 	{
-		IVoxelLogInterface::LogMessage(INVTEXT("Voxel World has not been saved"), "Error");
+		IVoxelLoggingInterface::LogMessage(INVTEXT("Voxel World has not been saved"), "Error");
 	}
-	return nullptr;
 }
-#endif

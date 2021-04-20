@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/Texture2D.h"
+//#include "AssetToolsModule.h"
+//#include "AssetRegistryModule.h"
 #include "VoxelHeightmapImport.generated.h"
 
 class AVoxelWorld;

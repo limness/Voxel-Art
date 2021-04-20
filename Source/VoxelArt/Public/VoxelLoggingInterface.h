@@ -10,7 +10,6 @@
 #include "Logging/MessageLog.h"
 #include "Logging/TokenizedMessage.h"
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FVoxelLoggingDelegates, const FText&, const FString&, float);
 
 
 //TODO: Delegates for Editor module
@@ -19,25 +18,24 @@ class VOXELART_API IVoxelLoggingInterface
 {
 public:
 
-	FVoxelLoggingDelegates& OnVoxelLogging()
+	/*FVoxelLoggingDelegates& OnVoxelLogging()
 	{
 		return VoxelLogging;
-	}
+	}*/
 
-	virtual ~IVoxelLogInterface() = default;
-
-private:
-
-	FVoxelLoggingDelegates VoxelLogging;
+	virtual ~IVoxelLoggingInterface() = default;
 
 public:
 
-	static void DialogMessage(const FText& Message, const FString& Verbosity)
-	{
-		VoxelLogging.Broadcast(Message, Verbosity, 0.f);
-	}
-	static void LogMessage(const FText& Message, const FString& Verbosity, float DurationTime = 0.4f)
-	{
-		VoxelLogging.Broadcast(Message, Verbosity, DurationTime);
-	}
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FVoxelDialogDelegates, const FText&, const FString&);
+	static FVoxelDialogDelegates VoxelDialogLogging;
+
+	DECLARE_MULTICAST_DELEGATE_ThreeParams(FVoxelMessageDelegates, const FText&, const FString&, float);
+	static FVoxelMessageDelegates VoxelMessageLogging;
+
+public:
+
+	static void DialogMessage(const FText& Message, const FString& Verbosity);
+
+	static void LogMessage(const FText& Message, const FString& Verbosity, float DurationTime = 0.4f);
 };
