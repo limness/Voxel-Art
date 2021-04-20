@@ -9,9 +9,11 @@
 
 #include "VoxelTabTools/VoxelTabTool.h"
 #include "VoxelSaveUtilities.h"
+#include "VoxelEditorListeners.h"
 #include "VoxelLoggingEditor.h"
 
 #include "Save/VoxelSaveInterface.h"
+#include "VoxelListenersInterface.h"
 #include "VoxelLoggingInterface.h"
 #include "VoxelWorld.h"
 
@@ -44,22 +46,6 @@ void IVoxelModuleInterface::FillPulldownMenu(FMenuBuilder& menuBuilder)
 }
 
 TSharedRef<FWorkspaceItem> IVoxelModuleInterface::MenuRoot = FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
-
-static void StartupDelegates(IVoxelDelegatesInterface* Interface, UObject* Object)
-{
-    if (!FCoreDelegates::OnPreExit.IsBoundToObject(Object))
-    {
-        FCoreDelegates::OnPreExit.AddWeakLambda(Object, [=]() { Interface->OnPreExit(); });
-    }
-    if (!FEditorDelegates::EndPIE.IsBoundToObject(Object))
-    {
-        FEditorDelegates::EndPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnEndPIE(bIsSimulating); });
-    }
-    if (!FEditorDelegates::PreBeginPIE.IsBoundToObject(Object))
-    {
-        FEditorDelegates::PreBeginPIE.AddWeakLambda(Object, [=](bool bIsSimulating) { Interface->OnPreBeginPIE(bIsSimulating); });
-    }
-}
 
 void IVoxelModuleInterface::StartupModule()
 {
@@ -102,7 +88,7 @@ void IVoxelModuleInterface::StartupModule()
     IVoxelLoggingInterface::VoxelDialogLogging.AddStatic(&FVoxelLoggingEditor::DialogMessage);
     IVoxelLoggingInterface::VoxelMessageLogging.AddStatic(&FVoxelLoggingEditor::LogMessage);
 
-    IVoxelDelegatesInterface::BindStartupDelegates.AddStatic(&StartupDelegates);
+    IVoxelListenersInterface::VoxelListenersDelegates.AddStatic(&FVoxelLoggingEditor::StartListeners);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,8 +13,6 @@
 
 namespace FVoxelLoggingEditor
 {
-
 	void DialogMessage(const FText& Message, const FString& Verbosity);
-
 	void LogMessage(const FText& Message, const FString& Verbosity, float DurationTime = 0.4f);
 };
