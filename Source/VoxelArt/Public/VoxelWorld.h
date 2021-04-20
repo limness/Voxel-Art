@@ -14,7 +14,7 @@
 #include "Save/VoxelSaveData.h"
 #include "Save/VoxelSaveInterface.h"
 #include "VoxelPlayerInterface.h"
-#include "VoxelDelegatesInterface.h"
+#include "VoxelListenersInterface.h"
 #include "VoxelChunkComponent.h"
 #include "VoxelPoolComponent.h"
 #include "VoxelWorld.generated.h"
@@ -53,7 +53,7 @@ class FVoxelCollisionBox;
 * Voxel World Main class
 */
 UCLASS(Blueprintable, HideCategories = ("Input", "Actor", "LOD"))
-class VOXELART_API AVoxelWorld : public AActor, public IVoxelDelegatesInterface
+class VOXELART_API AVoxelWorld : public AActor, public IVoxelListenersInterface
 {
 	GENERATED_BODY()
 	

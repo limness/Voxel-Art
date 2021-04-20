@@ -10,7 +10,8 @@
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
 
-IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;
+//IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;
+//IVoxelListenersInterface::FVoxelListenersDelegates FVoxelListenersDelegates::VoxelListenersDelegates;
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -114,7 +115,7 @@ void AVoxelWorld::CreateVoxelWorldInEditor()
 {
 	SCOPE_CYCLE_COUNTER(STAT_CreateVoxelWorld);
 
-	StartupDelegates(this);
+	StartListeners(this);
 
 	if (bWorldCreated)
 	{

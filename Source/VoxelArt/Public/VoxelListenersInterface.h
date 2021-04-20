@@ -13,7 +13,7 @@ public:
 		return VoxelListenersDelegates;
 	}*/
 
-	virtual ~IVoxelLoggingInterface() = default;
+	virtual ~IVoxelListenersInterface() = default;
 
 public:
 

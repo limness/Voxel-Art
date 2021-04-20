@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "VoxelListenersInterface.h"
 
 
-namespace FEditorListeners
+namespace FVoxelEditorListeners
 {
-	void StartListeners(IVoxelListenersInterface* Interface, UObject* Object)
+	void StartListeners(IVoxelListenersInterface* Interface, UObject* Object);
 };

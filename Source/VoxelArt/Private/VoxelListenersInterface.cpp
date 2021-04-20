@@ -2,12 +2,12 @@
 
 #include "VoxelListenersInterface.h"
 
-IVoxelListenersInterface::FVoxelListenersDelegates FVoxelListenersDelegates::VoxelListenersDelegates;
+IVoxelListenersInterface::FVoxelListenersDelegates IVoxelListenersInterface::VoxelListenersDelegates;
 
 
 void IVoxelListenersInterface::StartListeners(UObject* Self)
 {
-	if (VoxelDialogLogging.IsBound())
+	if (VoxelListenersDelegates.IsBound())
 	{
 		VoxelListenersDelegates.Broadcast(this, Self);
 	}

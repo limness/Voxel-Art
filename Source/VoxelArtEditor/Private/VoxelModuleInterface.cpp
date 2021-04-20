@@ -88,7 +88,7 @@ void IVoxelModuleInterface::StartupModule()
     IVoxelLoggingInterface::VoxelDialogLogging.AddStatic(&FVoxelLoggingEditor::DialogMessage);
     IVoxelLoggingInterface::VoxelMessageLogging.AddStatic(&FVoxelLoggingEditor::LogMessage);
 
-    IVoxelListenersInterface::VoxelListenersDelegates.AddStatic(&FVoxelLoggingEditor::StartListeners);
+    IVoxelListenersInterface::VoxelListenersDelegates.AddStatic(&FVoxelEditorListeners::StartListeners);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
