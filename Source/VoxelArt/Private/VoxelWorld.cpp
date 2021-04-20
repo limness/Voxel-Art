@@ -10,9 +10,6 @@
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
 
-//IVoxelDelegatesInterface::FStartupDelegates IVoxelDelegatesInterface::BindStartupDelegates;
-//IVoxelListenersInterface::FVoxelListenersDelegates FVoxelListenersDelegates::VoxelListenersDelegates;
-
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
