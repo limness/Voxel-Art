@@ -1,7 +1,7 @@
-// Voxel Art Plugin ~ Copyright limit 2018
-
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #include "Editor/VoxelModificationComponent.h"
+
 
 // Sets default values for this component's properties
 UVoxelModificationComponent::UVoxelModificationComponent()

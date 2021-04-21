@@ -1,9 +1,10 @@
-// Voxel Art Plugin ~ Copyright limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Helpers/FastNoise.h"
 #include "Math/Vector2D.h"
 #include "Engine/Texture2D.h"
 #include "VoxelWorldGenerator.generated.h"
@@ -26,6 +27,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings Density")
 	float Height = 40.f;
+
+	FastNoise* NoiseObject = nullptr;
 
 public:
 
@@ -161,7 +164,7 @@ protected:
 	* @return	Density			Density of the World at the position
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
-	float SimplexNoise(int X, int Y, int Z);
+	float SimplexNoise(int X, int Y, int Z, float Frequency = 1.f);
 
 	/*
 	* Doesn't work.

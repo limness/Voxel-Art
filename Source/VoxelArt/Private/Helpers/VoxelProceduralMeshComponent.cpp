@@ -1,5 +1,5 @@
+// Modified by Voxel Art Plugin 2021 ~ Copyright Limit
 // Copyright Epic Games, Inc. All Rights Reserved. 
-// Modified Voxel Art Plugin © limit 2018
 
 #include "Helpers/VoxelProceduralMeshComponent.h"
 #include "PrimitiveViewRelevance.h"

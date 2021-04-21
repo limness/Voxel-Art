@@ -1,4 +1,4 @@
-// Voxel Art Plugin ~ Copyright limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 
 #include "Editor/VoxelModificationWorld.h"
@@ -7,7 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "Noise/SimplexNoiseBPLibrary.h"
+//#include "Noise/SimplexNoiseBPLibrary.h"
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
 #include "VoxelWorld.h"
@@ -101,7 +101,9 @@ float UVoxelModificationWorld::BangPainter(int X, int Y, int Z, float Radius, in
 {
 	float value = 0.f;
 	float valuefractal = 0.f;
-
+	
+	// TODO: Tranfer to Fast Noise
+	/*
 	value = Radius - sqrt(X * X + Y * Y + Z * Z);
 
 	for (int i = 0; i < octaves; i++)
@@ -110,7 +112,7 @@ float UVoxelModificationWorld::BangPainter(int X, int Y, int Z, float Radius, in
 		frequency *= 2.f;
 		amplitude *= 0.5f;
 	}
-
+	*/
 	return value + valuefractal;
 }
 

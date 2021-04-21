@@ -1,12 +1,10 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/Texture2D.h"
-//#include "AssetToolsModule.h"
-//#include "AssetRegistryModule.h"
 #include "VoxelHeightmapImport.generated.h"
 
 class AVoxelWorld;

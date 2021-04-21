@@ -1,9 +1,9 @@
-// Voxel Art Plugin © limit 2018
-
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #include "Meshers/VoxelMarchingCubesMesher.h"
 #include "Helpers/MarchingCubes.h"
 #include "Helpers/Transvoxels.h"
+
 
 FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap)
 	: World(_World)

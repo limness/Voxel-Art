@@ -1,4 +1,4 @@
-﻿// Voxel Art Plugin © limit 2018
+﻿// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #include "Meshers/VoxelSurfaceNetsMesher.h"
 #include "DrawDebugHelpers.h"
@@ -155,23 +155,23 @@ void FVoxelSurfaceNetsMesher::GeneratePlane()
 					{
 						if (GetDensity(x + 1, y + 0, z + 1) > 0)
 						{
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 							Triangles.Add(v1);
-							Triangles.Add(v2);
-							Triangles.Add(v3);
 
-							Triangles.Add(v4);
-							Triangles.Add(v3);
 							Triangles.Add(v2);
+							Triangles.Add(v3);
+							Triangles.Add(v4);
 						}
 						else
 						{
-							Triangles.Add(v3);
-							Triangles.Add(v2);
 							Triangles.Add(v1);
-
 							Triangles.Add(v2);
 							Triangles.Add(v3);
+
 							Triangles.Add(v4);
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 						}
 					}
 				}
@@ -189,23 +189,23 @@ void FVoxelSurfaceNetsMesher::GeneratePlane()
 					{
 						if (GetDensity(x + 1, y + 1, z + 0) < 0)
 						{
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 							Triangles.Add(v1);
-							Triangles.Add(v2);
-							Triangles.Add(v3);
 
-							Triangles.Add(v4);
-							Triangles.Add(v3);
 							Triangles.Add(v2);
+							Triangles.Add(v3);
+							Triangles.Add(v4);
 						}
 						else
 						{
-							Triangles.Add(v3);
-							Triangles.Add(v2);
 							Triangles.Add(v1);
-
 							Triangles.Add(v2);
 							Triangles.Add(v3);
+
 							Triangles.Add(v4);
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 						}
 					}
 				}
@@ -223,23 +223,23 @@ void FVoxelSurfaceNetsMesher::GeneratePlane()
 					{
 						if (GetDensity(x + 0, y + 1, z + 1) < 0)
 						{
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 							Triangles.Add(v1);
-							Triangles.Add(v2);
-							Triangles.Add(v3);
 
-							Triangles.Add(v4);
-							Triangles.Add(v3);
 							Triangles.Add(v2);
+							Triangles.Add(v3);
+							Triangles.Add(v4);
 						}
 						else
 						{
-							Triangles.Add(v3);
-							Triangles.Add(v2);
 							Triangles.Add(v1);
-
 							Triangles.Add(v2);
 							Triangles.Add(v3);
+
 							Triangles.Add(v4);
+							Triangles.Add(v3);
+							Triangles.Add(v2);
 						}
 					}
 				}

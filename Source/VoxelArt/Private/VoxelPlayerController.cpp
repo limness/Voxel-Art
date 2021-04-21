@@ -1,10 +1,11 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #include "VoxelPlayerController.h"
 #include "Helpers/VoxelTools.h"
 #include "Editor/VoxelModificationWorld.h"
 
 #include "DrawDebugHelpers.h"
+
 
 void AVoxelPlayerController::BeginPlay()
 {

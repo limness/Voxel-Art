@@ -1,9 +1,8 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Octree/VoxelOctreeData.h"
 #include "Async/Async.h"
 
 class AVoxelWorld;

@@ -3,13 +3,13 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "Voxel Art Free",
-	"Description": "Create huge worlds for real-time editing",
+	"Description": "Create huge worlds for realtime editing",
 	"Category": "Other",
-	"CreatedBy": "limit",
+	"CreatedBy": "Limit",
 	"CreatedByURL": "https://twitter.com/limtosingular",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "",
+	"DocsURL": "https://github.com/limness/Voxel-Art/blob/main/README.md",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/3f055047d2834d51bec427dfd03e8fdd",
+	"SupportURL": "https://discord.gg/FX3zzNxPq3",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
@@ -18,7 +18,7 @@
 		{
 			"Name": "VoxelArt",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
+			"LoadingPhase": "PostConfigInit",
 			"WhitelistPlatforms": [
 				"Win64",
 				"Win32"
@@ -30,8 +30,7 @@
 			"LoadingPhase": "PostEngineInit",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Linux",
-				"Mac"
+				"Win32"
 			]
 		}
 	]

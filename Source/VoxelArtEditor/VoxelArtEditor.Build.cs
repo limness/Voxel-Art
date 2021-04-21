@@ -1,3 +1,4 @@
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 using System.IO;
 using UnrealBuildTool;

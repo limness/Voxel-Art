@@ -1,10 +1,6 @@
-// Voxel Art Plugin © limit 2018
+// Voxel Art Plugin 2021 ~ Copyright Limit
 
 #include "Generators/VoxelWorldGenerator.h"
-#include "Noise/SimplexNoiseBPLibrary.h"
-//#include "Kismet/KismetMathLibrary.h"
-
-//#include "Engine/Texture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 #include "Helpers/VoxelTools.h"
@@ -95,6 +91,7 @@ void UVoxelWorldGenerator::GeneratorInit()
 		ColormapTexture->UpdateResource();
 #endif
 	}
+	NoiseObject = new FastNoise(1337);
 }
 
 
@@ -183,10 +180,16 @@ float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float
 
 	for (int i = 0; i < Octaves; i++)
 	{
-		Value += USimplexNoiseBPLibrary::SimplexNoise3D(X * Frequency, Y * Frequency, Z * Frequency) * Amplitude;
+		Value += SimplexNoise(X, Y, Z, Frequency) * Amplitude;
 		Frequency *= 2.f;
 		Amplitude *= 0.5f;
 	}
+	//NoiseObject->SetFrequency(Frequency);
+	//NoiseObject->SetFractalOctaves(Octaves);
+
+//	Value = NoiseObject->GetSimplexFractal(X, Y, Z);
+
+	//UE_LOG(LogTemp, Log, TEXT("%f"), Value);
 	return Value;
 }
 
@@ -215,11 +218,13 @@ float UVoxelWorldGenerator::IQNoise(FVector p)
 	return a;
 }
 
-float UVoxelWorldGenerator::SimplexNoise(int X, int Y, int Z)
+float UVoxelWorldGenerator::SimplexNoise(int X, int Y, int Z, float Frequency)
 {
 	float value = 0.f;
 
-	value = USimplexNoiseBPLibrary::SimplexNoise3D(X, Y, Z);
+	NoiseObject->SetFrequency(Frequency);
+
+	value = NoiseObject->GetSimplex(X, Y, Z);
 
 	return value;
 }
