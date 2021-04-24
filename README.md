@@ -22,15 +22,29 @@ All of you know the game of mancraft, and what fantastic things you can make ins
 - [Discord channel](https://discord.gg/FX3zzNxPq3)
 
 # Documentation
+### Set up plugin:
 - Create a new directive inside your main UE4 project and name it __Plugins__ (If there is no such directive)
 - Place the plugin in new directive
-- Start the project and confirm the pop-up window for creating new builds
-- As soon as the project starts, select the right area of the __Place__ __Actors__  editor and enter `Voxel World` in the search box
+- Start the project and confirm the pop-up window for creating new builds</br>![markdown logo](https://i.ibb.co/WgWhgvB/UE4-Editor-GBu-AHb5-Djl.png)
+### Create new Voxel World:
+As soon as the project starts, select the right area of the __Place__ __Actors__  editor and enter `Voxel World` in the search box
 - Place the new `Voxel World component` on the scene
 - Generate noise in a new file or use an existing one for the World Generator category
 ![markdown logo](http://i.piccy.info/i9/a77461b290bfca8c160e081c27d64330/1619034527/15583/1425940/222222222222222.png)
+
+You can manually change the size of the entire world, the amount of LOD detail, the size of each voxel, and the size of the chunk.
+
 - You can click on the "Create World" button to preview the world</br>
 ![markdown logo](http://i.piccy.info/i9/db43b4b85db2db609ff1e9fb0396a7a9/1619034440/6065/1425940/111111111.png)
+### Generate custom landscape:
+Generate noise in a new file or use an existing one for the World Generator category
+By default, you can choose already ready-made examples of the generated landscape, which has been set up beforehand in the C++ class. 
+- `Voxel World Generator`</br>
+Default empty generator. Can be used for heightmap importing
+- `Voxel World Flat Generator`</br>
+Generates default flat world
+- `Voxel World Planet Generator`</br>
+Generates planet world using Fractal Noise + Sphere
 
 # Screenshots
 ![markdown logo](http://ipic.su/img/img7/fs/UE4Editor_tLjSZZYAlk.1619035360.png)
