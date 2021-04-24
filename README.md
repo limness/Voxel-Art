@@ -29,6 +29,8 @@ All of you know the game of mancraft, and what fantastic things you can make ins
 ### Create new Voxel World:
 As soon as the project starts, select the right area of the __Place__ __Actors__  editor and enter `Voxel World` in the search box
 - Place the new `Voxel World component` on the scene
+- To be able to edit the game world directly in the game. You must select a new class in the game mod as your primary controller. 
+![markdown logo](https://i.imgur.com/bNZPSNK.png)
 - Generate noise in a new file or use an existing one for the World Generator category
 ![markdown logo](http://i.piccy.info/i9/a77461b290bfca8c160e081c27d64330/1619034527/15583/1425940/222222222222222.png)
 - You can click on the "Create World" button to preview the world</br>
@@ -37,7 +39,7 @@ As soon as the project starts, select the right area of the __Place__ __Actors__
 You can manually change the size of the entire world, the amount of LOD detail, the size of each voxel, and the size of the chunk.
 ![markdown logo](https://i.imgur.com/JTCQCP8.png)
 
-### Generate custom landscape:
+### Create custom Generator:
 Generate noise in a new file or use an existing one for the World Generator category
 By default, you can choose already ready-made examples of the generated landscape, which has been set up beforehand in the C++ class. 
 - `Voxel World Generator`</br>
@@ -54,8 +56,12 @@ Of course you can create your own noise for the world, for this you need the fol
 - In the class that opens, you will see a window with two methods. The method you are interested in at the moment is `Get Density Map`. This method is responsible for what kind of shape your world will have. I opened a ready-made Voxel World Planet Generator class as an example. That generates first a regular sphere and then adds some fractal noise. 
 ![markdown logo](https://i.ibb.co/6rmhCxr/devenv-Iug-NT7-Itc-S.png)
 - Once you compile the finished class. Select a new generator class in the Voxel World properties
-- If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**
+- If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br>
 ![markdown logo](https://i.ibb.co/18fZLSz/UE4-Editor-ae-Jv-N8fp2-G.png)
+
+### Editing the world in editor mode
+The plugin allows you to pre-edit and modify the world as you see fit (and then save it to a separate file if you need it). 
+To do this, go to category `Modes -> Voxel Art Editor Mode`
 
 # Screenshots
 ![markdown logo](http://ipic.su/img/img7/fs/UE4Editor_tLjSZZYAlk.1619035360.png)
