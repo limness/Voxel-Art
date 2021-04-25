@@ -35,8 +35,7 @@ As soon as the project starts, select the right area of the __Place__ __Actors__
 ![markdown logo](http://i.piccy.info/i9/a77461b290bfca8c160e081c27d64330/1619034527/15583/1425940/222222222222222.png)
 - You can click on the "Create World" button to preview the world</br>
 ![markdown logo](http://i.piccy.info/i9/db43b4b85db2db609ff1e9fb0396a7a9/1619034440/6065/1425940/111111111.png)
-
-You can manually change the size of the entire world, the amount of LOD detail, the size of each voxel, and the size of the chunk.
+- You can manually change the size of the entire world, the amount of LOD detail, the size of each voxel, and the size of the chunk.
 ![markdown logo](https://i.imgur.com/JTCQCP8.png)
 
 ### Create custom Generator:
@@ -51,15 +50,24 @@ Generates planet world using Fractal Noise + Sphere
 
 #### Of course you can create your own noise for the world, for this you need the following:</br></br>
 Create a new C++ class that inherits from the main Voxel World Generator class</br></br>
-![markdown logo](https://i.ibb.co/4WV3bxg/28-db-Oye-Zk-Q.jpg)
+![markdown logo](https://i.ibb.co/4WV3bxg/28-db-Oye-Zk-Q.jpg)</br></br>
 Name the class with any free name. The recommended name is `VoxelWorld[YourName]Generator`. And then select the VoxelArt module and the `VoxelArt/Public/Generators` directory, as shown below</br></br>
-![markdown logo](https://i.ibb.co/prjT9ws/Za8ipu7-Jp-Eg.jpg)
+![markdown logo](https://i.ibb.co/prjT9ws/Za8ipu7-Jp-Eg.jpg)</br></br>
 In the class that opens, you will need to redefine two methods</br>
 - `Get Density Map` - this method defines the shape of your landscape (noise)
 - `Get Color Map` - in charge of what color your landscape will be.
 Do as shown below. 
 `VoxelWorldMyNameGenerator.h`
 ```c++
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Generators/VoxelWorldGenerator.h"
+#include "VoxelWorldMyNameGenerator.generated.h"
+
+/**
+*
+*/
 UCLASS()
 class VOXELART_API UVoxelWorldMyNameGenerator : public UVoxelWorldGenerator
 {
@@ -68,7 +76,6 @@ class VOXELART_API UVoxelWorldMyNameGenerator : public UVoxelWorldGenerator
 private:
 
   virtual float GetDensityMap(const FIntVector& CellPosition);
-
   virtual FColor GetColorMap(const FIntVector& CellPosition);
 };
 ```
@@ -94,9 +101,8 @@ FColor UVoxelWorldMyNameGenerator::GetColorMap(const FIntVector& CellPosition)
   return VOXEL_COLOR;
 }
 ```
-- Once you compile the finished class. Select a new generator class in the Voxel World properties
-- If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br>
-![markdown logo](https://i.ibb.co/18fZLSz/UE4-Editor-ae-Jv-N8fp2-G.png)
+Once you compile the finished class. Select a new generator class in the Voxel World properties. If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br></br>
+![markdown logo](https://i.ibb.co/56ywMWw/Nq-Zeez6xf-Jk.jpg)
 
 ### Editing the world in editor mode
 The plugin allows you to pre-edit and modify the world as you see fit (and then save it to a separate file if you need it). 
