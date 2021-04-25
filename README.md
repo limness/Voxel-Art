@@ -56,7 +56,7 @@ Name the class with any free name. The recommended name is `VoxelWorld[YourName]
 In the class that opens, you will need to redefine two methods</br>
 - `Get Density Map` - this method defines the shape of your landscape (noise)
 - `Get Color Map` - in charge of what color your landscape will be.
-Do as shown below.</br></br>
+Do as shown below.</br>
 
 > If the class was created without the U prefix, add it</br>
 > Name this as **UVoxelWorld[YourName]Generator**</br>
@@ -110,12 +110,12 @@ FColor UVoxelWorldMyNameGenerator::GetColorMap(const FIntVector& CellPosition)
 }
 ```
 
-Once you compile the finished class. Select a new generator class in the Voxel World properties. If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br></br>
+Once you compile the finished class. Select a new generator class in the Voxel World properties. If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br>
+
+> If the new class does not appear in the list - restart the editor</br></br>
+
 ![markdown logo](https://i.ibb.co/56ywMWw/Nq-Zeez6xf-Jk.jpg)
 
-### Editing the world in editor mode
-The plugin allows you to pre-edit and modify the world as you see fit (and then save it to a separate file if you need it). 
-To do this, go to category `Modes -> Voxel Art Editor Mode`
 
 # Screenshots
 ![markdown logo](http://ipic.su/img/img7/fs/UE4Editor_tLjSZZYAlk.1619035360.png)
