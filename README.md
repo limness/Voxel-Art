@@ -56,7 +56,7 @@ Name the class with any free name. The recommended name is `VoxelWorld[YourName]
 In the class that opens, you will need to redefine two methods</br>
 - `Get Density Map` - this method defines the shape of your landscape (noise)
 - `Get Color Map` - in charge of what color your landscape will be.
-Do as shown below. 
+Do as shown below.</br></br>
 `VoxelWorldMyNameGenerator.h`
 ```c++
 #pragma once
