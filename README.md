@@ -57,6 +57,10 @@ In the class that opens, you will need to redefine two methods</br>
 - `Get Density Map` - this method defines the shape of your landscape (noise)
 - `Get Color Map` - in charge of what color your landscape will be.
 Do as shown below.</br></br>
+
+> If the class was created without the U prefix, add it</br>
+> Name this as **UVoxelWorld[YourName]Generator**</br>
+
 `VoxelWorldMyNameGenerator.h`
 ```c++
 #pragma once
@@ -79,11 +83,15 @@ private:
   virtual FColor GetColorMap(const FIntVector& CellPosition);
 };
 ```
-You must also add a VoxelTools directive to the cpp file header in order to use special plugin tools (Such as: logging, ready-made colors, etc.). For the example I used a formula to display a flat world (More examples in the Generators file)
+You must also add a VoxelTools directive to the cpp file header in order to use special plugin tools (Such as: logging, ready-made colors, etc.). For the example I used a formula to display a flat world (More examples in the Generators file)</br>
+
+> If the editor gives an error like "The file was not found in the directory</br>
+> Add **#include "Generators/VoxelWorld[YourName]Generator.h"** instead of **#include "VoxelWorld[YourName]Generator.h"**</br>
+> (Provided the class was created exactly in the Generators directory)</br>
 
 `VoxelWorldMyNameGenerator.cpp`
 ```c++
-#include "VoxelWorldMyNameGenerator.h"
+#include "Generators/VoxelWorldMyNameGenerator.h"
 #include "Helpers/VoxelTools.h"
 
 float UVoxelWorldMyNameGenerator::GetDensityMap(const FIntVector& CellPosition)
@@ -101,6 +109,7 @@ FColor UVoxelWorldMyNameGenerator::GetColorMap(const FIntVector& CellPosition)
   return VOXEL_COLOR;
 }
 ```
+
 Once you compile the finished class. Select a new generator class in the Voxel World properties. If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br></br>
 ![markdown logo](https://i.ibb.co/56ywMWw/Nq-Zeez6xf-Jk.jpg)
 
