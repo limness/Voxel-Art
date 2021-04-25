@@ -49,12 +49,51 @@ Generates default flat world
 - `Voxel World Planet Generator`</br>
 Generates planet world using Fractal Noise + Sphere
 
-Of course you can create your own noise for the world, for this you need the following:
-- Create a new C++ class that inherits from the main Voxel World Generator class
-![markdown logo](https://i.ibb.co/HzCwKPJ/UE4-Editor-Gf58bdp1s9.png)
-- Name the class with any free name. The recommended name is `Voxel World [Your Name] Generator`
-- In the class that opens, you will see a window with two methods. The method you are interested in at the moment is `Get Density Map`. This method is responsible for what kind of shape your world will have. I opened a ready-made Voxel World Planet Generator class as an example. That generates first a regular sphere and then adds some fractal noise. 
-![markdown logo](https://i.ibb.co/6rmhCxr/devenv-Iug-NT7-Itc-S.png)
+#### Of course you can create your own noise for the world, for this you need the following:</br></br>
+Create a new C++ class that inherits from the main Voxel World Generator class</br></br>
+![markdown logo](https://i.ibb.co/4WV3bxg/28-db-Oye-Zk-Q.jpg)
+Name the class with any free name. The recommended name is `VoxelWorld[YourName]Generator`. And then select the VoxelArt module and the `VoxelArt/Public/Generators` directory, as shown below</br></br>
+![markdown logo](https://i.ibb.co/prjT9ws/Za8ipu7-Jp-Eg.jpg)
+In the class that opens, you will need to redefine two methods</br>
+- `Get Density Map` - this method defines the shape of your landscape (noise)
+- `Get Color Map` - in charge of what color your landscape will be.
+Do as shown below. 
+`VoxelWorldMyNameGenerator.h`
+```c++
+UCLASS()
+class VOXELART_API UVoxelWorldMyNameGenerator : public UVoxelWorldGenerator
+{
+  GENERATED_BODY()
+
+private:
+
+  virtual float GetDensityMap(const FIntVector& CellPosition);
+
+  virtual FColor GetColorMap(const FIntVector& CellPosition);
+};
+```
+You must also add a VoxelTools directive to the cpp file header in order to use special plugin tools (Such as: logging, ready-made colors, etc.). For the example I used a formula to display a flat world (More examples in the Generators file)
+
+`VoxelWorldMyNameGenerator.cpp`
+```c++
+#include "VoxelWorldMyNameGenerator.h"
+#include "Helpers/VoxelTools.h"
+
+float UVoxelWorldMyNameGenerator::GetDensityMap(const FIntVector& CellPosition)
+{
+  Super::GetDensityMap(CellPosition);
+
+  float Value = CellPosition.Z + Height + VoxelTools::VoxelOffset;
+  return Value;
+}
+
+FColor UVoxelWorldMyNameGenerator::GetColorMap(const FIntVector& CellPosition)
+{
+  Super::GetColorMap(CellPosition);
+  
+  return VOXEL_COLOR;
+}
+```
 - Once you compile the finished class. Select a new generator class in the Voxel World properties
 - If you have done everything correctly, the new generator class should appear in the corresponding window in the Voxel World properties. Select it and click **Play** or create a preview of the world by clicking **Create World**</br>
 ![markdown logo](https://i.ibb.co/18fZLSz/UE4-Editor-ae-Jv-N8fp2-G.png)
