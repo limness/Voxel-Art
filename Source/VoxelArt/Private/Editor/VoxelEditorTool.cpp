@@ -35,19 +35,19 @@ AVoxelEditorTool::AVoxelEditorTool()
 
 void AVoxelEditorTool::ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition)
 {
-	if (!Material)
+	if (Material != nullptr)
 	{
 		Material = UMaterialInstanceDynamic::Create(MaterialPath, this);
 		Marker->SetMaterial(0, Material);
 	}
-	if (CurrentTool != Data->BrushType)
+	if (CurrentTool != Data->BrushShape)
 	{
-		switch (Data->BrushType)
+		switch (Data->BrushShape)
 		{
-		case BrushType::Cube: { Marker->SetStaticMesh(CubeToolMesh); break;  }
-		case BrushType::Sphere: { Marker->SetStaticMesh(SphereToolMesh); break; }
+		case EBrushShape::Cube: { Marker->SetStaticMesh(CubeToolMesh); break;  }
+		case EBrushShape::Sphere: { Marker->SetStaticMesh(SphereToolMesh); break; }
 		}
-		CurrentTool = Data->BrushType;
+		CurrentTool = Data->BrushShape;
 	}
 	Marker->SetWorldLocation(ToolPosition);
 	Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);

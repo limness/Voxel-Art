@@ -118,7 +118,7 @@ void AVoxelWorld::CreateVoxelWorldInEditor()
 	{
 		DestroyVoxelWorld();
 	}
-	if (!VoxelScenePlayer)
+	if (VoxelScenePlayer == nullptr)
 	{
 		FActorSpawnParameters Transient = FActorSpawnParameters();
 		Transient.ObjectFlags = RF_Transient;
@@ -356,7 +356,12 @@ void AVoxelWorld::UpdateOctree()
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdatePriority);
 
-		check(GetVoxelScenePlayer() != nullptr);
+		if (GetVoxelScenePlayer() == nullptr)
+		{
+			IVoxelLoggingInterface::LogMessage(INVTEXT("#10. Voxel Player Actor is wrong! World was destroyd"), "Error");
+			DestroyVoxelWorld();
+			return;
+		}
 
 		FIntVector PlayerPositionToWorld = TransferToVoxelWorld(GetVoxelScenePlayer()->GetActorLocation());
 

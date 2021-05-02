@@ -25,10 +25,6 @@ public:
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "Main")
 	UVoxelModificationWorld* WorldModificator;
 
-//public:
-	//UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Nice Cock"))
-	//void GetPainterData(const float& X, const float& Y, const float& Z, float& noise, bool& smooth);
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -36,13 +32,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-public:
-	/*UFUNCTION(BlueprintCallable)
-	void Modification(
-		AVoxelWorld* terrain,
-		AVoxelChunk* chunkCenter,
-		FVector position,
-		float range
-	);*/
 };

@@ -8,7 +8,7 @@
 
 class AVoxelWorld;
 
-UCLASS()
+UCLASS(Abstract)
 class VOXELART_API AVoxelPlayerInterface : public AActor
 {
 	GENERATED_BODY()

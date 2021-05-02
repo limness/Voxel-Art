@@ -34,11 +34,6 @@ protected:
 	/*Overridable function called whenever this actor is being removed from a level*/
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-#if WITH_EDITOR
-	/*Called when a property on this object has been modified externally*/
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
-#endif
-
 	/*Handles a key press*/
 	virtual bool InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad);
 
@@ -55,33 +50,48 @@ public:
 
 public:
 
-	UPROPERTY(EditDefaultsOnly)
 	bool EditorRemovePressed = false;
-
-	UPROPERTY(EditDefaultsOnly)
 	bool EditorCreatePressed = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<BrushType> BrushType = BrushType::Sphere;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetEditDig(bool Dig);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<BrushSoftness> BrushSoftness = BrushSoftness::Insert;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	bool GetEditDig();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	TEnumAsByte<EditorType> EditorType = EditorType::TerrainEdit;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetBrushShape(TEnumAsByte<EBrushShape> Shape);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	bool Dig = true;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	TEnumAsByte<EBrushShape> GetBrushShape();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	float Radius = 10.f;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetBrushSoftness(TEnumAsByte<EBrushSoftness> Softness);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Editor ~ Settings")
-	FColor Color = FColor(0.17f, 0.07f,	1.f);
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	TEnumAsByte<EBrushSoftness> GetBrushSoftness();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	float Strength = 10.f;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetEditorType(TEnumAsByte<EEditorType> Type);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = "Editor ~ Settings")
-	float MaxDictance = 256.f;
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	TEnumAsByte<EEditorType> GetEditorType();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetBrushRadius(float Radius = 10.f);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	float GetBrushRadius();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetBrushColor(FColor Color);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	FColor GetBrushColor();
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	void SetBrushStrength(float Strength = 10.f);
+
+	UFUNCTION(BlueprintCallable, Category = "Editor ~ Settings")
+	float GetBrushStrength();
 };

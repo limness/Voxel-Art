@@ -14,10 +14,13 @@
 #define NORMALS			2
 #define NORMAL			1
 
-
-DECLARE_LOG_CATEGORY_EXTERN(VoxelArt, Log, All);
+VOXELART_API DECLARE_LOG_CATEGORY_EXTERN(VoxelArt, Log, All);
 
 DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);
+
+#define VOXEL_LOG(FMT, ...) UE_LOG(VoxelArt, Log, (FMT), ##__VA_ARGS__)
+#define VOXEL_WARNING(FMT, ...) UE_LOG(LogTemp, Warning, (FMT), ##__VA_ARGS__)
+#define VOXEL_ERROR(FMT, ...) UE_LOG(LogTemp, Error, (FMT), ##__VA_ARGS__)
 
 namespace VoxelTools
 {

@@ -7,25 +7,60 @@
 #include "VoxelEditorData.generated.h"
 
 UENUM()
-enum BrushType
+enum EBrushShape
 {
-	Sphere	UMETA(DisplayName = "Sphere"),
-	Cube	UMETA(DisplayName = "Cube")
+	Sphere		UMETA(DisplayName = "Sphere"),
+	Cube		UMETA(DisplayName = "Cube"),
+	Cylinder	UMETA(DisplayName = "Cylinder"),
+	Torus		UMETA(DisplayName = "Torus"),
+	Cone		UMETA(DisplayName = "Cone")
 };
 
 UENUM()
-enum EditorType
+enum EEditorType
 {
 	TerrainEdit	UMETA(DisplayName = "Terrain"),
 	ColorEdit	UMETA(DisplayName = "Color")
 };
 
 UENUM()
-enum BrushSoftness
+enum EBrushSoftness
 {
 	Smooth	UMETA(DisplayName = "Smooth"),
 	Insert	UMETA(DisplayName = "Insert"),
 	Flat	UMETA(DisplayName = "Flat")
+};
+
+UENUM()
+enum ECopyingPasting
+{
+	Copying	UMETA(DisplayName = "Copying"),
+	Pasting	UMETA(DisplayName = "Pasting")
+};
+
+
+USTRUCT(BlueprintType)
+struct VOXELART_API FVoxelInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FIntVector Position = FIntVector(0, 0, 0);
+
+	UPROPERTY()
+	float Value = 0.f;
+
+	UPROPERTY()
+	FColor Color = VOXEL_COLOR;
+
+	FVoxelInfo() {}
+
+	FVoxelInfo(FIntVector InPosition, float InValue, FColor InColor) 
+		: Position(InPosition)
+		, Value(InValue)
+		, Color(InColor)
+	{
+	}
 };
 
 /*
@@ -44,19 +79,13 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Edit"))
-	TEnumAsByte<EditorType> EditorType = EditorType::TerrainEdit;
-
-	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Brush Type"))
-	TEnumAsByte<BrushType> BrushType = BrushType::Sphere;
+	TEnumAsByte<EEditorType> EditorType = EEditorType::TerrainEdit;
 
 	UPROPERTY(EditAnywhere, Category = "Tools", meta = (DisplayName = "Softness"))
-	TEnumAsByte<BrushSoftness> BrushSoftness = BrushSoftness::Insert;
+	TEnumAsByte<EBrushSoftness> BrushSoftness = EBrushSoftness::Insert;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Brush Dig"))
 	bool Dig = true;
-
-	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Radius"))
-	float Radius = 10.f;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Brush Strength"))
 	float Strength = 10.f;
@@ -66,4 +95,29 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (DisplayName = "Color"))
 	FColor BrushColor = VOXEL_COLOR;
+
+	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Brush Shape"))
+	TEnumAsByte<EBrushShape> BrushShape = EBrushShape::Sphere;
+
+	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Radius"))
+	float Radius = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Torus Inner Radius"))
+	float InnerRadius = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Cone Height"))
+	float Height = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Cone Angle"))
+	FVector2D Angle = FVector2D(5, 10);
+
+	UPROPERTY(EditAnywhere, Category = "Copying & pasting", meta = (DisplayName = "Copy Past On"))
+	bool CopyPastOn = false;
+
+	UPROPERTY(EditAnywhere, Category = "Copying & pasting", meta = (DisplayName = "Type"))
+	TEnumAsByte<ECopyingPasting> CopyingPasting = ECopyingPasting::Copying;
+
+	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	TArray<FVoxelInfo> CopiedDensity;
+
 };

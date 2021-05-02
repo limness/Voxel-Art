@@ -51,19 +51,19 @@ private:
 
 	AVoxelWorld* World;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Voxel Art ~ Save")
 	TArray<FVoxelSaveOctant> SavedOctants;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Voxel Art ~ Save")
 	int WorldSize = 4096;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Voxel Art ~ Save")
 	uint8 WorldDepth = 0;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Voxel Art ~ Save")
 	int WorldVoxels = 16;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Voxel Art ~ Save")
 	float WorldVoxelSize = 128.f;
 
 	UPROPERTY()

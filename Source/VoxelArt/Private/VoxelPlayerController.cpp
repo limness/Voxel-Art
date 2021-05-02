@@ -12,13 +12,6 @@ void AVoxelPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	EditorData = NewObject<UVoxelEditorData>(GetTransientPackage());
-
-	EditorData->EditorType = EditorType;
-	EditorData->BrushSoftness = BrushSoftness;
-	EditorData->Dig = Dig;
-	EditorData->Radius = Radius;
-	EditorData->Strength = Strength;
-	EditorData->BrushColor = Color;
 }
 
 bool AVoxelPlayerController::InputKey(FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)
@@ -72,26 +65,12 @@ void AVoxelPlayerController::Tick(float DeltaTime)
 				}
 			}
 		}
-		if (BrushSoftness != BrushSoftness::Smooth)
+		if (GetBrushSoftness() != EBrushSoftness::Smooth)
 		{
 			EditorRemovePressed ? EditorRemovePressed = false : EditorCreatePressed = false;
 		}
 	}
 }
-
-#if WITH_EDITOR
-void AVoxelPlayerController::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	EditorData->EditorType = EditorType;
-	EditorData->BrushSoftness = BrushSoftness;
-	EditorData->Dig = Dig;
-	EditorData->Radius = Radius;
-	EditorData->Strength = Strength;
-	EditorData->BrushColor = Color;
-
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-}
-#endif
 
 void AVoxelPlayerController::ChangeWorld(AVoxelWorld* World, FVector HitPosition)
 {
@@ -99,10 +78,11 @@ void AVoxelPlayerController::ChangeWorld(AVoxelWorld* World, FVector HitPosition
 	{
 		FIntVector WorldPosition = World->TransferToVoxelWorld(HitPosition);
 
-		switch (BrushType)
+		switch (GetBrushShape())
 		{
-		case BrushType::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, World, WorldPosition, Radius); break; }
-		case BrushType::Cube: { UVoxelModificationWorld::CubePainter(EditorData, World, WorldPosition, Radius); break; }
+		case EBrushShape::Sphere:	{ UVoxelModificationWorld::SpherePainter(EditorData, World, WorldPosition, GetBrushRadius());		break; }
+		case EBrushShape::Cube:		{ UVoxelModificationWorld::CubePainter(EditorData, World, WorldPosition, GetBrushRadius());			break; }
+		case EBrushShape::Torus:	{ UVoxelModificationWorld::TorusPainter(EditorData, World, WorldPosition, GetBrushRadius(), 5.f);	break; }
 		}
 	}
 }
@@ -115,4 +95,74 @@ void AVoxelPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AVoxelPlayerController::BeginDestroy()
 {
 	Super::BeginDestroy();
+}
+
+void AVoxelPlayerController::SetEditDig(bool Dig)
+{
+	EditorData->Dig = Dig;
+}
+
+bool AVoxelPlayerController::GetEditDig()
+{
+	return EditorData->Dig;
+}
+
+void AVoxelPlayerController::SetBrushShape(TEnumAsByte<EBrushShape> Shape)
+{
+	EditorData->BrushShape = Shape;
+}
+
+TEnumAsByte<EBrushShape> AVoxelPlayerController::GetBrushShape()
+{
+	return EditorData->BrushShape;
+}
+
+void AVoxelPlayerController::SetBrushSoftness(TEnumAsByte<EBrushSoftness> Softness)
+{
+	EditorData->BrushSoftness = Softness;
+}
+
+TEnumAsByte<EBrushSoftness> AVoxelPlayerController::GetBrushSoftness()
+{
+	return EditorData->BrushSoftness;
+}
+
+void AVoxelPlayerController::SetEditorType(TEnumAsByte<EEditorType> Type)
+{
+	EditorData->EditorType = Type;
+}
+
+TEnumAsByte<EEditorType> AVoxelPlayerController::GetEditorType()
+{
+	return EditorData->EditorType;
+}
+
+void AVoxelPlayerController::SetBrushRadius(float Radius)
+{
+	EditorData->Radius = Radius;
+}
+
+float AVoxelPlayerController::GetBrushRadius()
+{
+	return EditorData->Radius;
+}
+
+void AVoxelPlayerController::SetBrushColor(FColor Color)
+{
+	EditorData->BrushColor = Color;
+}
+
+FColor AVoxelPlayerController::GetBrushColor()
+{
+	return EditorData->BrushColor;
+}
+
+void AVoxelPlayerController::SetBrushStrength(float Strength)
+{
+	EditorData->Strength = Strength;
+}
+
+float AVoxelPlayerController::GetBrushStrength()
+{
+	return EditorData->Strength;
 }

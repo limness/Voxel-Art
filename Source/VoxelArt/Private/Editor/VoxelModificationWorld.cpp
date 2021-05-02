@@ -9,6 +9,7 @@
 
 //#include "Noise/SimplexNoiseBPLibrary.h"
 #include "Helpers/VoxelTools.h"
+#include "Helpers/VoxelSDFUtilities.h"
 #include "Helpers/VoxelCollisionBox.h"
 #include "VoxelWorld.h"
 
@@ -23,18 +24,38 @@ void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld*
 
 	World->OctreeMutex.Lock();
 
-	bool TerrainEdit = Data->EditorType == EditorType::TerrainEdit;
-	bool ColorEdit = Data->EditorType == EditorType::ColorEdit;
+	bool TerrainEdit = Data->EditorType == EEditorType::TerrainEdit;
+	bool ColorEdit = Data->EditorType == EEditorType::ColorEdit;
 
+	if (Data->CopyPastOn && Data->CopyingPasting == ECopyingPasting::Pasting)
+	{
+		for (auto& VoxelCopied : Data->CopiedDensity)
+		{
+			World->SetVoxelValue(OutOctant, VoxelCopied.Position, VoxelCopied.Value, VoxelCopied.Color, true, true);
+		}
+		return;
+	}
 	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
 	{
 		for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
 		{
 			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
 			{
-				float SphereSDF = Radius - VoxelOffset - FVector(X, Y, Z).Size();
+				float SphereSDF = FVoxelSDFUtilities::SphereSDF(X, Y, Z, Radius);// Radius - VoxelOffset - FVector(X, Y, Z).Size();
 
 				//if (SphereSDF >= -2)
+				if(Data->CopyPastOn)
+				{
+					if (Data->CopyingPasting == ECopyingPasting::Copying)
+					{
+						float OutValue = 0.f;
+						FColor OutColor = FColor(77.f, 77.f, 77.f);
+						World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+						Data->CopiedDensity.Add(FVoxelInfo(FIntVector(X, Y, Z) + Position, OutValue, OutColor));
+					}
+				}
+				else
 				{
 					float OutValue = 0.f;
 					FColor OutColor = FColor(77.f, 77.f, 77.f);
@@ -44,17 +65,16 @@ void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld*
 					{
 						if (TerrainEdit)
 						{
-							if (Data->BrushSoftness == BrushSoftness::Smooth)
+							if (Data->BrushSoftness == EBrushSoftness::Smooth)
 							{
 							}
-							else if (Data->BrushSoftness == BrushSoftness::Insert)
+							else if (Data->BrushSoftness == EBrushSoftness::Insert)
 							{
 								Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, SphereSDF) : UKismetMathLibrary::FMin(OutValue, -SphereSDF);
 							}
 						}
 					}
 					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, Data->BrushColor, TerrainEdit, ColorEdit);
-
 				}
 			}
 		}
@@ -82,11 +102,81 @@ void UVoxelModificationWorld::CubePainter(UVoxelEditorData* Data, AVoxelWorld* W
 
 				float Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, 1.f) : UKismetMathLibrary::FMin(OutValue, -1.f);
 
-				if (Data->EditorType == EditorType::TerrainEdit)
+				if (Data->EditorType == EEditorType::TerrainEdit)
 				{
 					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
 				}
-				else if (Data->EditorType == EditorType::ColorEdit)
+				else if (Data->EditorType == EEditorType::ColorEdit)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
+				}
+			}
+		}
+	}
+	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
+	World->OctreeMutex.Unlock();
+}
+
+void UVoxelModificationWorld::TorusPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius, float InnerRadius)
+{
+	int VoxelsRadius = FMath::CeilToInt(Radius + InnerRadius);
+
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
+	World->OctreeMutex.Lock();
+	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
+	{
+		for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
+		{
+			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
+			{
+				float OutValue = 0.f;
+				FColor OutColor = FColor(77.f, 77.f, 77.f);
+				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+				float TorusSDF = FVoxelSDFUtilities::TorusSDF(X, Y, Z, Radius, InnerRadius);
+				float Value = UKismetMathLibrary::FMin(OutValue, TorusSDF);
+
+				if (Data->EditorType == EEditorType::TerrainEdit)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				}
+				else if (Data->EditorType == EEditorType::ColorEdit)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
+				}
+			}
+		}
+	}
+	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
+	World->OctreeMutex.Unlock();
+}
+
+void UVoxelModificationWorld::ConePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius, float Height, FVector2D Angle)
+{
+	int VoxelsRadius = FMath::CeilToInt(Radius + Height);
+
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
+	World->OctreeMutex.Lock();
+	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
+	{
+		for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
+		{
+			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
+			{
+				float OutValue = 0.f;
+				FColor OutColor = FColor(77.f, 77.f, 77.f);
+				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+				float TorusSDF = FVoxelSDFUtilities::ConeSDF(X, Y, Z, Angle, Height);//FVoxelSDFUtilities::TorusSDF(X, Y, Z, Radius, InnerRadius);
+				float Value = UKismetMathLibrary::FMin(OutValue, TorusSDF);
+
+				if (Data->EditorType == EEditorType::TerrainEdit)
+				{
+					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, Value, FColor(77.f, 77.f, 77.f), true, false);
+				}
+				else if (Data->EditorType == EEditorType::ColorEdit)
 				{
 					World->SetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, -1.f, Data->BrushColor, false, true);
 				}

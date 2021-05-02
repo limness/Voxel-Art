@@ -140,40 +140,6 @@ FColor UVoxelWorldGenerator::GetColorMap(const FIntVector& CellPosition)
 	return color;
 }
 
-float UVoxelWorldGenerator::FlatSDF(int A)
-{
-	float Value = 0.f;
-
-	if (A >= 0)
-	{
-	//	Value = (-1) * UKismetMathLibrary::FMax(1.f, A);
-	}
-	else if (A < 0)
-	{
-	//	Value = (-1) * UKismetMathLibrary::FMin(-1.f, A);
-	}
-	return Value;
-}
-
-
-float UVoxelWorldGenerator::SphereSDF(int X, int Y, int Z, float Radius)
-{
-	float Value = 0.f;
-
-	Value = Radius - FVector(X, Y, Z).Size();
-
-	return -Value;
-}
-
-float UVoxelWorldGenerator::TorusSDF(int X, int Y, int Z, float Radius, float RadiusInside)
-{
-	float Value = 0.f;
-
-	Value = (Radius - sqrt(X * X + Y * Y)) * (Radius - sqrt(X * X + Y * Y)) + Z * Z - RadiusInside * RadiusInside;
-
-	return Value;
-}
-
 float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float Amplitude, float Frequency)
 {
 	float Value = 0.f;
@@ -191,24 +157,6 @@ float UVoxelWorldGenerator::FractalNoise(int X, int Y, int Z, int Octaves, float
 
 	//UE_LOG(LogTemp, Log, TEXT("%f"), Value);
 	return Value;
-}
-
-float UVoxelWorldGenerator::ConeSDF(FVector p, FVector2D c, float h)
-{
-	FVector2D q = h * FVector2D(c.X, -c.Y) / c.Y;
-
-	float length = sqrt(p.X * p.X + p.Z * p.Z);
-
-	FVector2D w = FVector2D(length, p.Y);
-
-	//FVector2D a = w - q * UKismetMathLibrary::Clamp(FVector2D::DotProduct(w, q) / FVector2D::DotProduct(q, q), 0.0, 1.0);
-	//FVector2D b = w - q * FVector2D(UKismetMathLibrary::Clamp(w.X / q.X, 0.0, 1.0), 1.0);
-
-	//float k = FMath::Sign(q.Y);
-	//float d = FMath::Min(FVector2D::DotProduct(a, a), FVector2D::DotProduct(b, b));
-	//float s = FMath::Max(k * (w.X * q.Y - w.Y * q.X), k * (w.Y - q.Y));
-
-	return 0.f;//return sqrt(d) * FMath::Sign(s);
 }
 
 float UVoxelWorldGenerator::IQNoise(FVector p)

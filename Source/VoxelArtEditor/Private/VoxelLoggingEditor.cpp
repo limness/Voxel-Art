@@ -30,10 +30,10 @@ void FVoxelLoggingEditor::LogMessage(const FText& Message, const FString& Verbos
 
 	if (Verbosity == "Error")
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s"), *Message.ToString());
+		//VOXEL_ERROR(TEXT("%s"), *Message.ToString());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("%s"), *Message.ToString());
+		//VOXEL_LOG(TEXT("%s"), *Message.ToString());
 	}
 }

@@ -137,7 +137,7 @@ public:
 
 public:	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Transient)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Transient, Category = "Main")
 	bool bWorldCreated = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
@@ -185,12 +185,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Export Preview Heightmap")
 	void CreateTextureDensityMap();
 
-public:
+private:
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Transient)
 	AVoxelPlayerInterface*				VoxelScenePlayer;
 
-	UPROPERTY(BlueprintReadOnly)
+public:
+
+	UPROPERTY(BlueprintReadOnly, Transient)
 	TSubclassOf<AVoxelPlayerInterface>	VoxelScenePlayerClass;
 
 	UPROPERTY(BlueprintReadOnly)

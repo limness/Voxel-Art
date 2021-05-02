@@ -56,7 +56,7 @@ protected:
     void MakePulldownMenu(FMenuBarBuilder& menuBuilder);
     void FillPulldownMenu(FMenuBuilder& menuBuilder);
 
-    TSharedPtr<IVoxelModuleListenerInterface> faf;
+    TArray<TSharedPtr<IAssetTypeActions>> CreatedAssetTypeActions;
 };
 
 

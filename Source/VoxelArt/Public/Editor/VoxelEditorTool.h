@@ -26,7 +26,7 @@ public:
 
 public:
 
-	TEnumAsByte<BrushType> CurrentTool;
+	TEnumAsByte<EBrushShape> CurrentTool;
 	float CurrentRadius;
 
 private:

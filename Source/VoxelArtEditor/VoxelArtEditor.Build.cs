@@ -9,6 +9,7 @@ public class VoxelArtEditor : ModuleRules
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
         bEnforceIWYU = true;
+        bLegacyPublicIncludePaths = false;
 
         PublicDependencyModuleNames.AddRange(new string[] { "VoxelArt" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Projects" });
@@ -27,7 +28,11 @@ public class VoxelArtEditor : ModuleRules
                 "EditorWidgets",
                 "BlueprintGraph",
                 "AnimGraph",
-                "ComponentVisualizers"
+                "ComponentVisualizers",
+                "AssetRegistry",
+                "PlacementMode",
+               // "VoxelArtGraph",
+               // "VoxelArtGraphEditor"
         }
         );
 

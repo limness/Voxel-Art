@@ -6,13 +6,17 @@
 #include "VoxelDetailsCustomization/VoxelWorldDetails.h"
 #include "VoxelEditorMode/VoxelEdModeTool.h"
 #include "ISettingsModule.h"
+#include "IPlacementModeModule.h"
 
+#include "VoxelFactories/VoxelWorldFactory.h"
 #include "VoxelTabTools/VoxelTabTool.h"
 #include "VoxelSaveUtilities.h"
 #include "VoxelEditorListeners.h"
 #include "VoxelLoggingEditor.h"
+#include "VoxelTypeActions.h"
 
 #include "Save/VoxelSaveInterface.h"
+#include "VoxelFoliageConfig.h"
 #include "VoxelListenersInterface.h"
 #include "VoxelLoggingInterface.h"
 #include "VoxelWorld.h"
@@ -61,6 +65,26 @@ void IVoxelModuleInterface::StartupModule()
         static FName PropertyEditor("PropertyEditor");
         FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>(PropertyEditor);
         PropertyModule.RegisterCustomClassLayout(AVoxelWorld::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&IVoxelWorldDetails::MakeInstance));
+    }
+    // register placeable types:
+    {
+        FPlacementCategoryInfo Info(LOCTEXT("Voxel Art", "Voxel Art"), "VoxelArt", TEXT("PMVoxelArt"), 30);
+        IPlacementModeModule::Get().RegisterPlacementCategory(Info);
+        IPlacementModeModule::Get().RegisterPlaceableItem(Info.UniqueHandle, MakeShared<FPlaceableItem>(GetMutableDefault<UVoxelWorldFactory>(), FAssetData(AVoxelWorld::StaticClass())));
+    }
+    // register custom types:
+    {
+        IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+        EAssetTypeCategories::Type VoxelCategory = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("Voxel Art")), FText::FromString("Voxel Art"));
+
+        TSharedPtr<IAssetTypeActions> VoxelSaveObjectAction = MakeShareable(new FVoxelSaveObject_AssetsTypeActions(VoxelCategory));
+        TSharedPtr<IAssetTypeActions> VoxelFoliageConfigAction = MakeShareable(new FVoxelFoliageConfig_AssetsTypeActions(VoxelCategory));
+
+        AssetTools.RegisterAssetTypeActions(VoxelSaveObjectAction.ToSharedRef());
+        AssetTools.RegisterAssetTypeActions(VoxelFoliageConfigAction.ToSharedRef());
+
+        CreatedAssetTypeActions.Add(VoxelSaveObjectAction);
+        CreatedAssetTypeActions.Add(VoxelFoliageConfigAction);
     }
     // register settings:
     {
@@ -111,6 +135,22 @@ void IVoxelModuleInterface::ShutdownModule()
     {
         SettingsModule->UnregisterSettings("Project", "UnableCategory", "VoxelSettings");
     }
+    {
+        IPlacementModeModule::Get().UnregisterPlacementCategory("VoxelArt");
+    }
+    // Unregister all the asset types that we registered
+    if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
+    {
+        IAssetTools& AssetTools = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
+        for (int32 i = 0; i < CreatedAssetTypeActions.Num(); ++i)
+        {
+            AssetTools.UnregisterAssetTypeActions(CreatedAssetTypeActions[i].ToSharedRef());
+        }
+    }
+    CreatedAssetTypeActions.Empty();
+
+    /////////////////////////////
+    /////////////////////////////
 
 	UE_LOG(LogTemp, Log, TEXT("Shutdown Voxel Art Editor Module()"));
 }

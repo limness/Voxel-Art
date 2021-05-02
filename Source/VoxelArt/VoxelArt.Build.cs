@@ -23,8 +23,6 @@ public class VoxelArt : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"CoreUObject",
-			"Engine",
 			"Slate",
 			"SlateCore"
 		});

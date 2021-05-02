@@ -133,10 +133,12 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 
 			//UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %s"), *HitVoxelWorldPosition.ToString());
 			
-			switch (EditorData->BrushType)
+			switch (EditorData->BrushShape)
 			{
-			case BrushType::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
-			case BrushType::Cube: { UVoxelModificationWorld::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case EBrushShape::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case EBrushShape::Cube: { UVoxelModificationWorld::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case EBrushShape::Torus: { UVoxelModificationWorld::TorusPainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->InnerRadius); break; }
+			case EBrushShape::Cone: { UVoxelModificationWorld::ConePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->Height, EditorData->Angle); break; }
 			}
 		}
 	}

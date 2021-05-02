@@ -9,6 +9,7 @@ class UVoxelCustomSettings : public UObject
     GENERATED_BODY()
 
 public:
-        UPROPERTY(EditAnywhere, config)
-        bool bWelcomeShowed = false;
+
+    UPROPERTY(EditAnywhere, config)
+    bool bWelcomeShowed = false;
 };

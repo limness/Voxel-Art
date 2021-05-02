@@ -31,6 +31,12 @@ public:
 	static void CubePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius);
 
 	UFUNCTION(BlueprintCallable)
+	static void TorusPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius, float InnerRadius);
+
+	UFUNCTION(BlueprintCallable)
+	static void ConePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius, float Height, FVector2D Angle);
+
+	UFUNCTION(BlueprintCallable)
 	float BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency);
 
 private:
