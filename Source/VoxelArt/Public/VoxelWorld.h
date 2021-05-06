@@ -40,6 +40,20 @@ enum RenderTexture
 };
 
 UENUM()
+enum ENormalsType
+{
+	NoNormals	UMETA(DisplayName = "No Normals"),
+	Smoothed	UMETA(DisplayName = "Smoothed")
+};
+
+UENUM()
+enum EColorsType
+{
+	NoColors	UMETA(DisplayName = "No Colors"),
+	OwnColors	UMETA(DisplayName = "Own Color Map")
+};
+
+UENUM()
 enum Meshers
 {
 	MarchingCubes	UMETA(DisplayName = "Marching Cubes"),
@@ -143,6 +157,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level of Detail")
 	bool EnabledLOD = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Max Player Velocity (in m/s)", Category = "Level of Detail")
+	int MaxPlayerVelocity = 200;
+
 	UPROPERTY(Transient)
 	bool bEnableUpdateOctree = false;
 
@@ -162,10 +179,10 @@ public:
 	int32 ChunksPerFrame = 32;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
-	bool VertexSubdivision;
+	TEnumAsByte<EColorsType> ColorsType = EColorsType::NoColors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
-	bool NormalsSmoothing;
+	TEnumAsByte<ENormalsType> NormalsType = ENormalsType::Smoothed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage")
 	UStaticMesh* MeshTree;

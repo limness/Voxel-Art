@@ -133,7 +133,6 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 
 			//UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %s"), *HitVoxelWorldPosition.ToString());
 			
-
 			if (EditorData->CopyPastOn)
 			{
 				if (EditorData->CopyingPasting == ECopyingPasting::Copying)

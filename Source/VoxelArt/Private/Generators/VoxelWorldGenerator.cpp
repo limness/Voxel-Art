@@ -4,6 +4,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 
 #include "Helpers/VoxelTools.h"
+#include "VoxelLoggingInterface.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Heightmap"), STAT_GeneratorHeightmap, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Colormap"), STAT_GeneratorColormap, STATGROUP_Voxel);
@@ -11,8 +12,13 @@ DECLARE_CYCLE_STAT(TEXT("Voxel World ~ Generator Init ~ Colormap"), STAT_Generat
 
 void UVoxelWorldGenerator::GeneratorInit()
 {
-	if (HeightmapTexture && World)
+	if (HeightmapTexture)
 	{
+		if (World == nullptr)
+		{
+			IVoxelLoggingInterface::LogMessage(INVTEXT("You selected the heightmap, but the World parameter is not selected"), "Warning");
+			return;
+		}
 #if WITH_EDITORONLY_DATA
 		SCOPE_CYCLE_COUNTER(STAT_GeneratorHeightmap);
 
@@ -51,8 +57,13 @@ void UVoxelWorldGenerator::GeneratorInit()
 		HeightmapTexture->UpdateResource();
 #endif
 	}
-	if (ColormapTexture && World)
+	if (ColormapTexture)
 	{
+		if (World == nullptr)
+		{
+			IVoxelLoggingInterface::LogMessage(INVTEXT("You selected the colormap, but the World parameter is not selected"), "Warning");
+			return;
+		}
 #if WITH_EDITORONLY_DATA
 		SCOPE_CYCLE_COUNTER(STAT_GeneratorColormap);
 

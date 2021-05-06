@@ -2,6 +2,9 @@
 
 #include "VoxelPlayerEditor.h"
 #include "Components/CapsuleComponent.h"
+#include "Helpers/VoxelTools.h"
+
+DECLARE_CYCLE_STAT(TEXT("Voxel Player Editor ~ Tick"), STAT_Tick, STATGROUP_Voxel);
 
 AVoxelPlayerEditor::AVoxelPlayerEditor()
 {
@@ -18,6 +21,7 @@ void AVoxelPlayerEditor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	SCOPE_CYCLE_COUNTER(STAT_Tick);
 	/*if (VoxelScenePlayer)
 	{
 		UE_LOG(VoxelArt, Error, TEXT("Player is already exist"));
@@ -34,6 +38,7 @@ void AVoxelPlayerEditor::Tick(float DeltaTime)
 				{
 					if (Client == CurrentClient)
 					{
+						Velocity = (GetActorLocation() - Client->GetViewLocation()).Size() / DeltaTime;
 						SetActorLocation(Client->GetViewLocation());
 						break;
 					}
@@ -41,6 +46,11 @@ void AVoxelPlayerEditor::Tick(float DeltaTime)
 			}
 		}
 	}
+}
+
+float AVoxelPlayerEditor::GetVoxelVelocity()
+{
+	return Velocity;
 }
 
 bool AVoxelPlayerEditor::ShouldTickIfViewportsOnly() const

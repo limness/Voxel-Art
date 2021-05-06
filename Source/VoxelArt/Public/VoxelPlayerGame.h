@@ -25,11 +25,13 @@ private:
 
 public:
 
+	virtual float GetVoxelVelocity();
 	virtual void SetVoxelWorld(AVoxelWorld* _World);
 
 private:
 
 	AVoxelWorld* World;
+	float Velocity = 0.f;
 
 public:
 

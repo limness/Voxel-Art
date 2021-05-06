@@ -25,6 +25,8 @@ public:
 
 	virtual void Destroyed() override;
 
+	virtual float GetVoxelVelocity();
+
 #if WITH_EDITOR
 
 	/*If true, actor is ticked*/
@@ -38,4 +40,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voxel")
 	bool bEnabled = true;
+
+	float Velocity = 0.f;
 };

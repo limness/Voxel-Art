@@ -33,7 +33,7 @@ float FVoxelSDFUtilities::TorusSDF(int X, int Y, int Z, float Radius, float Inne
 
 	Value = FVector(FVector(X, Z, 0).Size() - Radius, Y, 0).Size() - InnerRadius - VoxelTools::VoxelOffset;
 
-	return Value;
+	return -Value;
 }
 
 float FVoxelSDFUtilities::ConeSDF(int X, int Y, int Z, FVector2D Angle, float Height)
@@ -61,7 +61,7 @@ float FVoxelSDFUtilities::ConeSDF(int X, int Y, int Z, FVector2D Angle, float He
 
 	Value = sqrt(d) * sign - VoxelTools::VoxelOffset;
 
-	return Value;
+	return -Value;
 }
 
 float FVoxelSDFUtilities::BoxFrameSDF(int X, int Y, int Z, FVector b, float e)

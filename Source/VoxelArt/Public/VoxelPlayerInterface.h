@@ -24,4 +24,5 @@ protected:
 public:
 
 	virtual void SetVoxelWorld(AVoxelWorld* _World);
+	virtual float GetVoxelVelocity();
 };

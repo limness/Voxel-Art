@@ -24,7 +24,7 @@ public:
 
 	void ToolInitialize(UVoxelEditorData* Data, FVector ToolPosition);
 
-public:
+private:
 
 	TEnumAsByte<EBrushShape> CurrentTool;
 	float CurrentRadius;

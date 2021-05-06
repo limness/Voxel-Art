@@ -6,6 +6,7 @@
 #include "VoxelWorld.h"
 
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker"), STAT_Run, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Player Data"), STAT_PlayerData, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Children"), STAT_AddChildren, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Destroy Children"), STAT_DestroyChildren, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel Manager ~ Octree Checker ~ Add Remove Data"), STAT_AddRemoveData, STATGROUP_Voxel);
@@ -61,36 +62,44 @@ uint32 VoxelOctreeManager::Run()
 		}
 		else
 		{
-			if (World->GetVoxelScenePlayer())
+			if (World->MaximumLOD > 0)
 			{
-				PlayerPositionToWorld = World->TransferToVoxelWorld(World->GetVoxelScenePlayer()->GetActorLocation());
-			}
-			if (PlayerPositionToWorld != OldPlayerPositionToWorld)
-			{
-				OldPlayerPositionToWorld = PlayerPositionToWorld;
+				float PlayerVelocity = 0.f;
 
-				if (World->MaximumLOD > 0)
+				if (World->GetVoxelScenePlayer())
 				{
-					SCOPE_CYCLE_COUNTER(STAT_Run);
+					SCOPE_CYCLE_COUNTER(STAT_PlayerData);
 
-					ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
+					PlayerPositionToWorld = World->TransferToVoxelWorld(World->GetVoxelScenePlayer()->GetActorLocation());
+					PlayerVelocity = World->GetVoxelScenePlayer()->GetVoxelVelocity() / 100;
+				}
+				if (PlayerVelocity < World->MaxPlayerVelocity)
+				{
+					if (PlayerPositionToWorld != OldPlayerPositionToWorld)
 					{
-						FScopeLock Lock(&World->OctreeMutex);
-						CheckOctree(World->MainOctree);
+						OldPlayerPositionToWorld = PlayerPositionToWorld;
+
+						SCOPE_CYCLE_COUNTER(STAT_Run);
+
+						ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
+						{
+							FScopeLock Lock(&World->OctreeMutex);
+							CheckOctree(World->MainOctree);
+						}
+						if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
+						{
+							World->ChangesOctree.Enqueue(ChangesOctree);
+						}
+						/*
+						* After the first Octree update, we have to enable
+						* the update in the game branch to then update the priority and update this
+						*/
+						if (!World->bEnableUpdateOctree)
+						{
+							World->bEnableUpdateOctree = true;
+						}
+						ChangesOctree.Reset();
 					}
-					if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
-					{
-						World->ChangesOctree.Enqueue(ChangesOctree);
-					}
-					/*
-					* After the first Octree update, we have to enable
-					* the update in the game branch to then update the priority and update this
-					*/
-					if (!World->bEnableUpdateOctree)
-					{
-						World->bEnableUpdateOctree = true;
-					}
-					ChangesOctree.Reset();
 				}
 			}
 			FPlatformProcess::Sleep(0.01f);

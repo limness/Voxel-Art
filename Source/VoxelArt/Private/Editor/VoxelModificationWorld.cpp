@@ -135,7 +135,7 @@ void UVoxelModificationWorld::TorusPainter(UVoxelEditorData* Data, AVoxelWorld* 
 				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
 
 				float TorusSDF = FVoxelSDFUtilities::TorusSDF(X, Y, Z, Radius, InnerRadius);
-				float Value = Data->Dig ? UKismetMathLibrary::FMin(OutValue, TorusSDF) : UKismetMathLibrary::FMax(OutValue, -TorusSDF);
+				float Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, TorusSDF) : UKismetMathLibrary::FMin(OutValue, -TorusSDF);
 
 				if (Data->EditorType == EEditorType::TerrainEdit)
 				{
@@ -170,7 +170,7 @@ void UVoxelModificationWorld::ConePainter(UVoxelEditorData* Data, AVoxelWorld* W
 				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
 
 				float ConeSDF = FVoxelSDFUtilities::ConeSDF(Y, Z - Height / 2, X, Angle, Height);
-				float Value = Data->Dig ? UKismetMathLibrary::FMin(OutValue, ConeSDF) : UKismetMathLibrary::FMax(OutValue, -ConeSDF);
+				float Value = Data->Dig ? UKismetMathLibrary::FMax(OutValue, ConeSDF) : UKismetMathLibrary::FMin(OutValue, -ConeSDF);
 
 				if (Data->EditorType == EEditorType::TerrainEdit)
 				{
@@ -260,7 +260,7 @@ void UVoxelModificationWorld::PastPainter(UVoxelEditorData* Data, AVoxelWorld* W
 	World->OctreeMutex.Lock();
 	for (auto& VoxelCopied : Data->CopiedDensity)
 	{
-		World->SetVoxelValue(OutOctant, VoxelCopied.Position + Position, VoxelCopied.Value, VoxelCopied.Color, true, true);
+		World->SetVoxelValue(OutOctant, VoxelCopied.Position + Position + Data->PastOffset, VoxelCopied.Value, VoxelCopied.Color, true, true);
 	}
 	FIntVector MaxBoundBox = FIntVector(
 		FMath::Max(Data->CornerMax.X, Data->CornerMin.X),

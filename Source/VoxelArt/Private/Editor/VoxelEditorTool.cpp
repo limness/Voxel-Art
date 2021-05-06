@@ -54,41 +54,52 @@ void AVoxelEditorTool::ToolInitialize(UVoxelEditorData* Data, FVector ToolPositi
 	}
 	if (Data->CopyPastOn)
 	{
+		CurrentTool = EBrushShape::Cube;
+
 		Marker->SetStaticMesh(CubeToolMesh);
 		Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->CopyRadius * 2.f);
+		Marker->SetWorldLocation(ToolPosition);
 		return;
 	}
 	if (CurrentTool != Data->BrushShape)
 	{
 		switch (Data->BrushShape)
 		{
+			case EBrushShape::Cube:		{ Marker->SetStaticMesh(CubeToolMesh);		break; }
+			case EBrushShape::Sphere:	{ Marker->SetStaticMesh(SphereToolMesh);	break; }
+			case EBrushShape::Cone:		{ Marker->SetStaticMesh(ConeToolMesh);		break; }
+			case EBrushShape::Torus:	{ Marker->SetStaticMesh(TorusToolMesh);		break; }
+		}
+		CurrentTool = Data->BrushShape;
+	}
+	{
+		switch (Data->BrushShape)
+		{
 			case EBrushShape::Cube: 
-			{ 
-				Marker->SetStaticMesh(CubeToolMesh);
+			{
+				Marker->SetWorldRotation(FQuat(FRotator(0.f, 0.f, 0.f)));
 				Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
 				break;  
 			}
 			case EBrushShape::Sphere: 
-			{ 
-				Marker->SetStaticMesh(SphereToolMesh);
+			{
+				Marker->SetWorldRotation(FQuat(FRotator(0.f, 0.f, 0.f)));
 				Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
 				break; 
 			}
 			case EBrushShape::Cone: 
-			{ 
-				Marker->SetStaticMesh(ConeToolMesh);
-				Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
+			{
+				Marker->SetWorldRotation(FQuat(FRotator(0.f, 0.f, 0.f)));
+				Marker->SetWorldScale3D(FVector(Data->Angle.X, Data->Angle.Y, Data->Height) * 1.28f * 2.f);
 				break; 
 			}
 			case EBrushShape::Torus: 
-			{ 
-				Marker->SetStaticMesh(TorusToolMesh);
+			{
 				Marker->SetWorldRotation(FQuat(FRotator(90.f, 0.f, 90.f)));
 				Marker->SetWorldScale3D(FVector(1, 1, 1) * 1.28f * Data->Radius * 2.f);
 				break; 
 			}
 		}
-		CurrentTool = Data->BrushShape;
 	}
 	Marker->SetWorldLocation(ToolPosition);
 }

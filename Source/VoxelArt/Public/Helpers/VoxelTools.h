@@ -18,9 +18,9 @@ VOXELART_API DECLARE_LOG_CATEGORY_EXTERN(VoxelArt, Log, All);
 
 DECLARE_STATS_GROUP(TEXT("Voxel"), STATGROUP_Voxel, STATCAT_Advanced);
 
-#define VOXEL_LOG(FMT, ...) UE_LOG(VoxelArt, Log, (FMT), ##__VA_ARGS__)
-#define VOXEL_WARNING(FMT, ...) UE_LOG(LogTemp, Warning, (FMT), ##__VA_ARGS__)
-#define VOXEL_ERROR(FMT, ...) UE_LOG(LogTemp, Error, (FMT), ##__VA_ARGS__)
+#define VOXEL_LOG(Text, ...)		UE_LOG(VoxelArt, Log, Text, ##__VA_ARGS__)
+#define VOXEL_WARNING(Text, ...)	UE_LOG(VoxelArt, Warning, Text, ##__VA_ARGS__)
+#define VOXEL_ERROR(Text, ...)		UE_LOG(VoxelArt, Error, Text, ##__VA_ARGS__)
 
 namespace VoxelTools
 {

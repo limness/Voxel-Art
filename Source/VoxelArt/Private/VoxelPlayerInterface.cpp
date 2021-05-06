@@ -22,3 +22,8 @@ void AVoxelPlayerInterface::SetVoxelWorld(AVoxelWorld* _World)
 	// Override from example classes
 }
 
+float AVoxelPlayerInterface::GetVoxelVelocity()
+{
+	// Override from example classes
+	return 0.f;
+}

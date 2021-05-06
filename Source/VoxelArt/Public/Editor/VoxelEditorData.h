@@ -122,13 +122,16 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
 	FIntVector CenterCopy;
 
-	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	UPROPERTY(EditAnywhere, Category = "Copying & pasting")
+	FIntVector PastOffset = FIntVector(0, 0, 0);
+
+	UPROPERTY(BlueprintReadWrite, Category = "Copying & pasting")
 	FIntVector CornerMin = FIntVector(0, 0, 0);
 
-	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	UPROPERTY(BlueprintReadWrite, Category = "Copying & pasting")
 	FIntVector CornerMax = FIntVector(0, 0, 0);
 
-	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	UPROPERTY(BlueprintReadWrite, Category = "Copying & pasting")
 	TArray<FVoxelInfo> CopiedDensity;
 
 	void ClearCopiedData();
