@@ -24,49 +24,63 @@ float FVoxelSDFUtilities::SphereSDF(int X, int Y, int Z, float Radius)
 
 	Value = Radius - VoxelTools::VoxelOffset - FVector(X, Y, Z).Size();
 
-	return -Value;
+	return Value;
 }
 
 float FVoxelSDFUtilities::TorusSDF(int X, int Y, int Z, float Radius, float InnerRadius)
 {
 	float Value = 0.f;
 
-	//Value = (Radius - sqrt(X * X + Y * Y)) * (Radius - sqrt(X * X + Y * Y)) + Z * Z - RadiusInside * RadiusInside;
 	Value = FVector(FVector(X, Z, 0).Size() - Radius, Y, 0).Size() - InnerRadius - VoxelTools::VoxelOffset;
 
 	return Value;
 }
 
-float FVoxelSDFUtilities::ConeSDF(int X, int Y, int Z, FVector2D c, float Height)
+float FVoxelSDFUtilities::ConeSDF(int X, int Y, int Z, FVector2D Angle, float Height)
 {
 	float Value = 0.f;
 
-	FVector q = Height * FVector(c.X / c.Y, -1.0, 0);
+	FVector q = Height * FVector(Angle.X / Angle.Y, -1.0, 0);
 
 	FVector w = FVector(FVector(X, Z, 0).Size(), Y, 0);
-	FVector a = w - q * FMath::Clamp<float>(FVector::DotProduct(w, q) / FVector::DotProduct(q, q), 0.0, 1.0); //
+	FVector a = w - q * FMath::Clamp<float>(FVector::DotProduct(w, q) / FVector::DotProduct(q, q), 0.0, 1.0);
 	FVector b = w - q * FVector(FMath::Clamp<float>(w.X / q.X, 0.0, 1.0), 1.0, 0);
 
-	float k = q.Y >= 0.f ? 1.f : -1.f;
+	float k = 0.f;
+
+	if (q.Y == 0) { k = 0.f; }
+	else if (q.Y > 0) { k = 1.f; }
+	else { k = -1.f; }
+
 	float d = UKismetMathLibrary::FMin(FVector::DotProduct(a, a), FVector::DotProduct(b, b));
-	float sign = FMath::Max(k * (w.X * q.Y - w.Y * q.X), k * (w.Y - q.Y)) >= 0.f ? 1.f : -1.f;
+	float sign = FMath::Max(k * (w.X * q.Y - w.Y * q.X), k * (w.Y - q.Y));
+
+	if (sign == 0) { sign = 0.f; }
+	else if (sign > 0) { sign = 1.f; }
+	else { sign = -1.f; }
 
 	Value = sqrt(d) * sign - VoxelTools::VoxelOffset;
 
 	return Value;
 }
-/*
-float FVoxelSDFUtilities::BoxFrameSDF(FVector p, FVector2D c, float h)
-{
-	p = abs(p) - b;
-	vec3 q = abs(p + e) - e;
-	return min(min(
-		length(max(vec3(p.x, q.y, q.z), 0.0)) + min(max(p.x, max(q.y, q.z)), 0.0),
-		length(max(vec3(q.x, p.y, q.z), 0.0)) + min(max(q.x, max(p.y, q.z)), 0.0)),
-		length(max(vec3(q.x, q.y, p.z), 0.0)) + min(max(q.x, max(q.y, p.z)), 0.0));
 
-	return 0.f;
-}*/
+float FVoxelSDFUtilities::BoxFrameSDF(int X, int Y, int Z, FVector b, float e)
+{
+	float Value = 0.f;
+
+	X = FMath::Abs(X) - b.X;
+	Y = FMath::Abs(Y) - b.Y;
+	Z = FMath::Abs(Z) - b.Z;
+
+	FVector q = FVector(FMath::Abs(X + e), FMath::Abs(Y + e), FMath::Abs(Z + e)) - e;
+	/*
+	Value = UKismetMathLibrary::FMin(UKismetMathLibrary::FMin(
+		length(FMath::Max(FVector(X, q.Y, q.Z), 0.0)) + UKismetMathLibrary::FMin(FMath::Max(X, FMath::Max(q.Y, q.Z)), 0.0),
+		length(FMath::Max(FVector(q.X, Y, q.Z), 0.0)) + UKismetMathLibrary::FMin(FMath::Max(q.X, FMath::Max(Y, q.Z)), 0.0)),
+		length(FMath::Max(FVector(q.X, q.Y, Z), 0.0)) + UKismetMathLibrary::FMin(FMath::Max(q.X, FMath::Max(q.Y, Z)), 0.0));
+		*/
+	return Value;
+}
 
 /*
 Octahedron

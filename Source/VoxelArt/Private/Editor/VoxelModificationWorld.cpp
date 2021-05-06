@@ -79,7 +79,7 @@ void UVoxelModificationWorld::SpherePainter(UVoxelEditorData* Data, AVoxelWorld*
 			}
 		}
 	}
-	UpdateOverlapOctants(World, Position, VoxelsRadius * 2);
+	UpdateOverlapOctants(World, Position, FIntVector(1, 1, 1) * VoxelsRadius * 2);
 	World->OctreeMutex.Unlock();
 }
 
@@ -113,7 +113,7 @@ void UVoxelModificationWorld::CubePainter(UVoxelEditorData* Data, AVoxelWorld* W
 			}
 		}
 	}
-	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
+	UpdateOverlapOctants(World, Position, FIntVector(1, 1, 1) * (VoxelsRadius + 1) * 2);
 	World->OctreeMutex.Unlock();
 }
 
@@ -135,7 +135,7 @@ void UVoxelModificationWorld::TorusPainter(UVoxelEditorData* Data, AVoxelWorld* 
 				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
 
 				float TorusSDF = FVoxelSDFUtilities::TorusSDF(X, Y, Z, Radius, InnerRadius);
-				float Value = UKismetMathLibrary::FMin(OutValue, TorusSDF);
+				float Value = Data->Dig ? UKismetMathLibrary::FMin(OutValue, TorusSDF) : UKismetMathLibrary::FMax(OutValue, -TorusSDF);
 
 				if (Data->EditorType == EEditorType::TerrainEdit)
 				{
@@ -148,7 +148,7 @@ void UVoxelModificationWorld::TorusPainter(UVoxelEditorData* Data, AVoxelWorld* 
 			}
 		}
 	}
-	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
+	UpdateOverlapOctants(World, Position, FIntVector(1, 1, 1) * (VoxelsRadius + 1) * 2);
 	World->OctreeMutex.Unlock();
 }
 
@@ -169,8 +169,8 @@ void UVoxelModificationWorld::ConePainter(UVoxelEditorData* Data, AVoxelWorld* W
 				FColor OutColor = FColor(77.f, 77.f, 77.f);
 				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
 
-				float TorusSDF = FVoxelSDFUtilities::ConeSDF(X, Y, Z, Angle, Height);//FVoxelSDFUtilities::TorusSDF(X, Y, Z, Radius, InnerRadius);
-				float Value = UKismetMathLibrary::FMin(OutValue, TorusSDF);
+				float ConeSDF = FVoxelSDFUtilities::ConeSDF(Y, Z - Height / 2, X, Angle, Height);
+				float Value = Data->Dig ? UKismetMathLibrary::FMin(OutValue, ConeSDF) : UKismetMathLibrary::FMax(OutValue, -ConeSDF);
 
 				if (Data->EditorType == EEditorType::TerrainEdit)
 				{
@@ -183,7 +183,91 @@ void UVoxelModificationWorld::ConePainter(UVoxelEditorData* Data, AVoxelWorld* W
 			}
 		}
 	}
-	UpdateOverlapOctants(World, Position, (VoxelsRadius + 1) * 2);
+	UpdateOverlapOctants(World, Position, FIntVector(1, 1, 1) * (VoxelsRadius + 1) * 2);
+	World->OctreeMutex.Unlock();
+}
+
+void UVoxelModificationWorld::CopyPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius)
+{
+	int VoxelsRadius = FMath::CeilToInt(Radius);
+
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
+	World->OctreeMutex.Lock();
+
+	// As soon as we start copying new data - we have to set a new center of coordinates
+	if (Data->CopiedDensity.Num() == 0)
+	{
+		Data->CenterCopy = Position;
+	}
+	for (int Z = -VoxelsRadius; Z <= VoxelsRadius; Z++)
+	{
+		for (int Y = -VoxelsRadius; Y <= VoxelsRadius; Y++)
+		{
+			for (int X = -VoxelsRadius; X <= VoxelsRadius; X++)
+			{
+				float OutValue = 0.f;
+				FColor OutColor = FColor(77.f, 77.f, 77.f);
+				World->GetVoxelValue(OutOctant, FIntVector(X, Y, Z) + Position, OutValue, OutColor);
+
+				Data->CopiedDensity.Add(FVoxelInfo(FIntVector(X, Y, Z) + Position - Data->CenterCopy, OutValue, OutColor));
+			}
+		}
+	}
+	World->OctreeMutex.Unlock();
+}
+
+void UVoxelModificationWorld::PastPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position)
+{
+	FVoxelOctreeDensity* OutOctant = nullptr;
+
+	// Before pasting, we must define the boundaries of the changed data
+	// so that we can then update only the affected chunks
+	if (Data->CornerMin == FIntVector(0, 0, 0) && Data->CornerMax == FIntVector(0, 0, 0))
+	{
+		for (auto& VoxelCopied : Data->CopiedDensity)
+		{
+			if (VoxelCopied.Position.X < Data->CornerMin.X)
+			{
+				Data->CornerMin.X = VoxelCopied.Position.X;
+			}
+			if (VoxelCopied.Position.Y < Data->CornerMin.Y)
+			{
+				Data->CornerMin.Y = VoxelCopied.Position.Y;
+			}
+			if (VoxelCopied.Position.Z < Data->CornerMin.Z)
+			{
+				Data->CornerMin.Z = VoxelCopied.Position.Z;
+			}
+
+			///////////////////////////////////////////////
+			///////////////////////////////////////////////
+
+			if (VoxelCopied.Position.X > Data->CornerMax.X)
+			{
+				Data->CornerMax.X = VoxelCopied.Position.X;
+			}
+			if (VoxelCopied.Position.Y > Data->CornerMax.Y)
+			{
+				Data->CornerMax.Y = VoxelCopied.Position.Y;
+			}
+			if (VoxelCopied.Position.Z > Data->CornerMax.Z)
+			{
+				Data->CornerMax.Z = VoxelCopied.Position.Z;
+			}
+		}
+	}
+	World->OctreeMutex.Lock();
+	for (auto& VoxelCopied : Data->CopiedDensity)
+	{
+		World->SetVoxelValue(OutOctant, VoxelCopied.Position + Position, VoxelCopied.Value, VoxelCopied.Color, true, true);
+	}
+	FIntVector MaxBoundBox = FIntVector(
+		FMath::Max(Data->CornerMax.X, Data->CornerMin.X),
+		FMath::Max(Data->CornerMax.Y, Data->CornerMin.Y),
+		FMath::Max(Data->CornerMax.Z, Data->CornerMin.Z)
+	);
+	UpdateOverlapOctants(World, Position, (MaxBoundBox + FIntVector(1, 1, 1)) * 2);
 	World->OctreeMutex.Unlock();
 }
 
@@ -206,7 +290,7 @@ float UVoxelModificationWorld::BangPainter(int X, int Y, int Z, float Radius, in
 	return value + valuefractal;
 }
 
-void UVoxelModificationWorld::UpdateOverlapOctants(AVoxelWorld* World, FIntVector Position, int Size)
+void UVoxelModificationWorld::UpdateOverlapOctants(AVoxelWorld* World, FIntVector Position, FIntVector Size)
 {
 	FVoxelCollisionBox Box = FVoxelCollisionBox(World, Position, Size);
 	TArray<TSharedPtr<FVoxelOctreeData>> OverlapOctants;

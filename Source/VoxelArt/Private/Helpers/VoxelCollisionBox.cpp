@@ -8,6 +8,13 @@
 FVoxelCollisionBox::FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, int _Size)
 	: World(_World)
 	, Position(_Position)
+	, Size(FIntVector(_Size, _Size, _Size))
+{
+}
+
+FVoxelCollisionBox::FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, FIntVector _Size)
+	: World(_World)
+	, Position(_Position)
 	, Size(_Size)
 {
 //	World->SpawnBoxTest(World->TransferToGameWorld(Position), Size / 2 * World->VoxelMin, 30.f, FColor::Green);
@@ -19,12 +26,12 @@ FVoxelCollisionBox::~FVoxelCollisionBox()
  
 FIntVector FVoxelCollisionBox::GetMinimumCorner()
 {
-	return this->Position - FIntVector(1, 1, 1) * Size / 2;
+	return this->Position - Size / 2;
 }
 
 FIntVector FVoxelCollisionBox::GetMaximumCorner()
 {
-	return this->Position + FIntVector(1, 1, 1) * Size / 2;
+	return this->Position + Size / 2;
 }
 
 bool FVoxelCollisionBox::IsInside(TSharedPtr<FVoxelOctreeData> CurrentOctant)

@@ -28,7 +28,7 @@ public:
     /** The details view we do most of our work within */
     TSharedPtr<IDetailsView> DetailsView;
 
-    FReply CreateWorldInEditor();
+    FReply ClearCopiedData();
 
 public:
 

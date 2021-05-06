@@ -133,12 +133,26 @@ void FVoxelEdMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 
 			//UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %s"), *HitVoxelWorldPosition.ToString());
 			
+
+			if (EditorData->CopyPastOn)
+			{
+				if (EditorData->CopyingPasting == ECopyingPasting::Copying)
+				{
+					UVoxelModificationWorld::CopyPainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->CopyRadius);
+				}
+				else if (EditorData->CopyingPasting == ECopyingPasting::Pasting)
+				{
+					UVoxelModificationWorld::PastPainter(EditorData, HitWorld, HitVoxelWorldPosition);
+				}
+				return;
+			}
+
 			switch (EditorData->BrushShape)
 			{
-			case EBrushShape::Sphere: { UVoxelModificationWorld::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
-			case EBrushShape::Cube: { UVoxelModificationWorld::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
-			case EBrushShape::Torus: { UVoxelModificationWorld::TorusPainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->InnerRadius); break; }
-			case EBrushShape::Cone: { UVoxelModificationWorld::ConePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->Height, EditorData->Angle); break; }
+			case EBrushShape::Sphere:	{ UVoxelModificationWorld::SpherePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case EBrushShape::Cube:		{ UVoxelModificationWorld::CubePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius); break; }
+			case EBrushShape::Torus:	{ UVoxelModificationWorld::TorusPainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->InnerRadius); break; }
+			case EBrushShape::Cone:		{ UVoxelModificationWorld::ConePainter(EditorData, HitWorld, HitVoxelWorldPosition, EditorData->Radius, EditorData->Height, EditorData->Angle); break; }
 			}
 		}
 	}

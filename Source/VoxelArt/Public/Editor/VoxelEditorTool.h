@@ -33,6 +33,8 @@ private:
 
 	UStaticMesh* CubeToolMesh;
 	UStaticMesh* SphereToolMesh;
+	UStaticMesh* ConeToolMesh;
+	UStaticMesh* TorusToolMesh;
 
 private:
 

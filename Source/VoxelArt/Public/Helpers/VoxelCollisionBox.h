@@ -14,6 +14,7 @@ class VOXELART_API FVoxelCollisionBox
 {
 public:
 	FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, int _Size);
+	FVoxelCollisionBox(AVoxelWorld* _World, FIntVector _Position, FIntVector _Size);
 	~FVoxelCollisionBox();
 
 public:
@@ -30,5 +31,5 @@ public:
 
 	AVoxelWorld* World;
 	FIntVector Position;
-	int Size;
+	FIntVector Size;
 };

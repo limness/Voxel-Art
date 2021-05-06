@@ -37,9 +37,15 @@ public:
 	static void ConePainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius, float Height, FVector2D Angle);
 
 	UFUNCTION(BlueprintCallable)
+	static void CopyPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position, float Radius);
+
+	UFUNCTION(BlueprintCallable)
+	static void PastPainter(UVoxelEditorData* Data, AVoxelWorld* World, FIntVector Position);
+
+	UFUNCTION(BlueprintCallable)
 	float BangPainter(int X, int Y, int Z, float Radius, int octaves, float amplitude, float frequency);
 
 private:
 
-	static void UpdateOverlapOctants(AVoxelWorld* World, FIntVector Position, int Size);
+	static void UpdateOverlapOctants(AVoxelWorld* World, FIntVector Position, FIntVector Size);
 };

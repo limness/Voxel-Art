@@ -44,5 +44,11 @@ public:
 	* Doesn't work.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
-	static float ConeSDF(int X, int Y, int Z, FVector2D c, float Height);
+	static float ConeSDF(int X, int Y, int Z, FVector2D Angle, float Height);
+
+	/*
+	* Doesn't work.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Voxel SDF")
+	static float BoxFrameSDF(int X, int Y, int Z, FVector b, float e);
 };

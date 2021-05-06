@@ -11,7 +11,6 @@ enum EBrushShape
 {
 	Sphere		UMETA(DisplayName = "Sphere"),
 	Cube		UMETA(DisplayName = "Cube"),
-	Cylinder	UMETA(DisplayName = "Cylinder"),
 	Torus		UMETA(DisplayName = "Torus"),
 	Cone		UMETA(DisplayName = "Cone")
 };
@@ -106,10 +105,10 @@ public:
 	float InnerRadius = 5.f;
 
 	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Cone Height"))
-	float Height = 10.f;
+	float Height = 30.f;
 
 	UPROPERTY(EditAnywhere, Category = "Shape Settings", meta = (DisplayName = "Cone Angle"))
-	FVector2D Angle = FVector2D(5, 10);
+	FVector2D Angle = FVector2D(15, 20);
 
 	UPROPERTY(EditAnywhere, Category = "Copying & pasting", meta = (DisplayName = "Copy Past On"))
 	bool CopyPastOn = false;
@@ -117,7 +116,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Copying & pasting", meta = (DisplayName = "Type"))
 	TEnumAsByte<ECopyingPasting> CopyingPasting = ECopyingPasting::Copying;
 
+	UPROPERTY(EditAnywhere, Category = "Copying & pasting", meta = (DisplayName = "Copy Radius"))
+	float CopyRadius = 15.f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	FIntVector CenterCopy;
+
+	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	FIntVector CornerMin = FIntVector(0, 0, 0);
+
+	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
+	FIntVector CornerMax = FIntVector(0, 0, 0);
+
 	UPROPERTY(VisibleAnywhere, Category = "Copying & pasting")
 	TArray<FVoxelInfo> CopiedDensity;
 
+	void ClearCopiedData();
 };

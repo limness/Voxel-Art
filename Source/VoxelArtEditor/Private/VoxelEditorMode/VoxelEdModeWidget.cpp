@@ -62,8 +62,8 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				[
 					SNew(SBorder)
-					//.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f)) // Dark Grey
-					.BorderBackgroundColor(FLinearColor(0.122f, 0.138f, 0.491f, 1.f)) // Voxel Blue
+					.BorderBackgroundColor(FLinearColor(0.0296f, 0.0296f, 0.0296f, 1.f)) // Dark Grey
+					//.BorderBackgroundColor(FLinearColor(0.122f, 0.138f, 0.491f, 1.f)) // Voxel Blue
 					.BorderImage(FCoreStyle::Get().GetBrush("ErrorReporting.Box"))
 					[
 						SNew(SVerticalBox)
@@ -121,6 +121,26 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
 						.Text(FText::FromString(ErrorDescription))
 					]
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SNew(SButton)
+					.ContentPadding(2)
+					.VAlign(VAlign_Center)
+					.HAlign(HAlign_Center)
+					.OnClicked(this, &SVoxelEdModeWidget::ClearCopiedData)
+					[
+						SNew(STextBlock)
+						.Font(IDetailLayoutBuilder::GetDetailFont())
+						.Text(FText::FromString(TEXT("Clear Copied Data")))
+					]
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SNew(SSeparator)
+					.Orientation(Orient_Horizontal)
 				]
 			]
         ];
@@ -200,7 +220,15 @@ FVoxelEdMode* SVoxelEdModeWidget::GetEdMode() const
     return (FVoxelEdMode*)GLevelEditorModeTools().GetActiveMode(FVoxelEdMode::EM_Example);
 }
 
-FReply SVoxelEdModeWidget::CreateWorldInEditor()
+FReply SVoxelEdModeWidget::ClearCopiedData()
 {
+    if (EditorTools != nullptr)
+    {
+		EditorTools->ClearCopiedData();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("EditorTools is NULL"));
+    }
     return FReply::Handled();
 }
