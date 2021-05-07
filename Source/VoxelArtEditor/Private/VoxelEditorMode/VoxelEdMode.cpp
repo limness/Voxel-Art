@@ -30,15 +30,9 @@ void FVoxelEdMode::Enter()
 
     if (!Toolkit.IsValid())
     {
-		UE_LOG(LogTemp, Warning, TEXT("Tooklit is not"));
-
         Toolkit = MakeShareable(new FVoxelEdModeToolkit);
         Toolkit->Init(Owner->GetToolkitHost());
-    } 
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Tooklit already is"));
-	}
+    }
 }
 
 void FVoxelEdMode::Exit()
