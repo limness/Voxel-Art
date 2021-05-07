@@ -46,6 +46,9 @@ protected:
 
     virtual bool DisallowMouseDeltaTracking() const override;
 
+    virtual bool UsesToolkits() const override;
+
+
 private:
 
     UVoxelEditorData* EditorData;

@@ -125,15 +125,20 @@ void SVoxelEdModeWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				.AutoHeight()
 				[
-					SNew(SButton)
-					.ContentPadding(2)
-					.VAlign(VAlign_Center)
-					.HAlign(HAlign_Center)
-					.OnClicked(this, &SVoxelEdModeWidget::ClearCopiedData)
+					SAssignNew(EditorObject, SVerticalBox)
+					.Visibility(bShowTools ? EVisibility::Visible : EVisibility::Collapsed)
+					+ SVerticalBox::Slot()
 					[
-						SNew(STextBlock)
-						.Font(IDetailLayoutBuilder::GetDetailFont())
-						.Text(FText::FromString(TEXT("Clear Copied Data")))
+						SNew(SButton)
+						.ContentPadding(2)
+						.VAlign(VAlign_Center)
+						.HAlign(HAlign_Center)
+						.OnClicked(this, &SVoxelEdModeWidget::ClearCopiedData)
+						[
+							SNew(STextBlock)
+							.Font(IDetailLayoutBuilder::GetDetailFont())
+							.Text(FText::FromString(TEXT("Clear Copied Data")))
+						]
 					]
 				]
 				+ SVerticalBox::Slot()

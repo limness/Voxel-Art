@@ -6,10 +6,10 @@
 #include "VoxelEdMode.h"
 #include "VoxelEdModeWidget.h"
 
-class FExampleEdModeToolkit : public FModeToolkit
+class FVoxelEdModeToolkit : public FModeToolkit
 {
 public:
-    FExampleEdModeToolkit()
+    FVoxelEdModeToolkit()
     {
         SAssignNew(VoxelEdModeWidget, SVoxelEdModeWidget);
     }

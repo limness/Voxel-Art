@@ -6,6 +6,7 @@
 
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
+//#include "Interfaces/IPluginManager.h"
 //#include "Materials/MaterialInstanceDynamic.h"
 
 
@@ -14,12 +15,12 @@ AVoxelEditorTool::AVoxelEditorTool()
 	Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EditorTool"));
 	RootComponent = Marker;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>	CubeTool(TEXT("/Engine/BasicShapes/Cube.Cube"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>	SphereTool(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>	ConeTool(TEXT("/Engine/BasicShapes/Cone.Cone"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>	TorusTool(TEXT("/VoxelArt/EditorTools/Torus.Torus"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	CubeTool(TEXT("/Engine/BasicShapes/Cube"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	SphereTool(TEXT("/Engine/BasicShapes/Sphere"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	ConeTool(TEXT("/Engine/BasicShapes/Cone"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>	TorusTool(TEXT("/VoxelArt/EditorTools/Torus"));
 
-	static ConstructorHelpers::FObjectFinder<UMaterial>		MaterialTool(TEXT("/VoxelArt/EditorMaterials/MVoxel_Tool.MVoxel_Tool"));
+	static ConstructorHelpers::FObjectFinder<UMaterial>		MaterialTool(TEXT("/VoxelArt/EditorMaterials/MVoxel_Tool"));
 
 	if (CubeTool.Succeeded())
 	{

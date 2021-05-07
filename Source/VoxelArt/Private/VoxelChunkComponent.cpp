@@ -11,7 +11,7 @@
 
 UVoxelChunkComponent::UVoxelChunkComponent(const class FObjectInitializer& ObjectInitializer)
 {
-	bUseAsyncCooking = true;
+	bUseAsyncCooking = false;
 }
 
 bool UVoxelChunkComponent::IsPoolActive()

@@ -26,7 +26,7 @@ float UVoxelWorldPlanetGenerator::GetDensityMap(const FIntVector& CellPosition)
 
 	Value += FractalNoise(CellPosition.X, CellPosition.Y, CellPosition.Z);
 
-	return Value;
+	return -Value;
 }
 
 FColor UVoxelWorldPlanetGenerator::GetColorMap(const FIntVector& CellPosition)

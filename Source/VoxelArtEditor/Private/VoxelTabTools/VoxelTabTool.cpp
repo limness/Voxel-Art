@@ -15,8 +15,9 @@ void FVoxelTabTool::OnStartupModule()
     {
         TSharedRef<class FGlobalTabmanager> tm = FGlobalTabmanager::Get();
 
-
 #if ENGINE_MINOR_VERSION < 26
+        UE_LOG(LogTemp, Warning, TEXT("Spawn new tab"));
+
         tm->InvokeTab(TabName);
 
         VoxelCustomMutableSettings->bWelcomeShowed = true;

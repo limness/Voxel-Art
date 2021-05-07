@@ -30,9 +30,15 @@ void FVoxelEdMode::Enter()
 
     if (!Toolkit.IsValid())
     {
-        Toolkit = MakeShareable(new FExampleEdModeToolkit);
+		UE_LOG(LogTemp, Warning, TEXT("Tooklit is not"));
+
+        Toolkit = MakeShareable(new FVoxelEdModeToolkit);
         Toolkit->Init(Owner->GetToolkitHost());
-    }
+    } 
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tooklit already is"));
+	}
 }
 
 void FVoxelEdMode::Exit()
@@ -161,7 +167,11 @@ bool FVoxelEdMode::DisallowMouseDeltaTracking() const
 {
 	return EditorRemovePressed;
 }
-		
+
+bool FVoxelEdMode::UsesToolkits() const
+{
+	return true;
+}
 /*AsyncTask(ENamedThreads::GameThread, [=]()
 	{
 
