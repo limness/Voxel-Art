@@ -10,6 +10,7 @@ class AVoxelWorld;
 class UVoxelWorldGenerator;
 class FVoxelOctreeData;
 class FVoxelChunkData;
+class FVoxelMesherAsyncTask;
 
 /*
 * Voxel Chunk Component class
@@ -25,6 +26,9 @@ public:
 
 public:
 
+	FAsyncTask<FVoxelMesherAsyncTask>* MesherTask;
+	FThreadSafeBool MeshComplete;
+
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 	UVoxelWorldGenerator* WorldGenerator;
 	UMaterialInterface* Material;
@@ -37,6 +41,7 @@ public:
 
 	bool IsPoolActive();
 	void SetPoolActive(bool activeStatus);
+	bool CreateMesh(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData);
 	void UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors);
 };
 
@@ -44,12 +49,13 @@ public:
 /*
 * Voxel Chunk Async Mesher class
 */
-class FMesherAsyncTask : public FNonAbandonableTask
+class FVoxelMesherAsyncTask : public FNonAbandonableTask
 {
 public:
 
-	FMesherAsyncTask(AVoxelWorld* _World, FVoxelChunkData* _Data) 
+	FVoxelMesherAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelChunkData* _Data)
 		: World(_World)
+		, Chunk(_Chunk)
 		, Data(_Data)
 	{
 	}
@@ -58,6 +64,8 @@ private:
 
 	AVoxelWorld* World;
 	FVoxelChunkData* Data;
+
+	UVoxelChunkComponent* Chunk;
 
 public:
 

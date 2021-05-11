@@ -10,6 +10,10 @@
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
 
+// TODO:
+// Restore enqueue line in VoxelOctreeNeightborsChecker
+// Restore removing loop in VoxelWorld
+
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Destroy World"), STAT_DestroyVoxelWorld, STATGROUP_Voxel);
@@ -27,6 +31,7 @@ DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Init")
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Octant Data Init"), STAT_OctantDataInit, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Create chunks ~ Create Chunk"), STAT_CreateChunk, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Remove chunks"), STAT_RemoveChunks, STATGROUP_Voxel);
+DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Force Remove chunks"), STAT_ForceRemoveChunks, STATGROUP_Voxel);
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Updating Octree ~ Update Octree chunks"), STAT_UpdateChunks, STATGROUP_Voxel);
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Spawn Chunk ~ Adding to Task"), STAT_AddChunkToTask, STATGROUP_Voxel);
@@ -48,7 +53,7 @@ AVoxelWorld::AVoxelWorld()
 	ChunkPoolComponent = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
 
 	/* Object pool thread */
-	//ThreadPool = FQueuedThreadPool::Allocate();
+	ThreadPool = FQueuedThreadPool::Allocate();
 }
 
 void AVoxelWorld::BeginPlay()
@@ -153,7 +158,7 @@ void AVoxelWorld::CreateVoxelWorld()
 	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 
 	// Allocate the number of tasks for the pool.
-	//ThreadPool->Create(4, 64 * 1024);
+	ThreadPool->Create(4, 64 * 1024);
 
 	// Initialize the World generator in order to get information about the import textures.
 	WorldGenerator->GeneratorInit();
@@ -279,7 +284,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
 			
-			//ThreadPool->Destroy();
+			ThreadPool->Destroy();
 			bWorldCreated = false;
 			bStatsShowed = false;
 			bEnableUpdateOctree = false;
@@ -328,9 +333,11 @@ void AVoxelWorld::OnConstruction(const FTransform& Transform)
 void AVoxelWorld::UpdateOctree()
 {
 	SCOPE_CYCLE_COUNTER(STAT_UpdateOctree);
+
+	FScopeLock Lock(&OctreeMutex);
 	{
 		SCOPE_CYCLE_COUNTER(STAT_EnqueueOctree);
-		
+
 		TSharedPtr<FChunksRenderInfo> ChunksChangesArray;
 		while (ChangesOctree.Peek(ChunksChangesArray))
 		{
@@ -339,6 +346,17 @@ void AVoxelWorld::UpdateOctree()
 			for (auto& Chunk : ChunksChangesArray->ChunksCreation)
 			{
 				ChunksCreation.Add(Chunk);
+				TemporaryOctantsTest.Add(Chunk);
+
+				/*if (bStatsShowed)
+				{
+					VoxelDebugBox(TransferToGameWorld(Chunk->Position), Chunk->Size / 2 * VoxelMin, 250.f, FColor::Red);
+				}*/
+				//VoxelDebugBox(TransferToGameWorld(Chunk->Position), Chunk->Size / 2 * VoxelMin, 250.f, FColor::Red);
+			}
+			for (auto& Chunk : ChunksChangesArray->ChunksForceRemoving)
+			{
+				ChunksForceRemoving.Add(Chunk);
 			}
 			for (auto& Chunk : ChunksChangesArray->ChunksRemoving)
 			{
@@ -350,6 +368,7 @@ void AVoxelWorld::UpdateOctree()
 			}
 			ChunksChangesArray->ChunksCreation.Empty();
 			ChunksChangesArray->ChunksRemoving.Empty();
+			ChunksChangesArray->ChunksForceRemoving.Empty();
 			ChunksChangesArray->ChunksGeneration.Empty();
 		}
 	}
@@ -377,6 +396,8 @@ void AVoxelWorld::UpdateOctree()
 	{
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
 
+//		FScopeLock Lock(&OctreeMutex);
+
 		int32 Index = 0;
 		while (Index < ChunksPerFrame)
 		{
@@ -388,9 +409,9 @@ void AVoxelWorld::UpdateOctree()
 					SCOPE_CYCLE_COUNTER(STAT_OctantInit);
 
 					//TODO: Fix this line because it takes a lot time for waiting
-					OctreeMutex.Lock();
+					//OctreeMutex.Lock();
 					Octant = ChunkData->CurrentOctree.Pin();
-					OctreeMutex.Unlock();
+					//OctreeMutex.Unlock();
 				}
 
 				if (Octant.IsValid())
@@ -410,9 +431,9 @@ void AVoxelWorld::UpdateOctree()
 						{
 							SCOPE_CYCLE_COUNTER(STAT_OctantDataInit);
 
-							OctreeMutex.Lock();
+							//OctreeMutex.Lock();
 							Octant->Data = ChunkData;
-							OctreeMutex.Unlock();
+							//OctreeMutex.Unlock();
 						}
 						/* Spawn new chunk for octant */
 						{
@@ -432,24 +453,21 @@ void AVoxelWorld::UpdateOctree()
 
 		if (TaskWorkGlobalCounter.GetValue() == 0)
 		{
-			int32 Index = 0;
-			while (Index < ChunksPerFrame)
+			//int32 Index = 0;
+			//while (Index < ChunksPerFrame)
+			if(ChunksCreation.Num() == 0)
 			{
-				if (ChunksRemoving.Num() > 0 && ChunksCreation.Num() == 0)
+				while (ChunksRemoving.Num() > 0)
 				{
+					if(ChunksForceRemoving.Num() > 0 || TemporaryOctantsTest.Num() > 0)
+					{
+						ChunksForceRemoving.Empty();
+						TemporaryOctantsTest.Empty();
+					}
 					if (!bStatsShowed)
 					{
-						/*https://forums.unrealengine.com/t/measure-time-a-function-has-taken/37472/8
-						double start = FPlatformTime::Seconds();
-
-						// put code you want to time here.
-
-						double end = FPlatformTime::Seconds();
-						UE_LOG(LogTemp, Warning, TEXT("code executed in %f seconds."), end-start);
-						
-						*/
 						double WorldGenerateTimeEnd = FPlatformTime::Seconds() - WorldGenerateTimeBegin;
-						UE_LOG(VoxelArt, Log, TEXT("Voxel World was generated in %fs s. (%d chunks)"), WorldGenerateTimeEnd, ChunkPoolComponent->PoolChunks.Num());
+						VOXEL_LOG(TEXT("Voxel World was generated in %fs s. (%d chunks)"), WorldGenerateTimeEnd, ChunkPoolComponent->PoolChunks.Num());
 						bStatsShowed = true;
 					}
 					{
@@ -463,14 +481,46 @@ void AVoxelWorld::UpdateOctree()
 							delete ChunkData;
 							ChunkData = nullptr;
 
-							Index++;
+							//Index++;
 						}
 					}
 				}
-				else { Index = ChunksPerFrame; }
+				//else { Index = ChunksPerFrame; }
 			}
 		}
 	}
+	//OctreeMutex.Lock();
+	{
+		SCOPE_CYCLE_COUNTER(STAT_ForceRemoveChunks);
+
+		int32 Index = 0;
+		while (Index < ChunksPerFrame)
+		{
+			if (ChunksForceRemoving.Num() > 0)
+			{
+				FVoxelChunkData* ChunkData = ChunksForceRemoving.Pop();
+
+				//VOXEL_LOG(TEXT("Radius %d"), ChunkData->Size / 2);
+				if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
+				{
+					//VoxelDebugBox(TransferToGameWorld(ChunkData->Position), ChunkData->Size / 2 * VoxelMin, 250.f, FColor::Red);
+					//UE_LOG(LogTemp, Warning, TEXT("Start delete this %p"), ChunkData->Chunk);
+					//UE_LOG(LogTemp, Warning, TEXT("End delete this %p"), ChunkData->Chunk);
+					ChunkData->Chunk->SetPoolActive(false);
+					//ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
+
+					//delete ChunkData;
+					//ChunkData = nullptr;
+
+					Index++;
+				}
+			}
+			else { Index = ChunksPerFrame; }
+		}
+	}
+	//OctreeMutex.Unlock();
+
+	if(false)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
 
@@ -612,11 +662,14 @@ void AVoxelWorld::CreateChunk(FVoxelChunkData* ChunkData)
 
 void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 {
-	TaskWorkGlobalCounter.Increment();
-	FAsyncTask<FMesherAsyncTask>* MesherTask = new FAsyncTask<FMesherAsyncTask>(this, ChunkData);
-	MesherTask->StartBackgroundTask(/*ThreadPool*/);
+	check(ChunkData != nullptr);
+	check(IsValid(ChunkData->Chunk));
 
-	PoolThreads.Add(MesherTask);
+	if (ChunkData->Chunk->CreateMesh(this, ThreadPool, ChunkData))
+	{
+		TaskWorkGlobalCounter.Increment();
+		PoolThreads.Add(ChunkData->Chunk->MesherTask);
+	}
 }
 
 void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)

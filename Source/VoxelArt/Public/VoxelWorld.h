@@ -329,7 +329,10 @@ public:
 	TArray<FVoxelChunkData*>				ChunksCreation;
 	TArray<FVoxelChunkData*>				ChunksGeneration;
 	TArray<FVoxelChunkData*>				ChunksRemoving;
+	TArray<FVoxelChunkData*>				ChunksForceRemoving;
 	TArray<UVoxelChunkComponent*>			ChunkComponents;
+
+	TArray<FVoxelChunkData*>				TemporaryOctantsTest;
 
 public:
 
@@ -345,9 +348,8 @@ public:
 	FThreadSafeCounter TaskWorkGlobalCounter;
 
 	FCriticalSection OctreeMutex;
-	FCriticalSection ChunksToCreationMutex;
 
-	TArray<FAsyncTask<FMesherAsyncTask>*> PoolThreads;
+	TArray<FAsyncTask<FVoxelMesherAsyncTask>*> PoolThreads;
 	
 public:
 

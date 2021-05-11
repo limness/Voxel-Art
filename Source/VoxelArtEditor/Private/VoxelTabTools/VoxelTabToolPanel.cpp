@@ -4,6 +4,7 @@
 #include "VoxelTabTools/VoxelTabTool.h"
 #include "VoxelModuleInterface.h"
 
+#include "Helpers/VoxelTools.h"
 //#define LOCTEXT_NAMESPACE "SStandardSlateWidget"
 
 void FVoxelTabToolPanel::Construct(const FArguments& InArgs)
@@ -31,7 +32,12 @@ void FVoxelTabToolPanel::Construct(const FArguments& InArgs)
 		For any other questions, tweet or join our discord channel below\n\
 		Enjoy!";
 
-	FString AboutPlugin = "Plugin Version: 0.22\nTwitter: twitter.com/limtosingular\nDiscord channel: discord.gg/FX3zzNxPq3";
+	FString AboutPlugin = FString::Printf(
+		TEXT("Plugin Version: %d\nTwitter: %S\nDiscord channel: %S"), 
+		VOXEL_ART_VERSION,
+		VOXEL_ART_TWITTER,
+		VOXEL_ART_DISCORD
+	);
 
     ChildSlot
         [

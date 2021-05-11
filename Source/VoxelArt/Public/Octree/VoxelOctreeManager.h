@@ -57,6 +57,7 @@ private:
 private:
 
 	TArray<TSharedPtr<FVoxelOctreeData>> GetLeavesChunk(TSharedPtr<FVoxelOctreeData> chunk);
-
+	
+	void CheckTemporaryOctants();
 	bool CheckOctree(TSharedPtr<FVoxelOctreeData> Octant);
 };

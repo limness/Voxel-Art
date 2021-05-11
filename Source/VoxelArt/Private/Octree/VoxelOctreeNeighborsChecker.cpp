@@ -86,7 +86,7 @@ uint32 VoxelOctreeNeighborsChecker::Run()
 			}
 			if (ChangesOctree->ChunksGeneration.Num() > 0)
 			{
-				World->ChangesOctree.Enqueue(ChangesOctree);
+			//	World->ChangesOctree.Enqueue(ChangesOctree);
 			}
 			//ChangesOctree->ChunksGeneration.Empty();
 			ChangesOctree.Reset();

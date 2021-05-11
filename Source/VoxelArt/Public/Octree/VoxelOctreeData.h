@@ -164,12 +164,15 @@ struct FChunksRenderInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	//Chunks which has to be created
+	// Chunks which has to be created
 	TArray<FVoxelChunkData*> ChunksCreation;
 
-	//Chunks which has to be generated
+	// Chunks which has to be generated
 	TArray<FVoxelChunkData*> ChunksGeneration;
 
-	//Chunks which has to be removed
+	// Chunks which has to be removed
 	TArray<FVoxelChunkData*> ChunksRemoving;
+
+	// Chunks which has to be force removed
+	TArray<FVoxelChunkData*> ChunksForceRemoving;
 };

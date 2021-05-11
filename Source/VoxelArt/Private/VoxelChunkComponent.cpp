@@ -24,6 +24,14 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 	PoolActive = activeStatus;
 	if (!activeStatus)
 	{
+		if (MesherTask)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Start shit delete this %p"), this);
+			//esherTask->EnsureCompletion();
+			//MesherTask->Cancel();
+			//delete MesherTask;
+			//MesherTask = nullptr;
+		}
 		ClearAllMeshSections();
 		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -32,6 +40,14 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 		SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 	ToggleVisibility(!activeStatus);
+}
+
+bool UVoxelChunkComponent::CreateMesh(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData)
+{
+	MesherTask = new FAsyncTask<FVoxelMesherAsyncTask>(World, this, ChunkData);
+	MesherTask->StartBackgroundTask(/*ThreadPool*/);
+
+	return true;
 }
 
 void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors)
@@ -45,7 +61,7 @@ void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Tr
 	}
 }
 
-void FMesherAsyncTask::DoWork()
+void FVoxelMesherAsyncTask::DoWork()
 {
 	TArray<float> DensityMap;
 	TArray<FColor> ColorMap;
@@ -95,9 +111,9 @@ void FMesherAsyncTask::DoWork()
 			{
 			//	UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());
 				/*One more check active before we will create mesh*/
-				if (Data->Chunk->IsPoolActive())
+				if (Chunk->IsPoolActive())
 				{
-					Data->Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
+					Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
 				}
 			});
 	}
@@ -114,10 +130,10 @@ void FMesherAsyncTask::DoWork()
 		AsyncTask(ENamedThreads::GameThread, [=]()
 			{
 				/*One more check active before we will create mesh*/
-				if (Data->Chunk->IsPoolActive())
+				if (Chunk->IsPoolActive())
 				{
 				//	UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());
-					Data->Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
+					Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
 				}
 			});
 	}
@@ -134,12 +150,15 @@ void FMesherAsyncTask::DoWork()
 		AsyncTask(ENamedThreads::GameThread, [=]()
 			{
 				/*One more check active before we will create mesh*/
-				if (Data->Chunk->IsPoolActive())
+				if (Chunk->IsPoolActive())
 				{
 					//UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());
-					Data->Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
+					Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors);
 				}
 			});
 	}
+	Chunk->MeshComplete = true;
 	World->TaskWorkGlobalCounter.Decrement();
+	
+//	UE_LOG(LogTemp, Warning, TEXT("Task is done %p"), Data->Chunk);
 }
