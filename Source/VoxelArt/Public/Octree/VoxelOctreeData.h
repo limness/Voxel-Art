@@ -32,10 +32,10 @@ public:
 
 public:
 
-	uint64 NodeID = 0x00;
-	uint8 Depth = 0;
-	int Size = 0;
-	FIntVector Position = FIntVector(0, 0, 0);
+	uint64 NodeID;
+	uint8 Depth;
+	int Size;
+	FIntVector Position;
 
 public:
 
@@ -82,14 +82,16 @@ public:
 
 public:
 
-	uint8 Depth = 0;
+	uint8 Depth;
 	uint8 TransitionSides = 0x00;
 
-	FIntVector Position = FIntVector(0, 0, 0);
+	FIntVector Position;
 
-	int Size = 0;
-	int Voxels = 32;
-	int Priority = 0;
+	bool TemporaryChunk;
+
+	int Size;
+	int Voxels;
+	int Priority;
 };
 
 //using ArrayChildrenDensity = TArray<FVoxelOctreeDensity*, TFixedAllocator<8>>;

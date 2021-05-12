@@ -22,17 +22,66 @@ bool UVoxelChunkComponent::IsPoolActive()
 void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 {
 	PoolActive = activeStatus;
+
 	if (!activeStatus)
 	{
 		if (MesherTask)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Start shit delete this %p"), this);
-			//esherTask->EnsureCompletion();
-			//MesherTask->Cancel();
-			//delete MesherTask;
-			//MesherTask = nullptr;
+			//if(!MeshComplete) UE_LOG(LogTemp, Error, TEXT("This chunk hasn't mesh. It means that mesher is stil working"));
+
+			//if (MeshComplete)
+			{
+				/*UE_LOG(LogTemp, Error, TEXT("This chunk has mesh. Try to cancel async work"));
+
+				if (MesherTask->IsDone())
+				{
+					UE_LOG(LogTemp, Error, TEXT("MesherTask is done"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("MesherTask is not done"));
+				}
+
+
+				if (MesherTask->IsWorkDone())
+				{
+					UE_LOG(LogTemp, Error, TEXT("MesherTask wORK is done"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("MesherTask wORK is not done"));
+				}*/
+/*
+				if (MesherTask->Cancel())
+				{
+					UE_LOG(LogTemp, Error, TEXT("Cancel success"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("Cancel no success"));
+				}*/
+				MesherTask->EnsureCompletion();
+				//MesherTask->Cancel();
+				//if (MesherTask->IsDone())
+				{
+					/*if (MesherTask->GetTask().Data == nullptr)
+					{
+						UE_LOG(LogTemp, Error, TEXT("Data nullptr"));
+					}
+					else
+					{
+						//		UE_LOG(LogTemp, Error, TEXT("Data NOO nullptr"));
+					}*/
+				}
+				delete MesherTask;
+				MesherTask = nullptr;
+
+				MeshComplete = false;
+			}
 		}
+
 		ClearAllMeshSections();
+		//SetProcMeshSection(0, FVoxelProcMeshSection());
 		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	else

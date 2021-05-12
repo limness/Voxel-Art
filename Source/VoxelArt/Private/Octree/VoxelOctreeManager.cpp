@@ -82,12 +82,13 @@ uint32 VoxelOctreeManager::Run()
 						SCOPE_CYCLE_COUNTER(STAT_Run);
 
 						ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
+						FScopeLock Lock(&World->OctreeMutex);
+
 						{
-							FScopeLock Lock(&World->OctreeMutex);
 
 							CheckOctree(World->MainOctree);
 
-							CheckTemporaryOctants();
+						//	CheckTemporaryOctants();
 						}
 						if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
 						{
@@ -226,8 +227,15 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 
 					if (Octant->Data != nullptr)
 					{
+						if (Octant->Data->TemporaryChunk)
+						{
+							ChangesOctree->ChunksForceRemoving.Add(Octant->Data);
+						}
+						else
+						{
+							ChangesOctree->ChunksRemoving.Add(Octant->Data);
+						}
 						//FScopeLock Lock(&World->OctreeMutex);
-						ChangesOctree->ChunksRemoving.Add(Octant->Data);
 						Octant->Data = nullptr;
 					}
 				}
@@ -268,7 +276,14 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 						if (Leaf->Data != nullptr)
 						{
 							//FScopeLock Lock(&World->OctreeMutex);
-							ChangesOctree->ChunksRemoving.Add(Leaf->Data);
+							if (Leaf->Data->TemporaryChunk)
+							{
+								ChangesOctree->ChunksForceRemoving.Add(Leaf->Data);
+							}
+							else
+							{
+								ChangesOctree->ChunksRemoving.Add(Leaf->Data);
+							}
 							Octant->Data = nullptr;
 						}
 					}

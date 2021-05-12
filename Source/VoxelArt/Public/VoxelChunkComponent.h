@@ -30,7 +30,7 @@ public:
 	FThreadSafeBool MeshComplete;
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-	UVoxelWorldGenerator* WorldGenerator;
+	//UVoxelWorldGenerator* WorldGenerator;
 	UMaterialInterface* Material;
 
 public:
@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-private:
+public:
 
 	AVoxelWorld* World;
 	FVoxelChunkData* Data;

@@ -256,6 +256,7 @@ FVoxelChunkData::FVoxelChunkData(TWeakPtr<FVoxelOctreeData> _CurrentOctree, uint
 	, Size(_Size)
 	, Voxels(_Voxels)
 	, Priority(_Priority)
+	, TemporaryChunk(false)
 {
 	//	DensityMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
 	//	ColorMap.Reserve(FMath::Pow(Voxels + 1 + NORMALS, 3));
