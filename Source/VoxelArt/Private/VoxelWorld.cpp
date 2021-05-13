@@ -352,25 +352,14 @@ void AVoxelWorld::UpdateOctree()
 
 				ChunksCreation.Add(Chunk);
 				TemporaryOctantsTest.Add(Chunk);
-
-			//	VOXEL_ERROR(TEXT("create the data %p"), Chunk);
-				/*if (bStatsShowed)
-				{
-					VoxelDebugBox(TransferToGameWorld(Chunk->Position), Chunk->Size / 2 * VoxelMin, 250.f, FColor::Red);
-				}*/
-				//VoxelDebugBox(TransferToGameWorld(Chunk->Position), Chunk->Size / 2 * VoxelMin, 250.f, FColor::Red);
 			}
 			for (auto& Chunk : ChunksChangesArray->ChunksForceRemoving)
 			{
 				ChunksForceRemoving.Add(Chunk);
-
-			//	VOXEL_ERROR(TEXT("ChunksForceRemoving the data %p"), Chunk);
 			}
 			for (auto& Chunk : ChunksChangesArray->ChunksRemoving)
 			{
 				ChunksRemoving.Add(Chunk);
-
-			//	VOXEL_ERROR(TEXT("ChunksRemoving the data %p"), Chunk);
 			}
 			for (auto& Chunk : ChunksChangesArray->ChunksGeneration)
 			{
@@ -405,8 +394,6 @@ void AVoxelWorld::UpdateOctree()
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_CreateChunks);
-
-//		FScopeLock Lock(&OctreeMutex);
 
 		int32 Index = 0;
 		while (Index < ChunksPerFrame)
@@ -463,16 +450,9 @@ void AVoxelWorld::UpdateOctree()
 
 		if (TaskWorkGlobalCounter.GetValue() == 0)
 		{
-			//int32 Index = 0;
-			//while (Index < ChunksPerFrame)
 			if(ChunksCreation.Num() == 0)
 			{
-
-			//	VOXEL_LOG(TEXT("ChunksRemoving Num %d Pool %d"), ChunksRemoving.Num(), ChunkPoolComponent->PoolChunks.Num());
-
-				//while (ChunksRemoving.Num() > 0)
-				//{
-				if (ChunksForceRemoving.Num() > 0 || TemporaryOctantsTest.Num() > 0)
+				if (TemporaryOctantsTest.Num() > 0)
 				{
 					for (auto& TemporaryChunkData : TemporaryOctantsTest)
 					{
@@ -481,11 +461,9 @@ void AVoxelWorld::UpdateOctree()
 							TemporaryChunkData->TemporaryChunk = false;
 						}
 					}
-					//ChunksForceRemoving.Empty();
 					TemporaryOctantsTest.Empty();
 				}
 				for (auto& ChunkData : ChunksRemoving)
-				//for (int32 Index = ChunksRemoving.Num(); Index != 0; Index--)
 				{
 					if (!bStatsShowed)
 					{
@@ -494,34 +472,22 @@ void AVoxelWorld::UpdateOctree()
 						bStatsShowed = true;
 					}
 					{
-						//FVoxelChunkData* ChunkData = ChunksRemoving(Index - 1);
-
 						if (ChunkData != nullptr)
 						{
 							if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
 							{
-							//	VOXEL_ERROR(TEXT("global remove pos %s the data %p the chunk %p dEPTH %d"), *ChunkData->Position.ToString(), ChunkData, ChunkData->Chunk, ChunkData->Depth);
 								ChunkData->Chunk->SetPoolActive(false);
-								//ChunkData->Chunk->SetPoolActive(false);
 								ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
-
-								//delete ChunkData;
-								//ChunkData = nullptr;
 							}
 							delete ChunkData;
 							ChunkData = nullptr;
-							//Index++;
 						}
 					}
 				}
 				ChunksRemoving.Empty();
-				//else { Index = ChunksPerFrame; }
 			}
 		}
 	}
-	//OctreeMutex.Lock();
-	//OctreeMutex.Unlock();
-		//if (false)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ForceRemoveChunks);
 
@@ -532,19 +498,11 @@ void AVoxelWorld::UpdateOctree()
 			{
 				FVoxelChunkData* ChunkData = ChunksForceRemoving.Pop();
 
-				//ChunksRemoving.Remove(ChunkData);
-
-				//VOXEL_LOG(TEXT("Radius %d"), ChunkData->Size / 2);
 				if (ChunkData != nullptr)
 				{
 					if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
 					{
-					//	VOXEL_LOG(TEXT("remove the data %p the chunk %p"), ChunkData, ChunkData->Chunk);
-						//VoxelDebugBox(TransferToGameWorld(ChunkData->Position), ChunkData->Size / 2 * VoxelMin, 250.f, FColor::Red);
-						//UE_LOG(LogTemp, Warning, TEXT("Start delete this %p"), ChunkData->Chunk);
-						//UE_LOG(LogTemp, Warning, TEXT("End delete this %p"), ChunkData->Chunk);
 						ChunkData->Chunk->SetPoolActive(false);
-						//ChunkData->Chunk->SetPoolActive(false);
 						ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
 
 						Index++;
@@ -556,7 +514,7 @@ void AVoxelWorld::UpdateOctree()
 			else { Index = ChunksPerFrame; }
 		}
 	}
-	if(false)
+	//if(false)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
 
