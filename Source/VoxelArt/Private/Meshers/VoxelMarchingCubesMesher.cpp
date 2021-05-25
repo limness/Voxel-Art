@@ -5,24 +5,11 @@
 #include "Helpers/Transvoxels.h"
 
 
-FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap)
-	: World(_World)
-	, WorldGenerator(_World->WorldGenerator)
-	, Voxels(_Data->Voxels)
-	, Size(_Data->Size)
-	, Position(_Data->Position)
+FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data)
+	: FVoxelDefaultMesher(_World, _Data)
 	, TransitionSides(_Data->TransitionSides)
-	, DensityMap(_DensityMap)
-	, ColorMap(_ColorMap)
-{
-	VoxelSteps = (Size / Voxels);
-}
-
-FVoxelMarchingCubesMesher::~FVoxelMarchingCubesMesher()
 {
 }
-
-#include "DrawDebugHelpers.h"
 
 void FVoxelMarchingCubesMesher::GenerateMesh()
 {
@@ -425,32 +412,6 @@ FIntVector FVoxelMarchingCubesMesher::TransferToDirection(FIntVector P, int Size
 	return P;
 }
 
-FVector FVoxelMarchingCubesMesher::GetGradient(int x, int y, int z)
-{
-	float d = 0.01f;
-
-	FVector average_normal;
-
-	average_normal.X = (GetDensity(x + 1, y + 0, z + 0) - GetDensity(x - 1, y - 0, z - 0)) / 2 / d;
-	average_normal.Y = (GetDensity(x + 0, y + 1, z + 0) - GetDensity(x - 0, y - 1, z - 0)) / 2 / d;
-	average_normal.Z = (GetDensity(x + 0, y + 0, z + 1) - GetDensity(x - 0, y - 0, z - 1)) / 2 / d;
-
-	return average_normal;
-}
-
-FVector FVoxelMarchingCubesMesher::GetGradient(FIntVector map)
-{
-	float d = 0.01f;
-
-	FVector average_normal;
-
-	average_normal.X = (GetDensity((map.X + 1), (map.Y + 0), (map.Z + 0)) - GetDensity((map.X - 1), (map.Y - 0), (map.Z - 0))) / 2 / d;
-	average_normal.Y = (GetDensity((map.X + 0), (map.Y + 1), (map.Z + 0)) - GetDensity((map.X - 0), (map.Y - 1), (map.Z - 0))) / 2 / d;
-	average_normal.Z = (GetDensity((map.X + 0), (map.Y + 0), (map.Z + 1)) - GetDensity((map.X - 0), (map.Y - 0), (map.Z - 1))) / 2 / d;
-
-	return average_normal;
-}
-
 void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, FVector N2, float P1Val, float P2Val, FColor C1, FColor C2, FVector& Vertex, FVector& Normal, FColor& Color)
 {
 	if (FMath::Abs(isolevel - P1Val) < 0.00001)
@@ -493,9 +454,4 @@ void FVoxelMarchingCubesMesher::ValueInterp(FVector P1, FVector P2, FVector N1, 
 int FVoxelMarchingCubesMesher::PositionToIndices(FIntVector P)
 {
 	return (P.X + NORMAL) + (P.Y + NORMAL) * (Voxels + 1 + NORMALS) + (P.Z + NORMAL) * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS);
-}
-
-float FVoxelMarchingCubesMesher::GetDensity(int x, int y, int z)
-{
-	return DensityMap[x + y * (Voxels + 1 + NORMALS) + z * (Voxels + 1 + NORMALS) * (Voxels + 1 + NORMALS)];
 }

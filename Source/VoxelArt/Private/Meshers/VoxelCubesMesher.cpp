@@ -4,35 +4,9 @@
 #include "DrawDebugHelpers.h"
 
 
-FVoxelCubesMesher::FVoxelCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data, TArray<float> _DensityMap, TArray<FColor> _ColorMap)
-	: World(_World)
-	, WorldGenerator(_World->WorldGenerator)
-	, Voxels(_Data->Voxels)
-	, Size(_Data->Size)
-	, Position(_Data->Position)
-	, TransitionSides(_Data->TransitionSides)
-	, DensityMap(_DensityMap)
-	, ColorMap(_ColorMap)
+FVoxelCubesMesher::FVoxelCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data)
+	: FVoxelDefaultMesher(_World, _Data)
 {
-}
-
-FVoxelCubesMesher::~FVoxelCubesMesher()
-{
-}
-
-FVector FVoxelCubesMesher::GetGradient(FVector pos)
-{
-	//float d = de;
-
-	FVector average_normal;
-	/*
-		average_normal.X = (sphereFunction(pos.X + d, pos.Y, pos.Z) - sphereFunction(pos.X - d, pos.Y, pos.Z)) / 2 / d;
-		average_normal.Y = (sphereFunction(pos.X, pos.Y + d, pos.Z) - sphereFunction(pos.X, pos.Y - d, pos.Z)) / 2 / d;
-		average_normal.Z = (sphereFunction(pos.X, pos.Y, pos.Z + d) - sphereFunction(pos.X, pos.Y, pos.Z - d)) / 2 / d;
-
-		average_normal.Normalize();*/
-
-	return average_normal;
 }
 
 FVector FVoxelCubesMesher::GetInterp(FVector p1, FVector p2, float d1, float d2)

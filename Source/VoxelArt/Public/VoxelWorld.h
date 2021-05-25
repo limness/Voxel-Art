@@ -6,13 +6,16 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Editor/VoxelEditorData.h"
 #include "Generators/VoxelWorldGenerator.h"
+#include "Meshers/VoxelDefaultMesher.h"
 #include "Octree/VoxelOctreeData.h"
 #include "Octree/VoxelOctreeManager.h"
 #include "Octree/VoxelOctreeNeighborsChecker.h"
 #include "Save/VoxelSaveData.h"
 #include "Save/VoxelSaveInterface.h"
+#include "VoxelFoliageConfig.h"
 #include "VoxelPlayerInterface.h"
 #include "VoxelListenersInterface.h"
 #include "VoxelChunkComponent.h"
@@ -175,6 +178,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
 	TEnumAsByte<Meshers> MesherType;
 
+	FVoxelDefaultMesher* MesherObject;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering", meta = (ClampMin = "1", ClampMax = "4096", UIMin = "1", UIMax = "4096"))
 	int32 ChunksPerFrame = 32;
 
@@ -184,8 +189,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering")
 	TEnumAsByte<ENormalsType> NormalsType = ENormalsType::Smoothed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage")
-	UStaticMesh* MeshTree;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Foliage Config")
+	UVoxelFoliageConfig* FoliageConfig;
+
+	TArray<UHierarchicalInstancedStaticMeshComponent*> FoliageMeshComponents;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Export Preview Heightmap")
 	FString MapName = "DensityMapTexture";
@@ -327,12 +334,13 @@ public:
 	TQueue<TSharedPtr<FChunksRenderInfo>>	ChangesOctree;
 
 	TArray<FVoxelChunkData*>				ChunksCreation;
-	TArray<FVoxelChunkData*>				ChunksGeneration;
+	TSet<FVoxelChunkData*>					ChunksGeneration;
 	TSet<FVoxelChunkData*>					ChunksRemoving;
+	TSet<FVoxelChunkData*>					ChunksFoliageCreation;
 	TArray<FVoxelChunkData*>				ChunksForceRemoving;
 	TArray<UVoxelChunkComponent*>			ChunkComponents;
 
-	TArray<FVoxelChunkData*>				TemporaryOctantsTest;
+	TArray<FVoxelChunkData*>				TemporaryChunks;
 
 public:
 
@@ -345,6 +353,7 @@ public:
 public:
 
 	FQueuedThreadPool* ThreadPool;
+	FQueuedThreadPool* ThreadFoliagePool;
 	FThreadSafeCounter TaskWorkGlobalCounter;
 
 	FCriticalSection OctreeMutex;

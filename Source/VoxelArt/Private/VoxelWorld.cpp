@@ -4,15 +4,15 @@
 #include "Helpers/VoxelTools.h"
 #include "Helpers/VoxelCollisionBox.h"
 #include "Importers/VoxelHeightmapImport.h"
+#include "Meshers/VoxelMarchingCubesMesher.h"
+#include "Meshers/VoxelSurfaceNetsMesher.h"
+#include "Meshers/VoxelCubesMesher.h"
 #include "VoxelLoggingInterface.h"
 #include "VoxelPlayerGame.h"
 
 #include "TimerManager.h"	
 #include "DrawDebugHelpers.h"
 
-// TODO:
-// Restore enqueue line in VoxelOctreeNeightborsChecker
-// Restore removing loop in VoxelWorld
 
 DECLARE_CYCLE_STAT(TEXT("Voxel ~ Create World"), STAT_CreateVoxelWorld, STATGROUP_Voxel);
 
@@ -46,14 +46,15 @@ AVoxelWorld::AVoxelWorld()
 	PrimaryActorTick.bCanEverTick = true;
 
 	/* Root world component */
-	WorldComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
-	RootComponent = WorldComponent;
+	WorldComponent			= CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	RootComponent			= WorldComponent;
 
 	/* Object pool component */
-	ChunkPoolComponent = CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
+	ChunkPoolComponent		= CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
 
 	/* Object pool thread */
-	ThreadPool = FQueuedThreadPool::Allocate();
+	ThreadPool				= FQueuedThreadPool::Allocate();
+	//ThreadFoliagePool		= FQueuedThreadPool::Allocate();
 }
 
 void AVoxelWorld::BeginPlay()
@@ -160,6 +161,9 @@ void AVoxelWorld::CreateVoxelWorld()
 	// Allocate the number of tasks for the pool.
 	ThreadPool->Create(4, 64 * 1024);
 
+	// Allocate the number of tasks for the pool.
+	//ThreadFoliagePool->Create(4, 64 * 1024);
+
 	// Initialize the World generator in order to get information about the import textures.
 	WorldGenerator->GeneratorInit();
 
@@ -179,6 +183,25 @@ void AVoxelWorld::CreateVoxelWorld()
 			IVoxelLoggingInterface::LogMessage(INVTEXT("World has not been saved!"), "Error");
 		}
 	}
+
+	// Create the Foliage Static Mesh if world has foliage config
+	if (FoliageConfig)
+	{
+		for (auto& Object : FoliageConfig->FoliageObject)
+		{
+			UHierarchicalInstancedStaticMeshComponent* FoliageMeshComponent = NewObject<UHierarchicalInstancedStaticMeshComponent>(this, NAME_None, RF_Transient);
+
+			FoliageMeshComponent->OnComponentCreated();
+			FoliageMeshComponent->RegisterComponent();
+
+			FoliageMeshComponent->SetStaticMesh(Object.Mesh);
+
+			FoliageMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+			FoliageMeshComponents.Add(FoliageMeshComponent);
+		}
+	}
+
 	// Create Octree thread and Transvoxel
 	if (EnabledLOD)
 	{
@@ -288,6 +311,8 @@ void AVoxelWorld::DestroyVoxelWorld()
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
 			
 			ThreadPool->Destroy();
+			//ThreadFoliagePool->Destroy();
+
 			bWorldCreated = false;
 			bStatsShowed = false;
 			bEnableUpdateOctree = false;
@@ -351,7 +376,7 @@ void AVoxelWorld::UpdateOctree()
 				Chunk->TemporaryChunk = true;
 
 				ChunksCreation.Add(Chunk);
-				TemporaryOctantsTest.Add(Chunk);
+				TemporaryChunks.Add(Chunk);
 			}
 			for (auto& Chunk : ChunksChangesArray->ChunksForceRemoving)
 			{
@@ -452,16 +477,16 @@ void AVoxelWorld::UpdateOctree()
 		{
 			if(ChunksCreation.Num() == 0)
 			{
-				if (TemporaryOctantsTest.Num() > 0)
+				if (TemporaryChunks.Num() > 0)
 				{
-					for (auto& TemporaryChunkData : TemporaryOctantsTest)
+					for (auto& TemporaryChunkData : TemporaryChunks)
 					{
 						if (TemporaryChunkData != nullptr)
 						{
 							TemporaryChunkData->TemporaryChunk = false;
 						}
 					}
-					TemporaryOctantsTest.Empty();
+					TemporaryChunks.Empty();
 				}
 				for (auto& ChunkData : ChunksRemoving)
 				{
@@ -472,6 +497,8 @@ void AVoxelWorld::UpdateOctree()
 						bStatsShowed = true;
 					}
 					{
+						ChunksGeneration.Remove(ChunkData);
+
 						if (ChunkData != nullptr)
 						{
 							if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
@@ -498,6 +525,8 @@ void AVoxelWorld::UpdateOctree()
 			{
 				FVoxelChunkData* ChunkData = ChunksForceRemoving.Pop();
 
+				ChunksGeneration.Remove(ChunkData);
+
 				if (ChunkData != nullptr)
 				{
 					if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
@@ -507,26 +536,24 @@ void AVoxelWorld::UpdateOctree()
 
 						Index++;
 					}
+					delete ChunkData;
+					ChunkData = nullptr;
 				}
-				delete ChunkData;
-				ChunkData = nullptr;
 			}
 			else { Index = ChunksPerFrame; }
 		}
 	}
-	//if(false)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateChunks);
 
-		while (ChunksGeneration.Num() > 0)
+		for(auto& ChunkData : ChunksGeneration)
 		{
-			FVoxelChunkData* ChunkData = ChunksGeneration.Pop();
-
 			if (ChunkData != nullptr)
 			{
 				PutChunkOnGeneration(ChunkData);
 			}
 		}
+		ChunksGeneration.Empty();
 	}
 }
 
@@ -664,6 +691,7 @@ void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 		TaskWorkGlobalCounter.Increment();
 	//	PoolThreads.Add(ChunkData->Chunk->MesherTask);
 	}
+	ChunkData->Chunk->CreateFoliage(this, ThreadFoliagePool, ChunkData);
 }
 
 void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
@@ -671,11 +699,26 @@ void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* 
 	if (Chunk)
 	{
 		ChunkData->Chunk = Chunk;
+		{
+			Chunk->CurrentOctree = ChunkData->CurrentOctree;
+			Chunk->Material = Material;
+		}
+		{
+			check(!Chunk->MesherObject);
 
-		Chunk->CurrentOctree = ChunkData->CurrentOctree;
-		Chunk->Material = Material;
-//		Chunk->WorldGenerator = WorldGenerator;
-
+			switch (MesherType)
+			{
+			case Meshers::MarchingCubes:
+				Chunk->MesherObject = new FVoxelMarchingCubesMesher(this, ChunkData);
+				break;
+			case Meshers::SurfaceNets:
+				Chunk->MesherObject = new FVoxelSurfaceNetsMesher(this, ChunkData);
+				break;
+			case Meshers::Cubes:
+				Chunk->MesherObject = new FVoxelCubesMesher(this, ChunkData);
+				break;
+			}
+		}
 		Chunk->SetMaterial(0, Material);
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic

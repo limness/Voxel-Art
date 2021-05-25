@@ -46,6 +46,8 @@ public:
 	void AddChildren();
 
 	FORCEINLINE bool HasChildren();
+	FORCEINLINE bool IsInside(FIntVector LocalPosition);
+
 	FORCEINLINE void DestroyChildren();
 
 	FORCEINLINE FIntVector GetMinimumCorner();
@@ -87,11 +89,11 @@ public:
 
 	FIntVector Position;
 
-	bool TemporaryChunk;
-
 	int Size;
 	int Voxels;
 	int Priority;
+
+	bool TemporaryChunk;
 };
 
 //using ArrayChildrenDensity = TArray<FVoxelOctreeDensity*, TFixedAllocator<8>>;

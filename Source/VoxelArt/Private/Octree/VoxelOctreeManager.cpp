@@ -82,13 +82,9 @@ uint32 VoxelOctreeManager::Run()
 						SCOPE_CYCLE_COUNTER(STAT_Run);
 
 						ChangesOctree = TSharedPtr<FChunksRenderInfo>(new FChunksRenderInfo());
-						FScopeLock Lock(&World->OctreeMutex);
-
 						{
-
+							FScopeLock Lock(&World->OctreeMutex);
 							CheckOctree(World->MainOctree);
-
-						//	CheckTemporaryOctants();
 						}
 						if (ChangesOctree->ChunksCreation.Num() > 0 || ChangesOctree->ChunksRemoving.Num() > 0)
 						{
@@ -161,48 +157,6 @@ bool VoxelOctreeManager::IsThreadPaused()
 	return (bool)m_Pause;
 }
 
-void VoxelOctreeManager::CheckTemporaryOctants()
-{
-	if (World->TemporaryOctantsTest.Num() > 0)
-	{
-	//	UE_LOG(LogTemp, Warning, TEXT("World->TemporaryOctantsTest.Num() %d"), World->TemporaryOctantsTest.Num());
-
-		for (int32 Index = World->TemporaryOctantsTest.Num(); Index != 0; Index--)
-		{
-			auto& Octant = World->TemporaryOctantsTest[Index - 1];
-			
-			if (!IsValid(Octant->Chunk))
-			{
-				continue;
-			}
-
-			if (!Octant->Chunk->MeshComplete)
-			{
-				continue;
-			}
-			//AsyncTask(ENamedThreads::GameThread, [=]()
-				//{
-				///	World->VoxelDebugBox(World->TransferToGameWorld(Octant->Position), Octant->Size / 2 * World->VoxelMin, 250.f, FColor::Red);
-				//});
-
-			//if(Octant.I)
-			float DistanceLODs = DrawingRange * Octant->Size * 2;
-			float DistancePlayer = (PlayerPositionToWorld - Octant->Position).Size();
-
-			// Add a check for LOD minimum in a case there are errors
-
-			if (World->MinimumLOD < Octant->Depth + 1)
-			{
-				if (!(DistancePlayer - Octant->Size / 2 <= DistanceLODs/* / 2.f*/))
-				{
-					ChangesOctree->ChunksForceRemoving.Add(Octant);
-					World->TemporaryOctantsTest.RemoveAt(Index - 1);
-				}
-			}
-		}
-	}
-}
-
 bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 {
 	float DistanceLODs = DrawingRange * Octant->Size; 
@@ -212,7 +166,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	{
 		if (World->MaximumLOD > Octant->Depth)
 		{
-			if (DistancePlayer <= DistanceLODs/* / 2.f*/)
+			if (DistancePlayer <= DistanceLODs / 2.f)
 			{
 				/*Create new branch*/
 				{
@@ -251,6 +205,18 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 						}
 					}
 				}
+				/*Create new foliage*/
+				{
+					SCOPE_CYCLE_COUNTER(STAT_AddCreateData);
+
+					for (auto& Leaf : Octant->GetChildren())
+					{
+						if (!CheckOctree(Leaf))
+						{
+							ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
+						}
+					}
+				}
 				return true;
 			}
 		}
@@ -259,7 +225,7 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 	{
 		if (World->MinimumLOD < Octant->Depth + 1)
 		{
-			if (!(DistancePlayer <= DistanceLODs/* / 2.f*/))
+			if (!(DistancePlayer <= DistanceLODs / 2.f))
 			{
 				/*Create old chunk*/
 				{

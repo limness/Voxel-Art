@@ -59,6 +59,13 @@ FIntVector FVoxelOctreeData::GetMaximumCorner()
 	return this->Position + FIntVector(1, 1, 1) * this->Size / 2;
 }
 
+bool FVoxelOctreeData::IsInside(FIntVector LocalPosition)
+{
+	return  (GetMinimumCorner().X <= LocalPosition.X && GetMaximumCorner().X >= LocalPosition.X) &&
+		(GetMinimumCorner().Y <= LocalPosition.Y && GetMaximumCorner().Y >= LocalPosition.Y) &&
+		(GetMinimumCorner().Z <= LocalPosition.Z && GetMaximumCorner().Z >= LocalPosition.Z);
+}
+
 void FVoxelOctreeData::AddChildren()
 {
 	int P = Size >> 2;

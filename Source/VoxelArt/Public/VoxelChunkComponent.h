@@ -8,9 +8,11 @@
 
 class AVoxelWorld;
 class UVoxelWorldGenerator;
+class FVoxelDefaultMesher;
 class FVoxelOctreeData;
 class FVoxelChunkData;
 class FVoxelMesherAsyncTask;
+class FVoxelFoliageAsyncTask;
 
 /*
 * Voxel Chunk Component class
@@ -27,11 +29,16 @@ public:
 public:
 
 	FAsyncTask<FVoxelMesherAsyncTask>* MesherTask;
+	TArray<FAsyncTask<FVoxelFoliageAsyncTask>*> FoliageTasks;
+
 	FThreadSafeBool MeshComplete;
+	FThreadSafeBool FoliageComplete;
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
-	//UVoxelWorldGenerator* WorldGenerator;
+	FVoxelDefaultMesher* MesherObject;
 	UMaterialInterface* Material;
+
+	//TArray<>
 
 public:
 
@@ -41,8 +48,16 @@ public:
 
 	bool IsPoolActive();
 	void SetPoolActive(bool activeStatus);
+
+	FORCEINLINE FVector GetMinimumCorner();
+	FORCEINLINE FVector GetMaximumCorner();
+	FORCEINLINE bool IsInside(FVector LocalPosition);
+
 	bool CreateMesh(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData);
+	bool CreateFoliage(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData);
+
 	void UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors);
+	void UpdateFoliage(AVoxelWorld* World, TArray<FVector> FoliagePositions);
 };
 
 
@@ -53,7 +68,41 @@ class FVoxelMesherAsyncTask : public FNonAbandonableTask
 {
 public:
 
-	FVoxelMesherAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelChunkData* _Data)
+	FVoxelMesherAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelChunkData* _Data, FVoxelDefaultMesher* _MesherObject)
+		: World(_World)
+		, Chunk(_Chunk)
+		, Data(_Data)
+		, MesherObject(_MesherObject)
+	{
+	}
+
+public:
+
+	AVoxelWorld* World;
+	UVoxelChunkComponent* Chunk;
+	FVoxelChunkData* Data;
+	FVoxelDefaultMesher* MesherObject;
+
+public:
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(TerrainGenerationAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+	
+	void DoWork();
+};
+
+
+
+/*
+* Voxel Chunk Async Foliage class
+*/
+class FVoxelFoliageAsyncTask : public FNonAbandonableTask
+{
+public:
+
+	FVoxelFoliageAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelChunkData* _Data)
 		: World(_World)
 		, Chunk(_Chunk)
 		, Data(_Data)
@@ -63,9 +112,8 @@ public:
 public:
 
 	AVoxelWorld* World;
-	FVoxelChunkData* Data;
-
 	UVoxelChunkComponent* Chunk;
+	FVoxelChunkData* Data;
 
 public:
 
@@ -73,6 +121,6 @@ public:
 	{
 		RETURN_QUICK_DECLARE_CYCLE_STAT(TerrainGenerationAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
 	}
-	
+
 	void DoWork();
 };
