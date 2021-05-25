@@ -206,17 +206,6 @@ bool VoxelOctreeManager::CheckOctree(TSharedPtr<FVoxelOctreeData> Octant)
 					}
 				}
 				/*Create new foliage*/
-				{
-					SCOPE_CYCLE_COUNTER(STAT_AddCreateData);
-
-					for (auto& Leaf : Octant->GetChildren())
-					{
-						if (!CheckOctree(Leaf))
-						{
-							ChangesOctree->ChunksCreation.Add(new FVoxelChunkData(Leaf, Leaf->Depth, Leaf->Position, Leaf->Size, World->VoxelsPerChunk, DistancePlayer));
-						}
-					}
-				}
 				return true;
 			}
 		}

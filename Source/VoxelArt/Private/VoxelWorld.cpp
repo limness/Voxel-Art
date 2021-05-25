@@ -53,7 +53,7 @@ AVoxelWorld::AVoxelWorld()
 	ChunkPoolComponent		= CreateDefaultSubobject<UVoxelPoolComponent>(TEXT("Chunk Pool Component"));
 
 	/* Object pool thread */
-	ThreadPool				= FQueuedThreadPool::Allocate();
+	//ThreadPool			= FQueuedThreadPool::Allocate();
 	//ThreadFoliagePool		= FQueuedThreadPool::Allocate();
 }
 
@@ -159,7 +159,7 @@ void AVoxelWorld::CreateVoxelWorld()
 	SetActorScale3D(FVector(VoxelMin, VoxelMin, VoxelMin));
 
 	// Allocate the number of tasks for the pool.
-	ThreadPool->Create(4, 64 * 1024);
+	//ThreadPool->Create(4, 64 * 1024);
 
 	// Allocate the number of tasks for the pool.
 	//ThreadFoliagePool->Create(4, 64 * 1024);
@@ -691,7 +691,7 @@ void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 		TaskWorkGlobalCounter.Increment();
 	//	PoolThreads.Add(ChunkData->Chunk->MesherTask);
 	}
-	ChunkData->Chunk->CreateFoliage(this, ThreadFoliagePool, ChunkData);
+	//ChunkData->Chunk->CreateFoliage(this, ThreadFoliagePool, ChunkData);
 }
 
 void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)

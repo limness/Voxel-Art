@@ -34,12 +34,12 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 
 			MeshComplete = false;
 		}
-		for (auto& FoliageTask : FoliageTasks)
+		/*for (auto& FoliageTask : FoliageTasks)
 		{
 			FoliageTask->EnsureCompletion();
 			delete FoliageTask;
 			FoliageTask = nullptr;
-		}
+		}*/
 		if (MesherObject)
 		{
 			delete MesherObject;
