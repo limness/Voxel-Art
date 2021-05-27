@@ -100,6 +100,7 @@ void AVoxelWorld::Tick(float DeltaTime)
 		if (bWorldCreated && bEnableUpdateOctree)
 		{
 			UpdateOctree();
+			UpdateChunks();
 		}
 #endif
 	}
@@ -110,6 +111,7 @@ void AVoxelWorld::Tick(float DeltaTime)
 		if (bWorldCreated && bEnableUpdateOctree)
 		{
 			UpdateOctree();
+			UpdateChunks();
 		}
 	}
 }
@@ -292,7 +294,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 			TotalChunks = ChunkPoolComponent->PoolChunks.Num();
 			for (auto& Chunk : ChunkPoolComponent->PoolChunks)
 			{
-				if (Chunk->MesherTask == nullptr)
+				/*if (Chunk->MesherTask == nullptr)
 				{
 					continue;
 				}
@@ -300,7 +302,8 @@ void AVoxelWorld::DestroyVoxelWorld()
 				{
 					Chunk->MesherTask->EnsureCompletion();
 					delete Chunk->MesherTask;
-				}
+				}*/
+				Chunk->SetPoolActive(this, false);
 				Chunk->DestroyComponent();
 				Chunk = nullptr;
 			}
@@ -310,7 +313,7 @@ void AVoxelWorld::DestroyVoxelWorld()
 		{
 			SCOPE_CYCLE_COUNTER(STAT_DestroyPoolThread);
 			
-			ThreadPool->Destroy();
+			//ThreadPool->Destroy();
 			//ThreadFoliagePool->Destroy();
 
 			bWorldCreated = false;
@@ -356,6 +359,25 @@ void AVoxelWorld::OnPreExit()
 void AVoxelWorld::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+}
+
+void AVoxelWorld::AddChunkToUpdate(UVoxelChunkComponent* Chunk)
+{
+	FScopeLock Lock(&ChunksApplyUpdateMutex);
+
+	ChunksApplyUpdate.Add(Chunk);
+}
+
+void AVoxelWorld::UpdateChunks()
+{
+	FScopeLock Lock(&ChunksApplyUpdateMutex);
+
+	for (auto& Chunk : ChunksApplyUpdate)
+	{
+		Chunk->UpdateMesh();
+		MesherWorkTasksCounter.Decrement();
+	}
+	ChunksApplyUpdate.Empty();
 }
 
 void AVoxelWorld::UpdateOctree()
@@ -473,7 +495,7 @@ void AVoxelWorld::UpdateOctree()
 	{
 		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
 
-		if (TaskWorkGlobalCounter.GetValue() == 0)
+		if (MesherWorkTasksCounter.GetValue() == 0)
 		{
 			if(ChunksCreation.Num() == 0)
 			{
@@ -498,12 +520,14 @@ void AVoxelWorld::UpdateOctree()
 					}
 					{
 						ChunksGeneration.Remove(ChunkData);
+						//ChunksApplyUpdate.Remove(ChunkData->Chunk);
+						//MesherWorkTasksCounter.Decrement();
 
 						if (ChunkData != nullptr)
 						{
 							if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
 							{
-								ChunkData->Chunk->SetPoolActive(false);
+								ChunkData->Chunk->SetPoolActive(this, false);
 								ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
 							}
 							delete ChunkData;
@@ -525,13 +549,19 @@ void AVoxelWorld::UpdateOctree()
 			{
 				FVoxelChunkData* ChunkData = ChunksForceRemoving.Pop();
 
-				ChunksGeneration.Remove(ChunkData);
+				if (ChunksGeneration.Remove(ChunkData))
+				{
+				}
+				if (ChunksApplyUpdate.Remove(ChunkData->Chunk))
+				{
+					MesherWorkTasksCounter.Decrement();
+				}
 
 				if (ChunkData != nullptr)
 				{
 					if (IsValid(ChunkData->Chunk) && ChunkData->Chunk->IsPoolActive())
 					{
-						ChunkData->Chunk->SetPoolActive(false);
+						ChunkData->Chunk->SetPoolActive(this, false);
 						ChunkPoolComponent->FreeChunks.Add(ChunkData->Chunk);
 
 						Index++;
@@ -666,7 +696,7 @@ void AVoxelWorld::CreateChunk(FVoxelChunkData* ChunkData)
 
 		if (!IsValid(PoolChunk))
 		{
-			PoolChunk = ChunkPoolComponent->AddChunkToPool();
+			PoolChunk = ChunkPoolComponent->AddChunkToPool(this);
 		}
 	}
 	{
@@ -686,12 +716,8 @@ void AVoxelWorld::PutChunkOnGeneration(FVoxelChunkData* ChunkData)
 	check(ChunkData != nullptr);
 	check(IsValid(ChunkData->Chunk));
 
-	if (ChunkData->Chunk->CreateMesh(this, ThreadPool, ChunkData))
-	{
-		TaskWorkGlobalCounter.Increment();
-	//	PoolThreads.Add(ChunkData->Chunk->MesherTask);
-	}
-	//ChunkData->Chunk->CreateFoliage(this, ThreadFoliagePool, ChunkData);
+	UVoxelChunkComponent* Chunk = ChunkData->Chunk;
+	Chunk->CreateMesh(this, ThreadPool, ChunkData);
 }
 
 void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* ChunkData)
@@ -718,13 +744,15 @@ void AVoxelWorld::ChunkInitialize(UVoxelChunkComponent* Chunk, FVoxelChunkData* 
 				Chunk->MesherObject = new FVoxelCubesMesher(this, ChunkData);
 				break;
 			}
+
+			//UE_LOG(LogTemp, Warning, TEXT("MesherObject created %p"), Chunk->MesherObject);
 		}
 		Chunk->SetMaterial(0, Material);
 		Chunk->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //QueryAndPhysics
 		Chunk->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); //ECC_WorldDynamic
 		Chunk->AttachToComponent(WorldComponent, FAttachmentTransformRules::KeepWorldTransform);
 		Chunk->SetWorldLocation(TransferToGameWorld(ChunkData->Position));
-		Chunk->SetPoolActive(true);
+		Chunk->SetPoolActive(this, true);
 	}
 }
 

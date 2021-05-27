@@ -31,14 +31,21 @@ public:
 	FAsyncTask<FVoxelMesherAsyncTask>* MesherTask;
 	TArray<FAsyncTask<FVoxelFoliageAsyncTask>*> FoliageTasks;
 
-	FThreadSafeBool MeshComplete;
+	//FThreadSafeBool MeshComplete;
 	FThreadSafeBool FoliageComplete;
 
 	TWeakPtr<FVoxelOctreeData> CurrentOctree;
 	FVoxelDefaultMesher* MesherObject;
 	UMaterialInterface* Material;
 
-	//TArray<>
+	TArray<int32> FoliageObjects;
+
+public:
+
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FLinearColor> VertexColors;
 
 public:
 
@@ -47,7 +54,7 @@ public:
 public:
 
 	bool IsPoolActive();
-	void SetPoolActive(bool activeStatus);
+	void SetPoolActive(AVoxelWorld* World, bool activeStatus);
 
 	FORCEINLINE FVector GetMinimumCorner();
 	FORCEINLINE FVector GetMaximumCorner();
@@ -56,8 +63,8 @@ public:
 	bool CreateMesh(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData);
 	bool CreateFoliage(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData);
 
-	void UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors);
-	void UpdateFoliage(AVoxelWorld* World, TArray<FVector> FoliagePositions);
+	void UpdateMesh();
+	void UpdateFoliage(AVoxelWorld* World, TArray<FTransform> FoliagePositions);
 };
 
 

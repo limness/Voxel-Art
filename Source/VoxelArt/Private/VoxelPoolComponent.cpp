@@ -17,17 +17,15 @@ void UVoxelPoolComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool()
+UVoxelChunkComponent* UVoxelPoolComponent::AddChunkToPool(AVoxelWorld* World)
 {
-	UWorld* const World = GetWorld();
-
-	if (World) 
+	if (World->GetWorld())
 	{
 		FString name = FString::Printf(TEXT("%d"), PoolChunks.Num());
 		UVoxelChunkComponent* PoolableChunk = NewObject<UVoxelChunkComponent>(this, *name);
 		PoolableChunk->OnComponentCreated();
 		PoolableChunk->RegisterComponent();
-		PoolableChunk->SetPoolActive(false);
+		PoolableChunk->SetPoolActive(World, false);
 
 		PoolChunks.Add(PoolableChunk);
 

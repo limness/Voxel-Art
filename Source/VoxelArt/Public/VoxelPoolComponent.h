@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "VoxelPoolComponent.generated.h"
 
+class AVoxelWorld;
 class UVoxelChunkComponent;
 
 /*
@@ -39,7 +40,7 @@ public:
 public:
 
 	// Has our pool free actors or not
-	UVoxelChunkComponent* AddChunkToPool();
+	UVoxelChunkComponent* AddChunkToPool(AVoxelWorld* World);
 
 	// Get our chunk from the pool
 	// If chunk is exist in queue we get it

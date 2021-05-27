@@ -20,7 +20,7 @@ bool UVoxelChunkComponent::IsPoolActive()
 	return PoolActive;
 }
 
-void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
+void UVoxelChunkComponent::SetPoolActive(AVoxelWorld* World, bool activeStatus)
 {
 	PoolActive = activeStatus;
 
@@ -31,20 +31,33 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 			MesherTask->EnsureCompletion();
 			delete MesherTask;
 			MesherTask = nullptr;
-
-			MeshComplete = false;
 		}
-		/*for (auto& FoliageTask : FoliageTasks)
+		for (auto& FoliageTask : FoliageTasks)
 		{
-			FoliageTask->EnsureCompletion();
-			delete FoliageTask;
-			FoliageTask = nullptr;
-		}*/
+		//	FoliageTask->EnsureCompletion();
+			//delete FoliageTask;
+			//FoliageTask = nullptr;
+		}
+		FoliageTasks.Empty();
+
 		if (MesherObject)
 		{
 			delete MesherObject;
 			MesherObject = nullptr;
 		}
+		//for (auto& ObjectIndex : FoliageObjects)
+		{
+			/*if (World->FoliageMeshComponents[0]->RemoveInstance(ObjectIndex))
+			{
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("not success remove"));
+			}*/
+		}
+		FoliageObjects.Empty();
+
 		ClearAllMeshSections();
 		SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -57,6 +70,15 @@ void UVoxelChunkComponent::SetPoolActive(bool activeStatus)
 
 bool UVoxelChunkComponent::CreateMesh(AVoxelWorld* World, FQueuedThreadPool* ThreadPool, FVoxelChunkData* ChunkData)
 {
+	if (MesherTask)
+	{
+		MesherTask->EnsureCompletion();
+		delete MesherTask;
+		MesherTask = nullptr;
+	}
+
+	World->MesherWorkTasksCounter.Increment();
+
 	MesherTask = new FAsyncTask<FVoxelMesherAsyncTask>(World, this, ChunkData, MesherObject);
 	MesherTask->StartBackgroundTask(/*ThreadPool*/);
 
@@ -86,6 +108,8 @@ bool UVoxelChunkComponent::CreateFoliage(AVoxelWorld* World, FQueuedThreadPool* 
 	{
 		if (DistanceBetweenPlayerAndChunk / World->VoxelsPerChunk <= Object.DrawingRadius)
 		{
+			//World->VoxelDebugBox(World->TransferToGameWorld(ChunkData->Position), ChunkData->Size / 2 * World->VoxelMin, 100.f, FColor::Red);
+
 			FAsyncTask<FVoxelFoliageAsyncTask>* FoliageTask = new FAsyncTask<FVoxelFoliageAsyncTask>(World, this, ChunkData);
 			FoliageTask->StartBackgroundTask(/*ThreadPool*/);
 
@@ -96,15 +120,20 @@ bool UVoxelChunkComponent::CreateFoliage(AVoxelWorld* World, FQueuedThreadPool* 
 	return true;
 }
 
-void UVoxelChunkComponent::UpdateMesh(TArray<FVector> Vertices, TArray<int32> Triangles, TArray<FVector> Normals, TArray<FLinearColor> Colors)
+void UVoxelChunkComponent::UpdateMesh()
 { 
 	//ClearMeshSection(0);
 
 	if (Vertices.Num() > 0)
 	{
-		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), Colors, TArray<FVoxelProcMeshTangent>(), true);
+		CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, TArray<FVector2D>(), VertexColors, TArray<FVoxelProcMeshTangent>(), true);
 		SetMaterial(0, Material);
 	}
+
+	Vertices.Empty();
+	Triangles.Empty();
+	Normals.Empty();
+	VertexColors.Empty();
 	//Chunk->CreateFoliage(World, nullptr, Data);
 }
 /*
@@ -113,44 +142,53 @@ void UVoxelChunkComponent::ShouldFoliageBeCreated()
 	//ClearMeshSection(0);
 }*/
 
-void UVoxelChunkComponent::UpdateFoliage(AVoxelWorld* World, TArray<FVector> FoliagePositions)
+void UVoxelChunkComponent::UpdateFoliage(AVoxelWorld* World, TArray<FTransform> FoliagePositions)
 {
-	for (auto& Position : FoliagePositions)
+	for (auto& Transform : FoliagePositions)
 	{
-		FTransform Transform;
-		Transform.SetLocation(Position);
-
-		World->FoliageMeshComponents[0]->AddInstance(Transform);
+		FoliageObjects.Add(World->FoliageMeshComponents[0]->AddInstance(Transform));
 	}
 }
 
 void FVoxelMesherAsyncTask::DoWork()
 {
+	check(IsValid(Chunk));
 	check(MesherObject != nullptr);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Start DoWork Chunk %p"), Chunk);
+
+	MesherObject->TransitionSides = Data->TransitionSides;
 
 	MesherObject->GenerateDensityMap();
 	MesherObject->GenerateMesh();
 
-	TArray<FVector> Vertices =				MesherObject->Vertices;
-	TArray<int32> Triangles =				MesherObject->Triangles;
-	TArray<FVector> Normals =				MesherObject->Normals;
-	TArray<FLinearColor> VertexColors =		MesherObject->VertexColors;
+	Chunk->Vertices =		MesherObject->Vertices;
+	Chunk->Triangles =		MesherObject->Triangles;
+	Chunk->Normals =		MesherObject->Normals;
+	Chunk->VertexColors =	MesherObject->VertexColors;
 
-	AsyncTask(ENamedThreads::GameThread, [=]()
+	//UE_LOG(LogTemp, Warning, TEXT("End use %p"), MesherObject);
+
+	//check(IsValid(Chunk));
+	//UE_LOG(LogTemp, Warning, TEXT("End DoWork Chunk %p"), Chunk);
+
+	World->AddChunkToUpdate(Chunk);
+	//Chunk->MeshComplete = true;
+	/*AsyncTask(ENamedThreads::GameThread, [=]()
 		{
+			check(IsValid(Chunk));
 		//	UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());
 			/*One more check active before we will create mesh*/
-			if (Chunk->IsPoolActive())
+	/*		if (Chunk->IsPoolActive())
 			{
 				Chunk->UpdateMesh(Vertices, Triangles, Normals, VertexColors); 
 
 				//World->ChunksFoliageCreation.Add(Data);
-				//Chunk->CreateFoliage(World, nullptr, Data);
+				Chunk->CreateFoliage(World, nullptr, Data);
 			}
-		});
-
-	Chunk->MeshComplete = true;
-	World->TaskWorkGlobalCounter.Decrement();
+			Chunk->MeshComplete = true;
+			World->TaskWorkGlobalCounter.Decrement();
+		});*/
 	
 //	UE_LOG(LogTemp, Warning, TEXT("Task is done %p"), Data->Chunk);
 }
@@ -160,23 +198,37 @@ void FVoxelFoliageAsyncTask::DoWork()
 {
 	check(World->FoliageConfig != nullptr);
 
-	TArray<FVector> FoliagePositions;
+	TArray<FTransform> FoliagePositions;
 
-	int32 FoliageSteps = World->FoliageConfig->FoliageObject[0].Steps * World->VoxelMin;
-	int32 FoliageCount = 16;//(16 * (World->MaximumLOD - Data->Depth + 1)) / FoliageSteps;
+	float FoliageSteps = Data->Size / World->VoxelsPerChunk * World->VoxelMin;//World->FoliageConfig->FoliageObject[0].Steps;
+	int32 FoliageCount = World->VoxelsPerChunk;//(16 * (World->MaximumLOD - Data->Depth + 1)) / FoliageSteps;
+
+	//UE_LOG(LogTemp, Warning, TEXT("GetComponentLocation %s"), *Chunk->GetComponentLocation().ToString());
 
 	for (int32 X = 0; X < FoliageCount; X++)
 	{
 		for (int32 Y = 0; Y < FoliageCount; Y++)
 		{
-			FVector Start = FVector(X, Y, Data->Size / 2) * FoliageSteps + Chunk->GetComponentLocation() - Data->Size / 2 * World->VoxelMin;
-			FVector End = FVector(X, Y, -Data->Size / 2) * FoliageSteps + Chunk->GetComponentLocation() - Data->Size / 2 * World->VoxelMin;
+			FTransform NewFoliage;
+			FIntVector VoxelPosition = FIntVector(X, Y, 0) + Data->Position - FIntVector(1, 1, 1) * Data->Size;
 
-			/*const FTraceHandle Handle = World->GetWorld()->AsyncLineTraceByChannel(
-				EAsyncTraceType::Single,
-				Start,
-				End,
-				ECC_Visibility);*/
+			if (VoxelPosition.X % World->FoliageConfig->FoliageObject[0].Steps != 0) continue;
+			if (VoxelPosition.Y % World->FoliageConfig->FoliageObject[0].Steps != 0) continue;
+			if (World->FoliageConfig->FoliageObject[0].Random && !FMath::RandBool()) continue;
+
+			////////////////////////////
+			////////////////////////////
+
+			FVector Start = FVector(X, Y, World->VoxelsPerChunk) * FoliageSteps + Chunk->GetComponentLocation() - Data->Size / 2 * World->VoxelMin;/*- Data->Size / 2 * World->VoxelMin*///;
+			FVector End = FVector(X, Y, 0) * FoliageSteps + Chunk->GetComponentLocation() - Data->Size / 2 * World->VoxelMin;
+
+			float Range = World->FoliageConfig->FoliageObject[0].RangeSpawn * World->VoxelMin * World->FoliageConfig->FoliageObject[0].Steps;
+
+			Start += FVector(FMath::RandRange(-Range, Range), FMath::RandRange(-Range, Range), 0);
+			End += FVector(FMath::RandRange(-Range, Range), FMath::RandRange(-Range, Range), 0);
+
+			////////////////////////////
+			////////////////////////////
 
 			TArray<FHitResult> MouseHitResults; 
 
@@ -184,44 +236,22 @@ void FVoxelFoliageAsyncTask::DoWork()
 			{
 				for (auto& Hit : MouseHitResults)
 				{
-				//	FoliagePositions.Add(Hit.ImpactPoint);
-				//	if (Hit.Component == Chunk)
-					if(Chunk->CurrentOctree.Pin()->IsInside(World->TransferToVoxelWorld(Hit.ImpactPoint)))
-					{
-						FoliagePositions.Add(Hit.ImpactPoint);
-					}
+					check(IsValid(Chunk));
 
-				/*	if (HitWorld)
+					//if(Chunk->CurrentOctree.Pin()->IsInside(World->TransferToVoxelWorld(Hit.ImpactPoint)))
 					{
-						HitWorldPosition = Hit.ImpactPoint;
-					}*/
+						if (World->FoliageConfig->FoliageObject[0].RandomRotation)
+						{
+							NewFoliage.SetRotation(FQuat(FRotator(FMath::RandRange(0, 360), FMath::RandRange(0, 360), FMath::RandRange(0, 360))));
+						}
+						NewFoliage.SetLocation((FVector)World->TransferToVoxelWorld(Hit.ImpactPoint));
+						NewFoliage.SetScale3D(FVector::OneVector / 128.f);
+						FoliagePositions.Add(NewFoliage/*Hit.ImpactPoint*/);
+					}
 				}
 			}
 		}
 	}
-
-	//TArray<FHitResult> MouseHitResults;
-	/*
-	if (GetWorld()->LineTraceMultiByChannel(MouseHitResults, Start, End, ECC_Visibility))
-	{
-		for (auto& Hit : MouseHitResults)
-		{
-			HitWorld = Cast<AVoxelWorld>(Hit.Component->GetOwner());
-
-			if (HitWorld)
-			{
-				HitWorldPosition = Hit.ImpactPoint;
-			}
-		}
-	}
-	if (HitWorld)
-	{
-		EditorTool->ToolInitialize(EditorData, HitWorldPosition);
-	}*/
-
-
-	//FoliagePositions.Add(Chunk->GetComponentLocation());
-
 	AsyncTask(ENamedThreads::GameThread, [=]()
 		{
 			//	UE_LOG(LogTemp, Warning, TEXT("From mesher Vertices %d Triangles %d Normals %d"), Vertices.Num(), Triangles.Num(), Normals.Num());

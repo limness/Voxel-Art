@@ -231,6 +231,7 @@ public:
 
 private:
 
+	void UpdateChunks();
 	void UpdateOctree();
 	void InitializeWorld();
 	void CreateChunk(FVoxelChunkData* ChunkData);
@@ -244,6 +245,13 @@ public:
 	* @return	ChunkData		Chunk Data for generation
 	*/
 	void PutChunkOnGeneration(FVoxelChunkData* ChunkData);
+
+	/*
+	* Add a chunk to the array that should apply the new mesh in the next frame.
+	*
+	* @param	Chunk		Chunk to apply mesh
+	*/
+	void AddChunkToUpdate(UVoxelChunkComponent* Chunk);
 
 	/*
 	* Gets all octants of the Octree that intersect with the box
@@ -336,11 +344,11 @@ public:
 	TArray<FVoxelChunkData*>				ChunksCreation;
 	TSet<FVoxelChunkData*>					ChunksGeneration;
 	TSet<FVoxelChunkData*>					ChunksRemoving;
-	TSet<FVoxelChunkData*>					ChunksFoliageCreation;
 	TArray<FVoxelChunkData*>				ChunksForceRemoving;
-	TArray<UVoxelChunkComponent*>			ChunkComponents;
 
 	TArray<FVoxelChunkData*>				TemporaryChunks;
+
+	TSet<UVoxelChunkComponent*>				ChunksApplyUpdate;
 
 public:
 
@@ -354,9 +362,10 @@ public:
 
 	FQueuedThreadPool* ThreadPool;
 	FQueuedThreadPool* ThreadFoliagePool;
-	FThreadSafeCounter TaskWorkGlobalCounter;
+	FThreadSafeCounter MesherWorkTasksCounter;
 
 	FCriticalSection OctreeMutex;
+	FCriticalSection ChunksApplyUpdateMutex;
 
 	TArray<FAsyncTask<FVoxelMesherAsyncTask>*> PoolThreads;
 	

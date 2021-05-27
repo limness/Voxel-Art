@@ -22,8 +22,6 @@ public:
 
 private:
 
-	uint8 TransitionSides;
-
 	TArray<FVector> positionSide;
 
 private:

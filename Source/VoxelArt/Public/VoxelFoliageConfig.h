@@ -28,9 +28,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Radius (in chunks)")
 	int DrawingRadius = 4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Random Spawn")
+	bool Random = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Random Rotation")
+	bool RandomRotation = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Range Spawn")
+	float RangeSpawn = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Offset Spawn")
+	FTransform Offset;
+
 	//TODO: Make priority system
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Priority")
-	int Priority = 0;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"), DisplayName = "Priority")
+	//int Priority = 0;
 
 	FVoxelFoliageObject()
 	{

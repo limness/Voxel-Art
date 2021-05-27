@@ -38,6 +38,8 @@ protected:
 
 public:
 
+	uint8 TransitionSides;
+
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
 	TArray<FVector> Normals;

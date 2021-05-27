@@ -7,7 +7,7 @@
 
 FVoxelMarchingCubesMesher::FVoxelMarchingCubesMesher(AVoxelWorld* _World, FVoxelChunkData* _Data)
 	: FVoxelDefaultMesher(_World, _Data)
-	, TransitionSides(_Data->TransitionSides)
+	//, TransitionSides(_Data->TransitionSides)
 {
 }
 
