@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Helpers/VoxelProceduralMeshComponent.h"
+#include "VoxelFoliageConfig.h"
 #include "VoxelChunkComponent.generated.h"
 
 class AVoxelWorld;
@@ -13,6 +14,7 @@ class FVoxelOctreeData;
 class FVoxelChunkData;
 class FVoxelMesherAsyncTask;
 class FVoxelFoliageAsyncTask;
+//struct FVoxelFoliageObject;
 
 /*
 * Voxel Chunk Component class
@@ -109,9 +111,10 @@ class FVoxelFoliageAsyncTask : public FNonAbandonableTask
 {
 public:
 
-	FVoxelFoliageAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelChunkData* _Data)
+	FVoxelFoliageAsyncTask(AVoxelWorld* _World, UVoxelChunkComponent* _Chunk, FVoxelFoliageObject _Foliage, FVoxelChunkData* _Data)
 		: World(_World)
 		, Chunk(_Chunk)
+		, Foliage(_Foliage)
 		, Data(_Data)
 	{
 	}
@@ -120,6 +123,7 @@ public:
 
 	AVoxelWorld* World;
 	UVoxelChunkComponent* Chunk;
+	FVoxelFoliageObject Foliage;
 	FVoxelChunkData* Data;
 
 public:

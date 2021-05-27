@@ -251,7 +251,7 @@ public:
 	*
 	* @param	Chunk		Chunk to apply mesh
 	*/
-	void AddChunkToUpdate(UVoxelChunkComponent* Chunk);
+	void AddChunkToUpdate(UVoxelChunkComponent* ChunkData);
 
 	/*
 	* Gets all octants of the Octree that intersect with the box
@@ -348,7 +348,7 @@ public:
 
 	TArray<FVoxelChunkData*>				TemporaryChunks;
 
-	TSet<UVoxelChunkComponent*>				ChunksApplyUpdate;
+	TSet<UVoxelChunkComponent*>					ChunksApplyUpdate;
 
 public:
 

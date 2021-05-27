@@ -361,20 +361,23 @@ void AVoxelWorld::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
-void AVoxelWorld::AddChunkToUpdate(UVoxelChunkComponent* Chunk)
+void AVoxelWorld::AddChunkToUpdate(UVoxelChunkComponent* ChunkData)
 {
 	FScopeLock Lock(&ChunksApplyUpdateMutex);
 
-	ChunksApplyUpdate.Add(Chunk);
+	ChunksApplyUpdate.Add(ChunkData);
 }
 
 void AVoxelWorld::UpdateChunks()
 {
 	FScopeLock Lock(&ChunksApplyUpdateMutex);
 
-	for (auto& Chunk : ChunksApplyUpdate)
+	for (auto& ChunkData : ChunksApplyUpdate)
 	{
-		Chunk->UpdateMesh();
+		//UVoxelChunkComponent* Chunk = ChunkData->Chunk;
+		ChunkData->UpdateMesh();
+		//Chunk->CreateFoliage(this, nullptr, ChunkData);
+
 		MesherWorkTasksCounter.Decrement();
 	}
 	ChunksApplyUpdate.Empty();
@@ -494,6 +497,8 @@ void AVoxelWorld::UpdateOctree()
 	}
 	{
 		SCOPE_CYCLE_COUNTER(STAT_RemoveChunks);
+
+		VOXEL_LOG(TEXT("MesherWorkTasksCounter (%d chunks)"), MesherWorkTasksCounter.GetValue());
 
 		if (MesherWorkTasksCounter.GetValue() == 0)
 		{
